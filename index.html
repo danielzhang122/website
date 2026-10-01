@@ -753,7 +753,7 @@
       </div>
 
       <div class="projects-grid">
-        <!-- Project 1: Featured Quadruped Robot (Assembly CAD & Chassis) -->
+        <!-- Project 1: Featured Quadruped Robot (Assembly CAD) -->
         <div class="project-card featured" data-category="hardware">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img class="fit-contain" src="quadriped.png" alt="Quadruped Robot Assembly" onerror="this.onerror=null; this.src='images/quadriped.png';" />
@@ -772,13 +772,15 @@
           </div>
         </div>
 
-        <!-- Project 1b: Featured Quadruped Locomotion Simulation (Video: yurr(2).mp4) -->
+        <!-- Project 1b: Featured Quadruped Locomotion Simulation (GIF) -->
         <div class="project-card featured" data-category="simulation">
-          <div class="project-img-wrapper" onclick="openLightboxMedia('video', this.querySelector('source').src)">
-            <video autoplay loop muted playsinline class="fit-contain">
-              <source src="yurr(2).mp4" type="video/mp4">
-              <source src="images/yurr(2).mp4" type="video/mp4">
-            </video>
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img 
+              class="fit-contain" 
+              src="yurr.gif" 
+              alt="Quadruped Locomotion Simulation Loop" 
+              onerror="this.onerror=null; this.src='images/yurr.gif'; this.onerror=() => { this.src='yurr.GIF'; this.onerror=() => { this.src='images/yurr.GIF'; }; };" 
+            />
             <div class="img-tag">[SIM-DYNAMICS]</div>
           </div>
           <div class="project-body">
@@ -838,12 +840,12 @@
           </div>
         </div>
 
-        <!-- Project 4: Looping High-Voltage Pulse Rig (Hardware) -->
+        <!-- Project 4: Looping High-Voltage Pulse Rig (Hardware Video) -->
         <div class="project-card" data-category="hardware">
           <div class="project-img-wrapper" onclick="openLightboxMedia('video', this.querySelector('source').src)">
             <video autoplay loop muted playsinline>
-              <source src="taser(1).mp4" type="video/mp4">
-              <source src="images/taser(1).mp4" type="video/mp4">
+              <source src="taser.mp4" type="video/mp4">
+              <source src="images/taser.mp4" type="video/mp4">
             </video>
             <div class="img-tag">[HIGH-VOLT]</div>
           </div>
