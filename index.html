@@ -147,7 +147,7 @@
       align-items: flex-start;
     }
 
-    /* Status badge sitting strictly on its own block row */
+    /* Status badge cleanly on its own row */
     .hazard-strip {
       display: inline-flex;
       align-items: center;
@@ -171,7 +171,7 @@
       box-shadow: 0 0 8px var(--blood-glow);
     }
 
-    /* Name Header as a distinct block */
+    /* Dedicated line for the title */
     .glitch {
       display: block;
       width: 100%;
@@ -375,7 +375,7 @@
       box-shadow: inset 0 0 8px rgba(225, 29, 72, 0.3);
     }
 
-    /* Projects Grid - Larger and Responsive */
+    /* Projects Grid */
     .projects-grid {
       display: grid;
       grid-template-columns: repeat(12, 1fr);
@@ -394,7 +394,6 @@
       overflow: hidden;
     }
 
-    /* Featured Full-Width Card for detailed models */
     .project-card.featured {
       grid-column: span 12;
       display: grid;
@@ -763,7 +762,7 @@
       </div>
 
       <div class="projects-grid">
-        <!-- Project 1: Featured Quadruped Robot (Widescreen Card) -->
+        <!-- Project 1: Featured Quadruped Robot -->
         <div class="project-card featured" data-category="hardware">
           <div class="project-img-wrapper" onclick="openLightbox('images/quadriped.png')">
             <img class="fit-contain" src="images/quadriped.png" alt="Quadruped Robot Assembly" onerror="this.src='quadriped.png'" />
@@ -782,7 +781,7 @@
           </div>
         </div>
 
-        <!-- Project 2: Featured Suspension POC (Widescreen Card) -->
+        <!-- Project 2: Featured Suspension POC -->
         <div class="project-card featured" data-category="simulation">
           <div class="project-img-wrapper" onclick="openLightbox('images/POC suspension.png')">
             <img class="fit-contain" src="images/POC suspension.png" alt="Suspension Concept" onerror="this.src='POC suspension.png'" />
@@ -801,8 +800,8 @@
           </div>
         </div>
 
-        <!-- Project 3: Oscilloscope Visuals -->
-        <div class="project-card" data-category="software">
+        <!-- Project 3: Oscilloscope Visuals (Hardware / Circuits) -->
+        <div class="project-card" data-category="hardware">
           <div class="project-img-wrapper" onclick="openLightbox('images/cool.jpg')">
             <img src="images/cool.jpg" alt="Oscilloscope Trace" onerror="this.src='cool.jpg'" />
             <div class="img-tag">[SYS-SCOPE]</div>
