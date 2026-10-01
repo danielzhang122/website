@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio & Projects</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --card-bg: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --border: #334155;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 0 1.5rem;
+    }
+
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 4rem 0;
+    }
+
+    header {
+      margin-bottom: 4rem;
+    }
+
+    .tagline {
+      color: var(--accent);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-size: 0.875rem;
+      margin-bottom: 0.5rem;
+    }
+
+    h1 {
+      font-size: 2.75rem;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+    }
+
+    p.lead {
+      color: var(--muted);
+      font-size: 1.25rem;
+      max-width: 600px;
+    }
+
+    .links {
+      display: flex;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .btn-primary {
+      background-color: var(--accent);
+      color: #0f172a;
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-secondary {
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--muted);
+    }
+
+    section {
+      margin-bottom: 4rem;
+    }
+
+    h2 {
+      font-size: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.75rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1.5rem;
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+    }
+
+    .card h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .card p {
+      color: var(--muted);
+      font-size: 0.95rem;
+      margin-bottom: 1rem;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .tag {
+      background: #0f172a;
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-family: monospace;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 0;
+      color: var(--muted);
+      font-size: 0.875rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="tagline">Engineering & Software</div>
+      <h1>Hi, I'm [Your Name].</h1>
+      <p class="lead">Building robotics, embedded systems, and automated software workflows.</p>
+      <div class="links">
+        <a href="https://github.com/[your-username]" class="btn btn-primary" target="_blank">GitHub Profile</a>
+        <a href="mailto:your-email@example.com" class="btn btn-secondary">Contact Me</a>
+      </div>
+    </header>
+
+    <section>
+      <h2>Featured Projects</h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Automated Workflow Engine</h3>
+          <p>End-to-end automation pipelines designed to cross-reference databases and verify documentation accuracy.</p>
+          <div class="tags">
+            <span class="tag">Automation</span>
+            <span class="tag">Python</span>
+            <span class="tag">API</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Embedded Control System</h3>
+          <p>Real-time microcontroller firmware controlling multi-axis actuators with high-precision feedback loops.</p>
+          <div class="tags">
+            <span class="tag">C++</span>
+            <span class="tag">ESP32</span>
+            <span class="tag">Hardware</span>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Kinematics & Dynamics Sim</h3>
+          <p>Physics-based simulation models for testing vehicle suspension stability and dynamic load distributions.</p>
+          <div class="tags">
+            <span class="tag">Simulation</span>
+            <span class="tag">CAD</span>
+            <span class="tag">Dynamics</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      &copy; 2026 [Your Name]. Hosted with GitHub Pages.
+    </footer>
+  </div>
+</body>
+</html>
