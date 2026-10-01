@@ -70,7 +70,7 @@
     }
 
     .nav-container {
-      max-width: 1020px;
+      max-width: 1080px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
@@ -115,7 +115,7 @@
     }
 
     .container {
-      max-width: 1020px;
+      max-width: 1080px;
       margin: 0 auto;
       padding: 0 1.5rem;
     }
@@ -363,13 +363,15 @@
       box-shadow: inset 0 0 8px rgba(225, 29, 72, 0.3);
     }
 
+    /* Projects Grid - Larger and Responsive */
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      grid-template-columns: repeat(12, 1fr);
       gap: 1.5rem;
     }
 
     .project-card {
+      grid-column: span 6;
       background: var(--card-bg);
       border: 1px solid #20222a;
       display: flex;
@@ -380,52 +382,75 @@
       overflow: hidden;
     }
 
+    /* Full-width featured card for detailed diagrams */
+    .project-card.featured {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: 1.25fr 1fr;
+    }
+
+    .project-card.featured .project-img-wrapper {
+      height: 380px;
+      border-bottom: none;
+      border-right: 1px solid #20222a;
+    }
+
     .project-card:hover {
       border-color: var(--blood);
       transform: translateY(-2px);
       box-shadow: 0 4px 20px -5px rgba(225, 29, 72, 0.3);
     }
 
+    /* Increased Frame Heights */
     .project-img-wrapper {
       position: relative;
       width: 100%;
-      height: 200px;
-      background: #08080a;
+      height: 280px;
+      background: #050608;
       overflow: hidden;
       border-bottom: 1px solid #20222a;
       cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .project-img-wrapper img, .project-img-wrapper video {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      filter: grayscale(70%) contrast(115%) brightness(90%);
+      filter: contrast(110%) brightness(95%);
       transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    /* Keeps entire CAD assembly / blueprint visible without clipping */
+    .project-img-wrapper img.fit-contain {
+      object-fit: contain;
+      padding: 0.5rem;
     }
 
     .project-card:hover .project-img-wrapper img,
     .project-card:hover .project-img-wrapper video {
-      filter: grayscale(0%) contrast(105%) brightness(100%);
-      transform: scale(1.04);
+      filter: contrast(115%) brightness(105%);
+      transform: scale(1.02);
     }
 
     .img-tag {
       position: absolute;
-      top: 8px;
-      right: 8px;
-      background: rgba(9, 9, 11, 0.85);
+      top: 10px;
+      right: 10px;
+      background: rgba(9, 9, 11, 0.9);
       border: 1px solid var(--border-accent);
-      color: var(--blood);
+      color: var(--blood-glow);
       font-size: 0.65rem;
-      padding: 0.15rem 0.4rem;
-      font-weight: 700;
+      padding: 0.2rem 0.5rem;
+      font-weight: 800;
       letter-spacing: 0.05em;
       z-index: 2;
     }
 
     .project-body {
-      padding: 1.5rem;
+      padding: 1.75rem;
       display: flex;
       flex-direction: column;
       flex-grow: 1;
@@ -433,14 +458,15 @@
     }
 
     .project-card h3 {
-      font-size: 1.15rem;
+      font-size: 1.25rem;
       color: #fff;
-      margin-bottom: 0.5rem;
+      margin-bottom: 0.6rem;
     }
 
     .project-card p {
       color: var(--muted);
-      font-size: 0.85rem;
+      font-size: 0.88rem;
+      line-height: 1.55;
       margin-bottom: 1.25rem;
     }
 
@@ -455,42 +481,47 @@
       background: #09090b;
       border: 1px solid var(--border-accent);
       color: var(--blood-glow);
-      padding: 0.2rem 0.5rem;
+      padding: 0.25rem 0.55rem;
       font-size: 0.7rem;
       font-weight: 600;
     }
 
+    /* Enlarged Gallery Grid */
     .gallery-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
       gap: 1.25rem;
     }
 
     .gallery-item {
       position: relative;
-      height: 180px;
+      height: 240px;
       border: 1px solid #20222a;
       overflow: hidden;
       cursor: pointer;
-      background: #08080a;
-      transition: border-color 0.2s ease;
+      background: #050608;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .gallery-item:hover {
       border-color: var(--blood);
+      transform: translateY(-2px);
     }
 
     .gallery-item img {
       width: 100%;
       height: 100%;
-      object-fit: cover;
-      filter: grayscale(85%) contrast(115%);
+      object-fit: contain;
+      padding: 0.4rem;
+      filter: contrast(110%);
       transition: all 0.3s ease;
     }
 
     .gallery-item:hover img {
-      filter: grayscale(0%) contrast(100%);
-      transform: scale(1.05);
+      transform: scale(1.04);
     }
 
     .gallery-item-caption {
@@ -498,10 +529,10 @@
       bottom: 0;
       left: 0;
       right: 0;
-      background: rgba(9, 9, 11, 0.85);
+      background: rgba(9, 9, 11, 0.92);
       border-top: 1px solid var(--border-accent);
-      padding: 0.3rem 0.6rem;
-      font-size: 0.7rem;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.72rem;
       color: var(--text);
     }
 
@@ -557,16 +588,17 @@
       line-height: 1.5;
     }
 
+    /* Modal / Lightbox for viewing photos and video */
     .lightbox {
       display: none;
       position: fixed;
       top: 0; left: 0; right: 0; bottom: 0;
-      background: rgba(9, 9, 11, 0.95);
+      background: rgba(7, 8, 10, 0.96);
       z-index: 1000;
       justify-content: center;
       align-items: center;
-      padding: 2rem;
-      backdrop-filter: blur(8px);
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
     }
 
     .lightbox.active {
@@ -574,19 +606,20 @@
     }
 
     .lightbox-content {
-      max-width: 90%;
-      max-height: 85%;
+      max-width: 92vw;
+      max-height: 90vh;
       border: 2px solid var(--blood);
-      box-shadow: 0 0 30px rgba(225, 29, 72, 0.4);
+      box-shadow: 0 0 35px rgba(225, 29, 72, 0.5);
       object-fit: contain;
+      background: #000;
     }
 
     .lightbox-close {
       position: absolute;
-      top: 2rem;
+      top: 1.5rem;
       right: 2rem;
       color: var(--blood);
-      font-size: 2rem;
+      font-size: 2.5rem;
       cursor: pointer;
       font-family: monospace;
       font-weight: bold;
@@ -602,7 +635,17 @@
       letter-spacing: 0.1em;
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 900px) {
+      .project-card, .project-card.featured {
+        grid-column: span 12;
+        display: flex;
+        flex-direction: column;
+      }
+      .project-card.featured .project-img-wrapper {
+        border-right: none;
+        border-bottom: 1px solid #20222a;
+        height: 280px;
+      }
       .nav-links {
         display: none;
       }
@@ -709,10 +752,10 @@
       </div>
 
       <div class="projects-grid">
-        <!-- Project 1: Quadruped Robot -->
-        <div class="project-card" data-category="hardware">
+        <!-- Project 1: Featured Quadruped Robot (Widescreen Card) -->
+        <div class="project-card featured" data-category="hardware">
           <div class="project-img-wrapper" onclick="openLightbox('images/quadriped.png')">
-            <img src="images/quadriped.png" alt="Quadruped Robot Assembly" onerror="this.src='quadriped.png'" />
+            <img class="fit-contain" src="images/quadriped.png" alt="Quadruped Robot Assembly" onerror="this.src='quadriped.png'" />
             <div class="img-tag">[MECH-ROBOT]</div>
           </div>
           <div class="project-body">
@@ -728,10 +771,10 @@
           </div>
         </div>
 
-        <!-- Project 2: Suspension POC -->
-        <div class="project-card" data-category="simulation">
+        <!-- Project 2: Featured Suspension POC (Widescreen Card) -->
+        <div class="project-card featured" data-category="simulation">
           <div class="project-img-wrapper" onclick="openLightbox('images/POC suspension.png')">
-            <img src="images/POC suspension.png" alt="Suspension Concept" onerror="this.src='POC suspension.png'" />
+            <img class="fit-contain" src="images/POC suspension.png" alt="Suspension Concept" onerror="this.src='POC suspension.png'" />
             <div class="img-tag">[CAD-PROTO]</div>
           </div>
           <div class="project-body">
@@ -747,28 +790,27 @@
           </div>
         </div>
 
-        <!-- Project 3: Automated Standards Registry Auditor -->
+        <!-- Project 3: Oscilloscope Visuals -->
         <div class="project-card" data-category="software">
           <div class="project-img-wrapper" onclick="openLightbox('images/cool.jpg')">
-            <img src="images/cool.jpg" alt="Automated Auditor" onerror="this.src='cool.jpg'" />
-            <div class="img-tag">[SYS-AUTO]</div>
+            <img src="images/cool.jpg" alt="Oscilloscope Trace" onerror="this.src='cool.jpg'" />
+            <div class="img-tag">[SYS-SCOPE]</div>
           </div>
           <div class="project-body">
             <div>
-              <h3>Automated Standards Registry Auditor</h3>
-              <p>Robotic process automation pipeline linking live database registries with engineering documentation to ensure strict compliance verification.</p>
+              <h3>Oscilloscope stuff</h3>
+              <p>this isnt rlly a project, some mistake we made in our circuits lab that had the graph generate some cool visuals. just thought id share</p>
             </div>
             <div class="project-tags">
-              <span class="project-tag">Power Automate</span>
-              <span class="project-tag">AI Builder</span>
-              <span class="project-tag">Python</span>
+              <span class="project-tag">Oscilloscope</span>
+              <span class="project-tag">Analog/Digital Electronics</span>
             </div>
           </div>
         </div>
 
-        <!-- Project 4: Embedded High-Voltage / Taser Rig with looping video -->
+        <!-- Project 4: Looping High-Voltage Pulse Rig -->
         <div class="project-card" data-category="hardware">
-          <div class="project-img-wrapper">
+          <div class="project-img-wrapper" onclick="openLightboxMedia('video', 'images/taser.mp4')">
             <video autoplay loop muted playsinline>
               <source src="images/taser.mp4" type="video/mp4">
               <source src="taser.mp4" type="video/mp4">
@@ -778,7 +820,7 @@
           <div class="project-body">
             <div>
               <h3>High-Voltage Pulse Discharge System</h3>
-              <p>Capacitive discharge and high-voltage arc firing mechanism with isolated gate switching and embedded trigger control.</p>
+              <p>capacitive discharge and high-voltage arc firing mechanism with embedded trigger control compatible with usb-c charging. not sure if this is very legal.</p>
             </div>
             <div class="project-tags">
               <span class="project-tag">Hardware</span>
@@ -790,7 +832,7 @@
       </div>
     </section>
 
-    <!-- Lab & CAD Gallery -->
+    <!-- Hardware & CAD Gallery -->
     <section id="gallery">
       <div class="section-header">
         <h2>Hardware & CAD Bench</h2>
@@ -805,17 +847,17 @@
 
         <div class="gallery-item" onclick="openLightbox('images/mbedpen.jpeg')">
           <img src="images/mbedpen.jpeg" alt="Embedded Pen / Microcontroller" onerror="this.src='mbedpen.jpeg'" />
-          <div class="gallery-item-caption">// Embedded Pen Prototype</div>
+          <div class="gallery-item-caption">// THC pen battery for embedded final</div>
         </div>
 
         <div class="gallery-item" onclick="openLightbox('images/cool2.jpg')">
           <img src="images/cool2.jpg" alt="Lab Test Setup" onerror="this.src='cool2.jpg'" />
-          <div class="gallery-item-caption">// Prototype Bench Test</div>
+          <div class="gallery-item-caption">// Circuits lab waveform capture</div>
         </div>
 
         <div class="gallery-item" onclick="openLightbox('images/cool.jpg')">
           <img src="images/cool.jpg" alt="Field Rig" onerror="this.src='cool.jpg'" />
-          <div class="gallery-item-caption">// Field & System Rig</div>
+          <div class="gallery-item-caption">// Scope resonance pattern</div>
         </div>
       </div>
     </section>
@@ -833,7 +875,7 @@
           <div class="timeline-title">Nuclear Engineering Intern</div>
           <div class="timeline-org">Eclipse Automation</div>
           <div class="timeline-desc">
-            Assisted nuclear engineering teams with technical compliance verification, workflow automation, and documentation audits against regulatory safety standards. Working on the Pickering RFBR mainly, sometimes some other cool nuclear projects.
+            Assisted the nuclear engineering team. Wrote some (relatively) important documents, did some calculations, conducted a few tests, etc. working on the Pickering RFBR mainly, sometimes some other cool nuclear projects.
           </div>
         </div>
 
@@ -862,9 +904,11 @@
     </footer>
   </div>
 
+  <!-- Lightbox Modal supporting Image or Video -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <span class="lightbox-close">&times;</span>
-    <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview">
+    <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview" style="display:none;">
+    <video class="lightbox-content" id="lightbox-video" autoplay loop muted controls playsinline style="display:none;"></video>
   </div>
 
   <script>
@@ -877,7 +921,7 @@
 
       cards.forEach(card => {
         if (category === 'all' || card.dataset.category === category) {
-          card.style.display = 'flex';
+          card.style.display = card.classList.contains('featured') && window.innerWidth > 900 ? 'grid' : 'flex';
         } else {
           card.style.display = 'none';
         }
@@ -885,14 +929,31 @@
     }
 
     function openLightbox(src) {
+      openLightboxMedia('img', src);
+    }
+
+    function openLightboxMedia(type, src) {
       const lb = document.getElementById('lightbox');
       const img = document.getElementById('lightbox-img');
-      img.src = src;
+      const video = document.getElementById('lightbox-video');
+
+      if (type === 'video') {
+        img.style.display = 'none';
+        video.style.display = 'block';
+        video.src = src;
+      } else {
+        video.style.display = 'none';
+        img.style.display = 'block';
+        img.src = src;
+      }
       lb.classList.add('active');
     }
 
     function closeLightbox() {
-      document.getElementById('lightbox').classList.remove('active');
+      const lb = document.getElementById('lightbox');
+      const video = document.getElementById('lightbox-video');
+      video.pause();
+      lb.classList.remove('active');
     }
 
     const canvas = document.getElementById('smoke-canvas');
