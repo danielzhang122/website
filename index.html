@@ -3,67 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Daniel Zhang | Engineering & Robotics</title>
+  <title>DANIEL // MECHATRONICS</title>
+  <!-- Gritty Condensed & Monospace Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,700;1,700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: rgba(18, 24, 38, 0.7);
-      --card-border: rgba(51, 65, 85, 0.5);
-      --card-hover: rgba(56, 189, 248, 0.2);
-      --text: #f1f5f9;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --accent-dim: rgba(56, 189, 248, 0.1);
-      --border: #1e293b;
+      --bg: #09090b;
+      --card-bg: #111215;
+      --border: #27272a;
+      --border-accent: #540d1c;
+      --blood: #e11d48;
+      --blood-glow: #ff1e56;
+      --crimson-dim: rgba(225, 29, 72, 0.12);
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --dark-muted: #52525b;
+      --hazard: #ffd23f;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       scroll-behavior: smooth;
     }
 
     body {
       background-color: var(--bg);
       color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
       line-height: 1.6;
+      overflow-x: hidden;
+      /* Heavy industrial grunge texture overlay using CSS patterns */
       background-image: 
-        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
-        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.06) 0px, transparent 50%);
+        radial-gradient(ellipse at 80% 0%, rgba(225, 29, 72, 0.15) 0%, transparent 60%),
+        radial-gradient(ellipse at 10% 100%, rgba(136, 19, 55, 0.2) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35) 1px, transparent 1px, transparent 3px);
       background-attachment: fixed;
     }
 
-    /* Navigation */
+    /* Scanline effect */
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      z-index: 999;
+      background-size: 100% 3px, 6px 100%;
+      pointer-events: none;
+    }
+
+    h1, h2, h3, .logo {
+      font-family: 'Chakra Petch', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    /* Top Bar */
     nav {
       position: sticky;
       top: 0;
-      backdrop-filter: blur(12px);
-      background: rgba(11, 15, 25, 0.85);
-      border-bottom: 1px solid var(--border);
+      background: rgba(9, 9, 11, 0.95);
+      border-bottom: 2px solid var(--border-accent);
       z-index: 100;
+      backdrop-filter: blur(4px);
     }
 
     .nav-container {
-      max-width: 960px;
+      max-width: 980px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 1rem 1.5rem;
+      padding: 0.9rem 1.5rem;
     }
 
     .logo {
       font-weight: 700;
-      font-size: 1.1rem;
-      letter-spacing: -0.02em;
+      font-size: 1.25rem;
       color: var(--text);
       text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
     }
 
-    .logo span {
-      color: var(--accent);
+    .logo .cross {
+      color: var(--blood);
+      font-size: 1.4rem;
+      text-shadow: 0 0 10px var(--blood-glow);
     }
 
     .nav-links {
@@ -75,63 +107,73 @@
     .nav-links a {
       color: var(--muted);
       text-decoration: none;
-      font-size: 0.9rem;
-      font-weight: 500;
-      transition: color 0.2s ease;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
     }
 
     .nav-links a:hover {
-      color: var(--accent);
+      color: var(--blood-glow);
+      text-shadow: 0 0 8px rgba(255, 30, 86, 0.6);
     }
 
-    /* Container */
     .container {
-      max-width: 960px;
+      max-width: 980px;
       margin: 0 auto;
       padding: 0 1.5rem;
     }
 
-    /* Hero */
+    /* Hero / Terminal Header */
     header {
-      padding: 5rem 0 4rem;
+      padding: 5rem 0 3.5rem;
+      position: relative;
     }
 
-    .badge {
+    .hazard-strip {
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
+      background: #180509;
+      border: 1px solid var(--blood);
       padding: 0.35rem 0.85rem;
-      border-radius: 9999px;
-      background: var(--accent-dim);
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      color: var(--accent);
-      font-size: 0.8rem;
-      font-weight: 600;
+      color: var(--blood-glow);
+      font-size: 0.75rem;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.12em;
       margin-bottom: 1.25rem;
+      box-shadow: 0 0 12px rgba(225, 29, 72, 0.25);
     }
 
-    .badge-dot {
-      width: 7px;
-      height: 7px;
-      background: var(--accent);
-      border-radius: 50%;
+    .hazard-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--blood-glow);
+      box-shadow: 0 0 8px var(--blood-glow);
     }
 
     h1 {
-      font-size: clamp(2.25rem, 5vw, 3.25rem);
-      line-height: 1.15;
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      margin-bottom: 1rem;
+      font-size: clamp(2.5rem, 6vw, 4rem);
+      line-height: 1;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 2px 2px 0px #3f0914, 4px 4px 0px #180307;
+      margin-bottom: 1.25rem;
+    }
+
+    h1 span {
+      color: var(--blood);
     }
 
     p.lead {
       color: var(--muted);
-      font-size: 1.15rem;
-      max-width: 680px;
-      margin-bottom: 2rem;
+      font-size: 1.05rem;
+      max-width: 640px;
+      margin-bottom: 2.25rem;
+      border-left: 2px solid var(--blood);
+      padding-left: 1rem;
+      background: linear-gradient(90deg, rgba(225, 29, 72, 0.05), transparent);
     }
 
     .btn-group {
@@ -144,39 +186,44 @@
       display: inline-flex;
       align-items: center;
       gap: 0.5rem;
-      padding: 0.65rem 1.4rem;
-      border-radius: 8px;
-      font-size: 0.95rem;
-      font-weight: 600;
+      padding: 0.75rem 1.4rem;
+      font-size: 0.85rem;
+      font-weight: 800;
       text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       transition: all 0.2s ease;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
     }
 
     .btn-primary {
-      background-color: var(--accent);
-      color: #0b0f19;
+      background: var(--blood);
+      color: #fff;
+      box-shadow: 0 0 14px rgba(225, 29, 72, 0.4);
     }
 
     .btn-primary:hover {
-      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
-      transform: translateY(-1px);
+      background: var(--blood-glow);
+      box-shadow: 0 0 20px rgba(255, 30, 86, 0.8);
+      transform: translate(-1px, -1px);
     }
 
     .btn-secondary {
-      background: var(--card-bg);
+      background: #14151a;
       border: 1px solid var(--border);
       color: var(--text);
     }
 
     .btn-secondary:hover {
-      border-color: var(--muted);
-      transform: translateY(-1px);
+      border-color: var(--blood);
+      color: var(--blood-glow);
     }
 
     /* Sections */
     section {
-      padding: 3.5rem 0;
-      border-top: 1px solid var(--border);
+      padding: 4rem 0;
+      border-top: 1px dashed #2f1219;
+      position: relative;
     }
 
     .section-header {
@@ -184,13 +231,23 @@
     }
 
     .section-header h2 {
-      font-size: 1.75rem;
-      letter-spacing: -0.02em;
+      font-size: 1.85rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-header h2::before {
+      content: "//";
+      color: var(--blood);
+      font-weight: 800;
     }
 
     .section-header p {
-      color: var(--muted);
-      font-size: 0.95rem;
+      color: var(--dark-muted);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
     }
 
     /* Skills Grid */
@@ -202,57 +259,64 @@
 
     .skill-card {
       background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 10px;
+      border: 1px solid #1f2229;
+      border-left: 3px solid var(--border);
       padding: 1.25rem;
+      transition: all 0.2s ease;
+    }
+
+    .skill-card:hover {
+      border-left-color: var(--blood);
+      background: #16181f;
     }
 
     .skill-card h3 {
-      font-size: 0.95rem;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      margin-bottom: 0.75rem;
+      font-size: 0.9rem;
+      color: var(--blood);
+      margin-bottom: 0.85rem;
+      letter-spacing: 0.08em;
     }
 
     .pill-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 0.4rem;
     }
 
     .pill {
-      background: rgba(15, 23, 42, 0.8);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-size: 0.8rem;
-      padding: 0.25rem 0.6rem;
-      border-radius: 6px;
+      background: #09090b;
+      border: 1px solid #27272a;
+      color: var(--muted);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.55rem;
     }
 
     /* Filter Controls */
     .filter-bar {
       display: flex;
       gap: 0.5rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.75rem;
       flex-wrap: wrap;
     }
 
     .filter-btn {
-      background: transparent;
+      background: #111215;
       border: 1px solid var(--border);
       color: var(--muted);
-      padding: 0.4rem 0.9rem;
-      border-radius: 6px;
-      font-size: 0.85rem;
+      padding: 0.4rem 0.85rem;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      text-transform: uppercase;
       cursor: pointer;
       transition: all 0.2s ease;
     }
 
     .filter-btn.active, .filter-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: var(--accent-dim);
+      border-color: var(--blood);
+      color: #fff;
+      background: var(--crimson-dim);
+      box-shadow: inset 0 0 8px rgba(225, 29, 72, 0.3);
     }
 
     /* Projects Grid */
@@ -264,58 +328,73 @@
 
     .project-card {
       background: var(--card-bg);
-      border: 1px solid var(--card-border);
-      border-radius: 12px;
+      border: 1px solid #20222a;
       padding: 1.75rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.25s ease;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+
+    .project-card::after {
+      content: "";
+      position: absolute;
+      bottom: 0; right: 0;
+      width: 0; height: 0;
+      border-style: solid;
+      border-width: 0 0 12px 12px;
+      border-color: transparent transparent var(--border) transparent;
+      transition: border-color 0.2s ease;
     }
 
     .project-card:hover {
-      border-color: var(--accent);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px -10px rgba(56, 189, 248, 0.25);
+      border-color: var(--blood);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px -5px rgba(225, 29, 72, 0.3);
+    }
+
+    .project-card:hover::after {
+      border-color: transparent transparent var(--blood) transparent;
     }
 
     .project-card h3 {
-      font-size: 1.25rem;
+      font-size: 1.2rem;
+      color: #fff;
       margin-bottom: 0.5rem;
     }
 
     .project-card p {
       color: var(--muted);
-      font-size: 0.925rem;
+      font-size: 0.85rem;
       margin-bottom: 1.25rem;
     }
 
     .project-tags {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 0.4rem;
       margin-top: auto;
     }
 
     .project-tag {
-      background: #0f172a;
-      border: 1px solid var(--border);
-      color: var(--accent);
-      padding: 0.2rem 0.55rem;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-family: monospace;
+      background: #09090b;
+      border: 1px solid var(--border-accent);
+      color: var(--blood-glow);
+      padding: 0.2rem 0.5rem;
+      font-size: 0.7rem;
+      font-weight: 600;
     }
 
     /* Experience Timeline */
     .timeline {
       position: relative;
-      border-left: 2px solid var(--border);
+      border-left: 2px solid var(--border-accent);
       margin-left: 0.5rem;
       padding-left: 1.5rem;
       display: flex;
       flex-direction: column;
-      gap: 2rem;
+      gap: 2.25rem;
     }
 
     .timeline-item {
@@ -329,42 +408,46 @@
       top: 0.35rem;
       width: 10px;
       height: 10px;
-      border-radius: 50%;
-      background: var(--accent);
-      box-shadow: 0 0 10px var(--accent);
+      background: var(--blood);
+      box-shadow: 0 0 8px var(--blood-glow);
     }
 
     .timeline-date {
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-family: monospace;
+      font-size: 0.75rem;
+      color: var(--blood);
+      font-weight: 700;
+      letter-spacing: 0.05em;
       margin-bottom: 0.25rem;
     }
 
     .timeline-title {
       font-size: 1.15rem;
-      font-weight: 700;
+      color: #fff;
     }
 
     .timeline-org {
-      color: var(--accent);
-      font-weight: 500;
-      font-size: 0.95rem;
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.85rem;
       margin-bottom: 0.5rem;
+      text-transform: uppercase;
     }
 
     .timeline-desc {
-      color: var(--muted);
-      font-size: 0.9rem;
+      color: var(--dark-muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
     }
 
     /* Footer */
     footer {
-      border-top: 1px solid var(--border);
+      border-top: 2px solid var(--border-accent);
       padding: 3rem 0;
       text-align: center;
-      color: var(--muted);
-      font-size: 0.875rem;
+      color: var(--dark-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
     }
 
     @media (max-width: 600px) {
@@ -379,12 +462,12 @@
   <!-- Navigation -->
   <nav>
     <div class="nav-container">
-      <a href="#" class="logo">Daniel<span>.</span></a>
+      <a href="#" class="logo"><span class="cross">✕</span> DANIEL</a>
       <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#skills">Skills</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#experience">Experience</a></li>
+        <li><a href="#about">// About</a></li>
+        <li><a href="#skills">// Skills</a></li>
+        <li><a href="#projects">// Projects</a></li>
+        <li><a href="#experience">// Timeline</a></li>
       </ul>
     </div>
   </nav>
@@ -392,10 +475,10 @@
   <div class="container">
     <!-- Hero Section -->
     <header id="about">
-      <div class="badge">
-        <span class="badge-dot"></span> Available for Spring 2027 Co-op
+      <div class="hazard-strip">
+        <span class="hazard-dot"></span> STATUS: AVAILABLE FOR SPRING 2027 CO-OP
       </div>
-      <h1>Daniel Zhang</h1>
+      <h1>DANIEL <span>ZHANG</span></h1>
       <p class="lead">
         hi, im daniel, a 3rd year mechatronics engineering student. im interested in a little bit of everything
       </p>
@@ -473,7 +556,6 @@
       </div>
 
       <div class="projects-grid">
-        <!-- Project 1 -->
         <div class="project-card" data-category="software">
           <div>
             <h3>Automated Standards Registry Auditor</h3>
@@ -486,7 +568,6 @@
           </div>
         </div>
 
-        <!-- Project 2 -->
         <div class="project-card" data-category="hardware">
           <div>
             <h3>Autonomous Locomotion & Balance Robot</h3>
@@ -499,7 +580,6 @@
           </div>
         </div>
 
-        <!-- Project 3 -->
         <div class="project-card" data-category="simulation">
           <div>
             <h3>Kinematic Suspension & Steering Simulator</h3>
@@ -523,7 +603,7 @@
 
       <div class="timeline">
         <div class="timeline-item">
-          <div class="timeline-date">2026 — Present</div>
+          <div class="timeline-date">2026 — PRESENT // INDUSTRY</div>
           <div class="timeline-title">Nuclear Engineering Intern</div>
           <div class="timeline-org">Eclipse Automation</div>
           <div class="timeline-desc">
@@ -532,7 +612,7 @@
         </div>
 
         <div class="timeline-item">
-          <div class="timeline-date">2026 — Present</div>
+          <div class="timeline-date">2026 — PRESENT // RACING</div>
           <div class="timeline-title">Mechanical Sub-team Member</div>
           <div class="timeline-org">Chem-E-Car Design Team</div>
           <div class="timeline-desc">
@@ -541,7 +621,7 @@
         </div>
 
         <div class="timeline-item">
-          <div class="timeline-date">2023 — Present</div>
+          <div class="timeline-date">2023 — PRESENT // ACADEMIA</div>
           <div class="timeline-title">B.Eng., Mechatronics Engineering</div>
           <div class="timeline-org">McMaster University</div>
           <div class="timeline-desc">
@@ -553,11 +633,10 @@
 
     <!-- Footer -->
     <footer>
-      &copy; 2026 Daniel Zhang.
+      [ // DANIEL ZHANG — 2026 // ALL SYSTEMS OPERATIONAL ]
     </footer>
   </div>
 
-  <!-- Interactive Project Filter Script -->
   <script>
     function filterProjects(category) {
       const cards = document.querySelectorAll('.project-card');
