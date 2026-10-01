@@ -4,7 +4,6 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>DANIEL // MECHATRONICS</title>
-  <!-- Gritty Condensed & Monospace Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,700;1,700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
@@ -37,21 +36,19 @@
       font-family: 'JetBrains Mono', monospace;
       line-height: 1.6;
       overflow-x: hidden;
-      /* Heavy industrial grunge texture overlay using CSS patterns */
       background-image: 
-        radial-gradient(ellipse at 80% 0%, rgba(225, 29, 72, 0.15) 0%, transparent 60%),
-        radial-gradient(ellipse at 10% 100%, rgba(136, 19, 55, 0.2) 0%, transparent 50%),
+        radial-gradient(ellipse at 85% 0%, rgba(225, 29, 72, 0.16) 0%, transparent 60%),
+        radial-gradient(ellipse at 10% 100%, rgba(136, 19, 55, 0.22) 0%, transparent 50%),
         repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35) 1px, transparent 1px, transparent 3px);
       background-attachment: fixed;
     }
 
-    /* Scanline effect */
     body::before {
       content: " ";
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
       z-index: 999;
       background-size: 100% 3px, 6px 100%;
       pointer-events: none;
@@ -63,18 +60,17 @@
       letter-spacing: 0.03em;
     }
 
-    /* Top Bar */
     nav {
       position: sticky;
       top: 0;
-      background: rgba(9, 9, 11, 0.95);
+      background: rgba(9, 9, 11, 0.94);
       border-bottom: 2px solid var(--border-accent);
       z-index: 100;
-      backdrop-filter: blur(4px);
+      backdrop-filter: blur(6px);
     }
 
     .nav-container {
-      max-width: 980px;
+      max-width: 1020px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
@@ -119,15 +115,30 @@
     }
 
     .container {
-      max-width: 980px;
+      max-width: 1020px;
       margin: 0 auto;
       padding: 0 1.5rem;
     }
 
-    /* Hero / Terminal Header */
+    #smoke-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.65;
+    }
+
     header {
-      padding: 5rem 0 3.5rem;
+      padding: 5.5rem 0 3.5rem;
       position: relative;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
     }
 
     .hazard-strip {
@@ -153,8 +164,10 @@
       box-shadow: 0 0 8px var(--blood-glow);
     }
 
-    h1 {
-      font-size: clamp(2.5rem, 6vw, 4rem);
+    .glitch {
+      position: relative;
+      display: inline-block;
+      font-size: clamp(2.5rem, 6vw, 4.25rem);
       line-height: 1;
       font-weight: 700;
       color: #fff;
@@ -162,14 +175,48 @@
       margin-bottom: 1.25rem;
     }
 
-    h1 span {
+    .glitch span {
       color: var(--blood);
+    }
+
+    .glitch:hover::before, .glitch:hover::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .glitch:hover::before {
+      left: 2px;
+      text-shadow: -2px 0 var(--blood-glow);
+      animation: glitch-anim-1 0.4s infinite linear alternate-reverse;
+    }
+
+    .glitch:hover::after {
+      left: -2px;
+      text-shadow: 2px 0 #00ffff;
+      animation: glitch-anim-2 0.3s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitch-anim-1 {
+      0% { clip: rect(10px, 9999px, 35px, 0); }
+      50% { clip: rect(45px, 9999px, 80px, 0); }
+      100% { clip: rect(20px, 9999px, 60px, 0); }
+    }
+
+    @keyframes glitch-anim-2 {
+      0% { clip: rect(60px, 9999px, 90px, 0); }
+      50% { clip: rect(15px, 9999px, 40px, 0); }
+      100% { clip: rect(70px, 9999px, 105px, 0); }
     }
 
     p.lead {
       color: var(--muted);
       font-size: 1.05rem;
-      max-width: 640px;
+      max-width: 650px;
       margin-bottom: 2.25rem;
       border-left: 2px solid var(--blood);
       padding-left: 1rem;
@@ -219,7 +266,6 @@
       color: var(--blood-glow);
     }
 
-    /* Sections */
     section {
       padding: 4rem 0;
       border-top: 1px dashed #2f1219;
@@ -250,7 +296,6 @@
       margin-top: 0.25rem;
     }
 
-    /* Skills Grid */
     .skills-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -291,7 +336,6 @@
       padding: 0.25rem 0.55rem;
     }
 
-    /* Filter Controls */
     .filter-bar {
       display: flex;
       gap: 0.5rem;
@@ -319,33 +363,21 @@
       box-shadow: inset 0 0 8px rgba(225, 29, 72, 0.3);
     }
 
-    /* Projects Grid */
     .projects-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
       gap: 1.5rem;
     }
 
     .project-card {
       background: var(--card-bg);
       border: 1px solid #20222a;
-      padding: 1.75rem;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
       position: relative;
       transition: all 0.2s ease;
-    }
-
-    .project-card::after {
-      content: "";
-      position: absolute;
-      bottom: 0; right: 0;
-      width: 0; height: 0;
-      border-style: solid;
-      border-width: 0 0 12px 12px;
-      border-color: transparent transparent var(--border) transparent;
-      transition: border-color 0.2s ease;
+      overflow: hidden;
     }
 
     .project-card:hover {
@@ -354,12 +386,54 @@
       box-shadow: 0 4px 20px -5px rgba(225, 29, 72, 0.3);
     }
 
-    .project-card:hover::after {
-      border-color: transparent transparent var(--blood) transparent;
+    .project-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 200px;
+      background: #08080a;
+      overflow: hidden;
+      border-bottom: 1px solid #20222a;
+      cursor: pointer;
+    }
+
+    .project-img-wrapper img, .project-img-wrapper video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(70%) contrast(115%) brightness(90%);
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    .project-card:hover .project-img-wrapper img,
+    .project-card:hover .project-img-wrapper video {
+      filter: grayscale(0%) contrast(105%) brightness(100%);
+      transform: scale(1.04);
+    }
+
+    .img-tag {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(9, 9, 11, 0.85);
+      border: 1px solid var(--border-accent);
+      color: var(--blood);
+      font-size: 0.65rem;
+      padding: 0.15rem 0.4rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      z-index: 2;
+    }
+
+    .project-body {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
     }
 
     .project-card h3 {
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       color: #fff;
       margin-bottom: 0.5rem;
     }
@@ -386,7 +460,51 @@
       font-weight: 600;
     }
 
-    /* Experience Timeline */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      height: 180px;
+      border: 1px solid #20222a;
+      overflow: hidden;
+      cursor: pointer;
+      background: #08080a;
+      transition: border-color 0.2s ease;
+    }
+
+    .gallery-item:hover {
+      border-color: var(--blood);
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: grayscale(85%) contrast(115%);
+      transition: all 0.3s ease;
+    }
+
+    .gallery-item:hover img {
+      filter: grayscale(0%) contrast(100%);
+      transform: scale(1.05);
+    }
+
+    .gallery-item-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(9, 9, 11, 0.85);
+      border-top: 1px solid var(--border-accent);
+      padding: 0.3rem 0.6rem;
+      font-size: 0.7rem;
+      color: var(--text);
+    }
+
     .timeline {
       position: relative;
       border-left: 2px solid var(--border-accent);
@@ -439,7 +557,41 @@
       line-height: 1.5;
     }
 
-    /* Footer */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(9, 9, 11, 0.95);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 2rem;
+      backdrop-filter: blur(8px);
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      max-width: 90%;
+      max-height: 85%;
+      border: 2px solid var(--blood);
+      box-shadow: 0 0 30px rgba(225, 29, 72, 0.4);
+      object-fit: contain;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      color: var(--blood);
+      font-size: 2rem;
+      cursor: pointer;
+      font-family: monospace;
+      font-weight: bold;
+    }
+
     footer {
       border-top: 2px solid var(--border-accent);
       padding: 3rem 0;
@@ -459,7 +611,6 @@
 </head>
 <body>
 
-  <!-- Navigation -->
   <nav>
     <div class="nav-container">
       <a href="#" class="logo"><span class="cross">✕</span> DANIEL</a>
@@ -467,29 +618,31 @@
         <li><a href="#about">// About</a></li>
         <li><a href="#skills">// Skills</a></li>
         <li><a href="#projects">// Projects</a></li>
+        <li><a href="#gallery">// Hardware & CAD</a></li>
         <li><a href="#experience">// Timeline</a></li>
       </ul>
     </div>
   </nav>
 
   <div class="container">
-    <!-- Hero Section -->
     <header id="about">
-      <div class="hazard-strip">
-        <span class="hazard-dot"></span> STATUS: AVAILABLE FOR SPRING 2027 CO-OP
-      </div>
-      <h1>DANIEL <span>ZHANG</span></h1>
-      <p class="lead">
-        3rd year mechatronics engineering student. not sure what to put here but feel free to check out my page lol
-      </p>
-      <div class="btn-group">
-        <a href="#projects" class="btn btn-primary">View Projects</a>
-        <a href="https://github.com/danielzhang122" target="_blank" class="btn btn-secondary">GitHub Profile</a>
-        <a href="mailto:zhand40@mcmaster.ca" class="btn btn-secondary">Get in Touch</a>
+      <canvas id="smoke-canvas"></canvas>
+      <div class="hero-content">
+        <div class="hazard-strip">
+          <span class="hazard-dot"></span> STATUS: AVAILABLE FOR SPRING 2027 CO-OP
+        </div>
+        <h1 class="glitch" data-text="DANIEL ZHANG">DANIEL <span>ZHANG</span></h1>
+        <p class="lead">
+          hi, im daniel, a 3rd year mechatronics engineering student. im interested in a little bit of everything
+        </p>
+        <div class="btn-group">
+          <a href="#projects" class="btn btn-primary">View Projects</a>
+          <a href="https://github.com/danielzhang122" target="_blank" class="btn btn-secondary">GitHub Profile</a>
+          <a href="mailto:zhand40@mcmaster.ca" class="btn btn-secondary">Get in Touch</a>
+        </div>
       </div>
     </header>
 
-    <!-- Technical Skills -->
     <section id="skills">
       <div class="section-header">
         <h2>Technical Core</h2>
@@ -545,7 +698,7 @@
     <section id="projects">
       <div class="section-header">
         <h2>Featured Projects</h2>
-        <p>some projects ive done. some (most) are incomplete. but at least i tried. i always forget to take photos before taking the project apart lol</p>
+        <p>some projects ive done. some (most) are incomplete. but at least i tried</p>
       </div>
 
       <div class="filter-bar">
@@ -556,40 +709,113 @@
       </div>
 
       <div class="projects-grid">
-        <div class="project-card" data-category="software">
-          <div>
-            <h3>Automated Standards Registry Auditor</h3>
-            <p>process automation pipeline linking live database registries with engineering documentation to ensure strict compliance verification. got in a bit of trouble with this cuz it used too many ai tokens. it was still pretty cool tho</p>
-          </div>
-          <div class="project-tags">
-            <span class="project-tag">Power Automate</span>
-            <span class="project-tag">AI Builder</span>
-            <span class="project-tag">Python</span>
-          </div>
-        </div>
-
+        <!-- Project 1: Quadruped Robot -->
         <div class="project-card" data-category="hardware">
-          <div>
-            <h3>Autonomous Locomotion & Balance Robot</h3>
-            <p>Multi-axis dynamic stabilization system with real-time sensor fusion, PID loop tuning, and servo driver integration on microcontrollers. yk, the classic</p>
+          <div class="project-img-wrapper" onclick="openLightbox('images/quadriped.png')">
+            <img src="images/quadriped.png" alt="Quadruped Robot Assembly" onerror="this.src='quadriped.png'" />
+            <div class="img-tag">[MECH-ROBOT]</div>
           </div>
-          <div class="project-tags">
-            <span class="project-tag">ESP32</span>
-            <span class="project-tag">PCA9685</span>
-            <span class="project-tag">C++</span>
+          <div class="project-body">
+            <div>
+              <h3>Autonomous Quadruped Robot</h3>
+              <p>Legged robotics chassis and multi-axis joint actuation designed for dynamic balancing and inverse kinematics locomotion.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">ESP32</span>
+              <span class="project-tag">Kinematics</span>
+              <span class="project-tag">C++</span>
+            </div>
           </div>
         </div>
 
+        <!-- Project 2: Suspension POC -->
         <div class="project-card" data-category="simulation">
-          <div>
-            <h3>Kinematic Suspension & Steering Simulator</h3>
-            <p>Double wishbone suspension geometry calculations and dynamic steering kinematics modeling for stability under uneven road forces.</p>
+          <div class="project-img-wrapper" onclick="openLightbox('images/POC suspension.png')">
+            <img src="images/POC suspension.png" alt="Suspension Concept" onerror="this.src='POC suspension.png'" />
+            <div class="img-tag">[CAD-PROTO]</div>
           </div>
-          <div class="project-tags">
-            <span class="project-tag">MATLAB</span>
-            <span class="project-tag">SolidWorks</span>
-            <span class="project-tag">Dynamics</span>
+          <div class="project-body">
+            <div>
+              <h3>POC Suspension Geometry</h3>
+              <p>Proof-of-concept suspension linkage and double-wishbone geometry setup designed for vehicle steering and dynamic load response.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">SolidWorks</span>
+              <span class="project-tag">Kinematics</span>
+              <span class="project-tag">Dynamics</span>
+            </div>
           </div>
+        </div>
+
+        <!-- Project 3: Automated Standards Registry Auditor -->
+        <div class="project-card" data-category="software">
+          <div class="project-img-wrapper" onclick="openLightbox('images/cool.jpg')">
+            <img src="images/cool.jpg" alt="Automated Auditor" onerror="this.src='cool.jpg'" />
+            <div class="img-tag">[SYS-AUTO]</div>
+          </div>
+          <div class="project-body">
+            <div>
+              <h3>Automated Standards Registry Auditor</h3>
+              <p>Robotic process automation pipeline linking live database registries with engineering documentation to ensure strict compliance verification.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">Power Automate</span>
+              <span class="project-tag">AI Builder</span>
+              <span class="project-tag">Python</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 4: Embedded High-Voltage / Taser Rig with looping video -->
+        <div class="project-card" data-category="hardware">
+          <div class="project-img-wrapper">
+            <video autoplay loop muted playsinline>
+              <source src="images/taser.mp4" type="video/mp4">
+              <source src="taser.mp4" type="video/mp4">
+            </video>
+            <div class="img-tag">[HIGH-VOLT]</div>
+          </div>
+          <div class="project-body">
+            <div>
+              <h3>High-Voltage Pulse Discharge System</h3>
+              <p>Capacitive discharge and high-voltage arc firing mechanism with isolated gate switching and embedded trigger control.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">Hardware</span>
+              <span class="project-tag">High Voltage</span>
+              <span class="project-tag">Circuitry</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Lab & CAD Gallery -->
+    <section id="gallery">
+      <div class="section-header">
+        <h2>Hardware & CAD Bench</h2>
+        <p>prototypes, mechanical assemblies, and subsystem test models</p>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="gallery-item" onclick="openLightbox('images/quadriped leg.png')">
+          <img src="images/quadriped leg.png" alt="Quadruped Leg Linkage" onerror="this.src='quadriped leg.png'" />
+          <div class="gallery-item-caption">// Quadruped Leg Assembly</div>
+        </div>
+
+        <div class="gallery-item" onclick="openLightbox('images/mbedpen.jpeg')">
+          <img src="images/mbedpen.jpeg" alt="Embedded Pen / Microcontroller" onerror="this.src='mbedpen.jpeg'" />
+          <div class="gallery-item-caption">// Embedded Pen Prototype</div>
+        </div>
+
+        <div class="gallery-item" onclick="openLightbox('images/cool2.jpg')">
+          <img src="images/cool2.jpg" alt="Lab Test Setup" onerror="this.src='cool2.jpg'" />
+          <div class="gallery-item-caption">// Prototype Bench Test</div>
+        </div>
+
+        <div class="gallery-item" onclick="openLightbox('images/cool.jpg')">
+          <img src="images/cool.jpg" alt="Field Rig" onerror="this.src='cool.jpg'" />
+          <div class="gallery-item-caption">// Field & System Rig</div>
         </div>
       </div>
     </section>
@@ -631,10 +857,14 @@
       </div>
     </section>
 
-    <!-- Footer -->
     <footer>
       [ // DANIEL ZHANG — 2026 // ALL SYSTEMS OPERATIONAL ]
     </footer>
+  </div>
+
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview">
   </div>
 
   <script>
@@ -653,6 +883,73 @@
         }
       });
     }
+
+    function openLightbox(src) {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      img.src = src;
+      lb.classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+
+    const canvas = document.getElementById('smoke-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.offsetWidth;
+      canvas.height = canvas.parentElement.offsetHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 20;
+        this.size = Math.random() * 2.5 + 0.8;
+        this.speedY = Math.random() * 0.7 + 0.3;
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.opacity = Math.random() * 0.7 + 0.2;
+        this.isRed = Math.random() > 0.4;
+      }
+      update() {
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        this.opacity -= 0.002;
+        if (this.y < 0 || this.opacity <= 0) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.fillStyle = this.isRed 
+          ? `rgba(225, 29, 72, ${this.opacity})` 
+          : `rgba(200, 200, 200, ${this.opacity * 0.4})`;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+      }
+    }
+
+    for (let i = 0; i < 45; i++) {
+      const p = new Particle();
+      p.y = Math.random() * canvas.height;
+      particles.push(p);
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
   </script>
 </body>
 </html>
