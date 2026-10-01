@@ -417,7 +417,7 @@
       justify-content: center;
     }
 
-    .project-img-wrapper img, .project-img-wrapper video {
+    .project-img-wrapper img {
       width: 100%;
       height: 100%;
       object-fit: cover;
@@ -425,13 +425,12 @@
       transition: filter 0.3s ease, transform 0.3s ease;
     }
 
-    .project-img-wrapper img.fit-contain, .project-img-wrapper video.fit-contain {
+    .project-img-wrapper img.fit-contain {
       object-fit: contain;
       padding: 0.5rem;
     }
 
-    .project-card:hover .project-img-wrapper img,
-    .project-card:hover .project-img-wrapper video {
+    .project-card:hover .project-img-wrapper img {
       filter: contrast(115%) brightness(105%);
       transform: scale(1.02);
     }
@@ -762,7 +761,7 @@
           <div class="project-body">
             <div>
               <h3>Autonomous Quadruped Robot</h3>
-              <p>Legged robotics chassis and multi-axis joint actuation designed for dynamic balancing and inverse kinematics locomotion.</p>
+              <p>legged robotics chassis and multi-axis joint actuation designed for dynamic balancing and inverse kinematics locomotion. never had the chance to print it, but i plan on picking it back up eventually</p>
             </div>
             <div class="project-tags">
               <span class="project-tag">ESP32</span>
@@ -786,7 +785,7 @@
           <div class="project-body">
             <div>
               <h3>Quadruped Locomotion Simulation</h3>
-              <p>Dynamic gait cycle and multi-joint kinematics simulation modeling leg trajectories, center of mass stabilization, and ground reaction forces in real time.</p>
+              <p>multi-joint kinematics simulation modeling leg trajectories, center of mass stabilization, and ground reaction forces in real time.</p>
             </div>
             <div class="project-tags">
               <span class="project-tag">Physics Sim</span>
@@ -829,30 +828,32 @@
           <div class="project-body">
             <div>
               <h3>Real-Time Minute Wage Tracker</h3>
-              <p>Minimalist live earnings tracker that computes and visualizes exactly how much money you make by the minute and second during work shifts. Built to watch the clock work for you.</p>
+              <p>"minimalist" live earnings tracker that computes and visualizes exactly how much money you make by the minute and second during work shifts. built to watch the clock work for you.</p>
             </div>
             <div class="project-tags">
-              <span class="project-tag">JavaScript</span>
-              <span class="project-tag">HTML/CSS</span>
+              <span class="project-tag">Python</span>
+              <span class="project-tag">App Development</span>
               <span class="project-tag">Productivity</span>
               <a href="https://github.com/danielzhang122/wage-tracker" target="_blank" style="color: var(--blood-glow); text-decoration: none; font-size: 0.7rem; font-weight: 700; margin-left: auto;">[REPO &nearr;]</a>
             </div>
           </div>
         </div>
 
-        <!-- Project 4: Looping High-Voltage Pulse Rig (Hardware Video) -->
+        <!-- Project 4: High-Voltage Pulse Rig (Converted to GIF) -->
         <div class="project-card" data-category="hardware">
-          <div class="project-img-wrapper" onclick="openLightboxMedia('video', this.querySelector('source').src)">
-            <video autoplay loop muted playsinline>
-              <source src="taser.mp4" type="video/mp4">
-              <source src="images/taser.mp4" type="video/mp4">
-            </video>
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img 
+              class="fit-contain" 
+              src="taser.gif" 
+              alt="High-Voltage Pulse Arc Discharge" 
+              onerror="this.onerror=null; this.src='images/taser.gif'; this.onerror=() => { this.src='taser.GIF'; this.onerror=() => { this.src='images/taser.GIF'; }; };" 
+            />
             <div class="img-tag">[HIGH-VOLT]</div>
           </div>
           <div class="project-body">
             <div>
               <h3>High-Voltage Pulse Discharge System</h3>
-              <p>capacitive discharge and high-voltage arc firing mechanism with embedded trigger control compatible with usb-c charging. not sure if this is very legal.</p>
+              <p>capacitive discharge and high-voltage arc firing mechanism with embedded trigger control compatible with usb-c charging. legally i cannot call this a taser</p>
             </div>
             <div class="project-tags">
               <span class="project-tag">Hardware</span>
@@ -897,7 +898,7 @@
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="mbedpen.jpeg" alt="Embedded Pen / Microcontroller" onerror="this.onerror=null; this.src='images/mbedpen.jpeg';" />
-          <div class="gallery-item-caption">// THC pen battery for embedded final</div>
+          <div class="gallery-item-caption">// THC pen battery for embedded final. not sure how this got approved, but i got an A</div>
         </div>
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
@@ -905,11 +906,7 @@
           <div class="gallery-item-caption">// Circuits lab waveform capture</div>
         </div>
 
-        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
-          <img src="cool.jpg" alt="Field Rig" onerror="this.onerror=null; this.src='images/cool.jpg';" />
-          <div class="gallery-item-caption">// Scope resonance pattern</div>
-        </div>
-      </div>
+
     </section>
 
     <!-- Experience Timeline -->
@@ -957,8 +954,7 @@
   <!-- Lightbox Modal -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <span class="lightbox-close">&times;</span>
-    <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview" style="display:none;">
-    <video class="lightbox-content" id="lightbox-video" autoplay loop muted controls playsinline style="display:none;"></video>
+    <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview">
   </div>
 
   <script>
@@ -979,31 +975,14 @@
     }
 
     function openLightbox(src) {
-      openLightboxMedia('img', src);
-    }
-
-    function openLightboxMedia(type, src) {
       const lb = document.getElementById('lightbox');
       const img = document.getElementById('lightbox-img');
-      const video = document.getElementById('lightbox-video');
-
-      if (type === 'video') {
-        img.style.display = 'none';
-        video.style.display = 'block';
-        video.src = src;
-      } else {
-        video.style.display = 'none';
-        img.style.display = 'block';
-        img.src = src;
-      }
+      img.src = src;
       lb.classList.add('active');
     }
 
     function closeLightbox() {
-      const lb = document.getElementById('lightbox');
-      const video = document.getElementById('lightbox-video');
-      video.pause();
-      lb.classList.remove('active');
+      document.getElementById('lightbox').classList.remove('active');
     }
 
     const canvas = document.getElementById('smoke-canvas');
