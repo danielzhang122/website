@@ -43,6 +43,7 @@
       background-attachment: fixed;
     }
 
+    /* CRT Scanline Filter */
     body::before {
       content: " ";
       display: block;
@@ -120,6 +121,7 @@
       padding: 0 1.5rem;
     }
 
+    /* Smoke Canvas */
     #smoke-canvas {
       position: absolute;
       top: 0;
@@ -131,6 +133,7 @@
       opacity: 0.65;
     }
 
+    /* Hero Section */
     header {
       padding: 5.5rem 0 3.5rem;
       position: relative;
@@ -139,8 +142,12 @@
     .hero-content {
       position: relative;
       z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
     }
 
+    /* Status badge sitting strictly on its own block row */
     .hazard-strip {
       display: inline-flex;
       align-items: center;
@@ -164,11 +171,13 @@
       box-shadow: 0 0 8px var(--blood-glow);
     }
 
+    /* Name Header as a distinct block */
     .glitch {
+      display: block;
+      width: 100%;
       position: relative;
-      display: inline-block;
       font-size: clamp(2.5rem, 6vw, 4.25rem);
-      line-height: 1;
+      line-height: 1.1;
       font-weight: 700;
       color: #fff;
       text-shadow: 2px 2px 0px #3f0914, 4px 4px 0px #180307;
@@ -266,6 +275,7 @@
       color: var(--blood-glow);
     }
 
+    /* Sections */
     section {
       padding: 4rem 0;
       border-top: 1px dashed #2f1219;
@@ -296,6 +306,7 @@
       margin-top: 0.25rem;
     }
 
+    /* Skills Grid */
     .skills-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -336,6 +347,7 @@
       padding: 0.25rem 0.55rem;
     }
 
+    /* Filters */
     .filter-bar {
       display: flex;
       gap: 0.5rem;
@@ -382,11 +394,11 @@
       overflow: hidden;
     }
 
-    /* Full-width featured card for detailed diagrams */
+    /* Featured Full-Width Card for detailed models */
     .project-card.featured {
       grid-column: span 12;
       display: grid;
-      grid-template-columns: 1.25fr 1fr;
+      grid-template-columns: 1.3fr 1fr;
     }
 
     .project-card.featured .project-img-wrapper {
@@ -401,7 +413,6 @@
       box-shadow: 0 4px 20px -5px rgba(225, 29, 72, 0.3);
     }
 
-    /* Increased Frame Heights */
     .project-img-wrapper {
       position: relative;
       width: 100%;
@@ -423,7 +434,6 @@
       transition: filter 0.3s ease, transform 0.3s ease;
     }
 
-    /* Keeps entire CAD assembly / blueprint visible without clipping */
     .project-img-wrapper img.fit-contain {
       object-fit: contain;
       padding: 0.5rem;
@@ -486,7 +496,7 @@
       font-weight: 600;
     }
 
-    /* Enlarged Gallery Grid */
+    /* Gallery Grid */
     .gallery-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -536,6 +546,7 @@
       color: var(--text);
     }
 
+    /* Timeline */
     .timeline {
       position: relative;
       border-left: 2px solid var(--border-accent);
@@ -588,7 +599,7 @@
       line-height: 1.5;
     }
 
-    /* Modal / Lightbox for viewing photos and video */
+    /* Lightbox Modal */
     .lightbox {
       display: none;
       position: fixed;
