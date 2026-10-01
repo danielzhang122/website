@@ -43,6 +43,7 @@
       background-attachment: fixed;
     }
 
+    /* CRT Scanline Overlay */
     body::before {
       content: " ";
       display: block;
@@ -588,6 +589,7 @@
       line-height: 1.5;
     }
 
+    /* Lightbox Modal */
     .lightbox {
       display: none;
       position: fixed;
@@ -753,8 +755,8 @@
       <div class="projects-grid">
         <!-- Project 1: Featured Quadruped Robot -->
         <div class="project-card featured" data-category="hardware">
-          <div class="project-img-wrapper" onclick="openLightbox('images/quadriped.png')">
-            <img class="fit-contain" src="images/quadriped.png" alt="Quadruped Robot Assembly" onerror="this.src='quadriped.png'" />
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img class="fit-contain" src="quadriped.png" alt="Quadruped Robot Assembly" onerror="this.onerror=null; this.src='images/quadriped.png';" />
             <div class="img-tag">[MECH-ROBOT]</div>
           </div>
           <div class="project-body">
@@ -772,8 +774,8 @@
 
         <!-- Project 2: Featured Suspension POC -->
         <div class="project-card featured" data-category="simulation">
-          <div class="project-img-wrapper" onclick="openLightbox('images/POC suspension.png')">
-            <img class="fit-contain" src="images/POC suspension.png" alt="Suspension Concept" onerror="this.src='POC suspension.png'" />
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img class="fit-contain" src="POC suspension.png" alt="Suspension Concept" onerror="this.onerror=null; this.src='images/POC suspension.png';" />
             <div class="img-tag">[CAD-PROTO]</div>
           </div>
           <div class="project-body">
@@ -791,8 +793,13 @@
 
         <!-- Project 3: Real-Time Minute Wage Tracker (Software) -->
         <div class="project-card" data-category="software">
-          <div class="project-img-wrapper" onclick="openLightbox('images/WAGES.PNG')">
-            <img class="fit-contain" src="images/WAGES.PNG" alt="Wage Tracker App Interface" onerror="this.src='WAGES.PNG'" />
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img 
+              class="fit-contain" 
+              src="WAGES.png" 
+              alt="Wage Tracker App Interface" 
+              onerror="this.onerror=null; this.src='images/WAGES.png'; this.onerror=() => { this.src='WAGES.PNG'; this.onerror=() => { this.src='images/WAGES.PNG'; }; };" 
+            />
             <div class="img-tag">[APP-DEV]</div>
           </div>
           <div class="project-body">
@@ -811,10 +818,10 @@
 
         <!-- Project 4: Looping High-Voltage Pulse Rig (Hardware) -->
         <div class="project-card" data-category="hardware">
-          <div class="project-img-wrapper" onclick="openLightboxMedia('video', 'images/taser.mp4')">
+          <div class="project-img-wrapper" onclick="openLightboxMedia('video', this.querySelector('source').src)">
             <video autoplay loop muted playsinline>
-              <source src="images/taser.mp4" type="video/mp4">
               <source src="taser.mp4" type="video/mp4">
+              <source src="images/taser.mp4" type="video/mp4">
             </video>
             <div class="img-tag">[HIGH-VOLT]</div>
           </div>
@@ -833,8 +840,8 @@
 
         <!-- Project 5: Oscilloscope Visuals (Hardware) -->
         <div class="project-card" data-category="hardware">
-          <div class="project-img-wrapper" onclick="openLightbox('images/cool.jpg')">
-            <img src="images/cool.jpg" alt="Oscilloscope Trace" onerror="this.src='cool.jpg'" />
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img src="cool.jpg" alt="Oscilloscope Trace" onerror="this.onerror=null; this.src='images/cool.jpg';" />
             <div class="img-tag">[SYS-SCOPE]</div>
           </div>
           <div class="project-body">
@@ -859,23 +866,23 @@
       </div>
 
       <div class="gallery-grid">
-        <div class="gallery-item" onclick="openLightbox('images/quadriped leg.png')">
-          <img src="images/quadriped leg.png" alt="Quadruped Leg Linkage" onerror="this.src='quadriped leg.png'" />
+        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+          <img src="quadriped leg.png" alt="Quadruped Leg Linkage" onerror="this.onerror=null; this.src='images/quadriped leg.png';" />
           <div class="gallery-item-caption">// Quadruped Leg Assembly</div>
         </div>
 
-        <div class="gallery-item" onclick="openLightbox('images/mbedpen.jpeg')">
-          <img src="images/mbedpen.jpeg" alt="Embedded Pen / Microcontroller" onerror="this.src='mbedpen.jpeg'" />
+        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+          <img src="mbedpen.jpeg" alt="Embedded Pen / Microcontroller" onerror="this.onerror=null; this.src='images/mbedpen.jpeg';" />
           <div class="gallery-item-caption">// THC pen battery for embedded final</div>
         </div>
 
-        <div class="gallery-item" onclick="openLightbox('images/cool2.jpg')">
-          <img src="images/cool2.jpg" alt="Lab Test Setup" onerror="this.src='cool2.jpg'" />
+        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+          <img src="cool2.jpg" alt="Lab Test Setup" onerror="this.onerror=null; this.src='images/cool2.jpg';" />
           <div class="gallery-item-caption">// Circuits lab waveform capture</div>
         </div>
 
-        <div class="gallery-item" onclick="openLightbox('images/cool.jpg')">
-          <img src="images/cool.jpg" alt="Field Rig" onerror="this.src='cool.jpg'" />
+        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+          <img src="cool.jpg" alt="Field Rig" onerror="this.onerror=null; this.src='images/cool.jpg';" />
           <div class="gallery-item-caption">// Scope resonance pattern</div>
         </div>
       </div>
@@ -923,7 +930,7 @@
     </footer>
   </div>
 
-  <!-- Lightbox Modal supporting Image or Video -->
+  <!-- Lightbox Modal -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <span class="lightbox-close">&times;</span>
     <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview" style="display:none;">
