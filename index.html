@@ -3,15 +3,18 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio & Projects</title>
+  <title>Daniel Zhang | Engineering & Robotics</title>
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --text: #f8fafc;
+      --bg: #0b0f19;
+      --card-bg: rgba(18, 24, 38, 0.7);
+      --card-border: rgba(51, 65, 85, 0.5);
+      --card-hover: rgba(56, 189, 248, 0.2);
+      --text: #f1f5f9;
       --muted: #94a3b8;
       --accent: #38bdf8;
-      --border: #334155;
+      --accent-dim: rgba(56, 189, 248, 0.1);
+      --border: #1e293b;
     }
 
     * {
@@ -19,195 +22,558 @@
       margin: 0;
       padding: 0;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      scroll-behavior: smooth;
     }
 
     body {
       background-color: var(--bg);
       color: var(--text);
       line-height: 1.6;
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.08) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(99, 102, 241, 0.06) 0px, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Navigation */
+    nav {
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(12px);
+      background: rgba(11, 15, 25, 0.85);
+      border-bottom: 1px solid var(--border);
+      z-index: 100;
+    }
+
+    .nav-container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem 1.5rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.1rem;
+      letter-spacing: -0.02em;
+      color: var(--text);
+      text-decoration: none;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color 0.2s ease;
+    }
+
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+
+    /* Container */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
       padding: 0 1.5rem;
     }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 4rem 0;
-    }
-
+    /* Hero */
     header {
-      margin-bottom: 4rem;
+      padding: 5rem 0 4rem;
     }
 
-    .tagline {
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      background: var(--accent-dim);
+      border: 1px solid rgba(56, 189, 248, 0.3);
       color: var(--accent);
+      font-size: 0.8rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-size: 0.875rem;
-      margin-bottom: 0.5rem;
+      letter-spacing: 0.05em;
+      margin-bottom: 1.25rem;
+    }
+
+    .badge-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--accent);
+      border-radius: 50%;
     }
 
     h1 {
-      font-size: 2.75rem;
-      line-height: 1.2;
+      font-size: clamp(2.25rem, 5vw, 3.25rem);
+      line-height: 1.15;
+      font-weight: 800;
+      letter-spacing: -0.03em;
       margin-bottom: 1rem;
     }
 
     p.lead {
       color: var(--muted);
-      font-size: 1.25rem;
-      max-width: 600px;
+      font-size: 1.15rem;
+      max-width: 680px;
+      margin-bottom: 2rem;
     }
 
-    .links {
+    .btn-group {
       display: flex;
+      flex-wrap: wrap;
       gap: 1rem;
-      margin-top: 1.5rem;
     }
 
     .btn {
-      display: inline-block;
-      padding: 0.6rem 1.2rem;
-      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.65rem 1.4rem;
+      border-radius: 8px;
       font-size: 0.95rem;
-      font-weight: 500;
+      font-weight: 600;
       text-decoration: none;
       transition: all 0.2s ease;
     }
 
     .btn-primary {
       background-color: var(--accent);
-      color: #0f172a;
+      color: #0b0f19;
     }
 
     .btn-primary:hover {
-      opacity: 0.9;
+      box-shadow: 0 0 16px rgba(56, 189, 248, 0.4);
+      transform: translateY(-1px);
     }
 
     .btn-secondary {
+      background: var(--card-bg);
       border: 1px solid var(--border);
       color: var(--text);
     }
 
     .btn-secondary:hover {
       border-color: var(--muted);
+      transform: translateY(-1px);
     }
 
+    /* Sections */
     section {
-      margin-bottom: 4rem;
+      padding: 3.5rem 0;
+      border-top: 1px solid var(--border);
     }
 
-    h2 {
-      font-size: 1.5rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.75rem;
-      margin-bottom: 1.5rem;
+    .section-header {
+      margin-bottom: 2rem;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-      gap: 1.5rem;
+    .section-header h2 {
+      font-size: 1.75rem;
+      letter-spacing: -0.02em;
     }
 
-    .card {
-      background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
-      transition: transform 0.2s ease;
-    }
-
-    .card:hover {
-      transform: translateY(-2px);
-    }
-
-    .card h3 {
-      font-size: 1.15rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .card p {
+    .section-header p {
       color: var(--muted);
       font-size: 0.95rem;
-      margin-bottom: 1rem;
     }
 
-    .tags {
+    /* Skills Grid */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .skill-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 1.25rem;
+    }
+
+    .skill-card h3 {
+      font-size: 0.95rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .pill-list {
       display: flex;
       flex-wrap: wrap;
       gap: 0.5rem;
     }
 
-    .tag {
+    .pill {
+      background: rgba(15, 23, 42, 0.8);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 0.8rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+    }
+
+    /* Filter Controls */
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-dim);
+    }
+
+    /* Projects Grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .project-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.25s ease;
+    }
+
+    .project-card:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px -10px rgba(56, 189, 248, 0.25);
+    }
+
+    .project-card h3 {
+      font-size: 1.25rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .project-card p {
+      color: var(--muted);
+      font-size: 0.925rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-top: auto;
+    }
+
+    .project-tag {
       background: #0f172a;
       border: 1px solid var(--border);
       color: var(--accent);
-      padding: 0.2rem 0.6rem;
+      padding: 0.2rem 0.55rem;
       border-radius: 4px;
       font-size: 0.75rem;
       font-family: monospace;
     }
 
+    /* Experience Timeline */
+    .timeline {
+      position: relative;
+      border-left: 2px solid var(--border);
+      margin-left: 0.5rem;
+      padding-left: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .timeline-item {
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: calc(-1.5rem - 6px);
+      top: 0.35rem;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 10px var(--accent);
+    }
+
+    .timeline-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-family: monospace;
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+
+    .timeline-org {
+      color: var(--accent);
+      font-weight: 500;
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .timeline-desc {
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    /* Footer */
     footer {
       border-top: 1px solid var(--border);
-      padding: 2rem 0;
+      padding: 3rem 0;
+      text-align: center;
       color: var(--muted);
       font-size: 0.875rem;
-      text-align: center;
+    }
+
+    @media (max-width: 600px) {
+      .nav-links {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
+
+  <!-- Navigation -->
+  <nav>
+    <div class="nav-container">
+      <a href="#" class="logo">Daniel<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#skills">Skills</a></li>
+        <li><a href="#projects">Projects</a></li>
+        <li><a href="#experience">Experience</a></li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="container">
-    <header>
-      <div class="tagline">Engineering & Software</div>
-      <h1>Hi, I'm [Your Name].</h1>
-      <p class="lead">Building robotics, embedded systems, and automated software workflows.</p>
-      <div class="links">
-        <a href="https://github.com/[your-username]" class="btn btn-primary" target="_blank">GitHub Profile</a>
-        <a href="mailto:your-email@example.com" class="btn btn-secondary">Contact Me</a>
+    <!-- Hero Section -->
+    <header id="about">
+      <div class="badge">
+        <span class="badge-dot"></span> Available for Fall 2026 Co-op
+      </div>
+      <h1>Daniel Zhang</h1>
+      <p class="lead">
+        Mechatronics Engineering student focusing on robotics, control systems, and automated testing workflows. Turning physical mechanics into autonomous, data-driven systems.
+      </p>
+      <div class="btn-group">
+        <a href="#projects" class="btn btn-primary">View Projects</a>
+        <a href="https://github.com/danielzhang122" target="_blank" class="btn btn-secondary">GitHub Profile</a>
+        <a href="mailto:zhangd102@mcmaster.ca" class="btn btn-secondary">Get in Touch</a>
       </div>
     </header>
 
-    <section>
-      <h2>Featured Projects</h2>
-      <div class="grid">
-        <div class="card">
-          <h3>Automated Workflow Engine</h3>
-          <p>End-to-end automation pipelines designed to cross-reference databases and verify documentation accuracy.</p>
-          <div class="tags">
-            <span class="tag">Automation</span>
-            <span class="tag">Python</span>
-            <span class="tag">API</span>
+    <!-- Technical Skills -->
+    <section id="skills">
+      <div class="section-header">
+        <h2>Technical Core</h2>
+        <p>Tools, languages, and frameworks used in hardware and software design.</p>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <h3>Hardware & Embedded</h3>
+          <div class="pill-list">
+            <span class="pill">ESP32</span>
+            <span class="pill">Raspberry Pi</span>
+            <span class="pill">Motor Drivers</span>
+            <span class="pill">Actuators</span>
+            <span class="pill">I2C / SPI</span>
           </div>
         </div>
 
-        <div class="card">
-          <h3>Embedded Control System</h3>
-          <p>Real-time microcontroller firmware controlling multi-axis actuators with high-precision feedback loops.</p>
-          <div class="tags">
-            <span class="tag">C++</span>
-            <span class="tag">ESP32</span>
-            <span class="tag">Hardware</span>
+        <div class="skill-card">
+          <h3>CAD & Simulation</h3>
+          <div class="pill-list">
+            <span class="pill">SolidWorks</span>
+            <span class="pill">Autodesk Inventor</span>
+            <span class="pill">MuJoCo</span>
+            <span class="pill">Gazebo</span>
+            <span class="pill">FEA</span>
           </div>
         </div>
 
-        <div class="card">
-          <h3>Kinematics & Dynamics Sim</h3>
-          <p>Physics-based simulation models for testing vehicle suspension stability and dynamic load distributions.</p>
-          <div class="tags">
-            <span class="tag">Simulation</span>
-            <span class="tag">CAD</span>
-            <span class="tag">Dynamics</span>
+        <div class="skill-card">
+          <h3>Software & Computation</h3>
+          <div class="pill-list">
+            <span class="pill">Python</span>
+            <span class="pill">C / C++</span>
+            <span class="pill">MATLAB</span>
+            <span class="pill">Julia</span>
+            <span class="pill">Power Automate</span>
+          </div>
+        </div>
+
+        <div class="skill-card">
+          <h3>Design & Standards</h3>
+          <div class="pill-list">
+            <span class="pill">GD&T</span>
+            <span class="pill">FMEA</span>
+            <span class="pill">Compliance Auditing</span>
+            <span class="pill">Kinematics</span>
           </div>
         </div>
       </div>
     </section>
 
+    <!-- Projects Section -->
+    <section id="projects">
+      <div class="section-header">
+        <h2>Featured Projects</h2>
+        <p>A selection of mechanical, embedded, and software engineering builds.</p>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterProjects('all')">All</button>
+        <button class="filter-btn" onclick="filterProjects('hardware')">Hardware & Embedded</button>
+        <button class="filter-btn" onclick="filterProjects('software')">Software & Automation</button>
+        <button class="filter-btn" onclick="filterProjects('simulation')">Simulation & CAD</button>
+      </div>
+
+      <div class="projects-grid">
+        <!-- Project 1 -->
+        <div class="project-card" data-category="software">
+          <div>
+            <h3>Automated Standards Registry Auditor</h3>
+            <p>Robotic process automation pipeline linking live database registries with engineering documentation to ensure strict compliance verification.</p>
+          </div>
+          <div class="project-tags">
+            <span class="project-tag">Power Automate</span>
+            <span class="project-tag">AI Builder</span>
+            <span class="project-tag">Python</span>
+          </div>
+        </div>
+
+        <!-- Project 2 -->
+        <div class="project-card" data-category="hardware">
+          <div>
+            <h3>Autonomous Locomotion & Balance Robot</h3>
+            <p>Multi-axis dynamic stabilization system with real-time sensor fusion, PID loop tuning, and servo driver integration on microcontrollers.</p>
+          </div>
+          <div class="project-tags">
+            <span class="project-tag">ESP32</span>
+            <span class="project-tag">PCA9685</span>
+            <span class="project-tag">C++</span>
+          </div>
+        </div>
+
+        <!-- Project 3 -->
+        <div class="project-card" data-category="simulation">
+          <div>
+            <h3>Kinematic Suspension & Steering Simulator</h3>
+            <p>Double wishbone suspension geometry calculations and dynamic steering kinematics modeling for stability under uneven road forces.</p>
+          </div>
+          <div class="project-tags">
+            <span class="project-tag">MATLAB</span>
+            <span class="project-tag">SolidWorks</span>
+            <span class="project-tag">Dynamics</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience Timeline -->
+    <section id="experience">
+      <div class="section-header">
+        <h2>Experience & Milestones</h2>
+        <p>Practical application across engineering co-ops and university initiatives.</p>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">2026 — Present</div>
+          <div class="timeline-title">Engineering Co-op Intern</div>
+          <div class="timeline-org">Eclipse Automation</div>
+          <div class="timeline-desc">
+            Assisted nuclear engineering teams with technical compliance verification, workflow automation, and documentation audits against regulatory safety standards.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">2026 — Present</div>
+          <div class="timeline-title">Mechanical Sub-team Member</div>
+          <div class="timeline-org">Chem-E-Car Design Team</div>
+          <div class="timeline-desc">
+            Designed wheel hub assemblies, analyzed chassis steering geometry, and performed CAD tolerance validation for custom vehicle prototypes.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">2023 — Present</div>
+          <div class="timeline-title">B.Eng., Mechatronics Engineering</div>
+          <div class="timeline-org">McMaster University</div>
+          <div class="timeline-desc">
+            Core coursework in dynamics, control theory, embedded systems, finite element analysis, and electronic circuitry.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Footer -->
     <footer>
-      &copy; 2026 [Your Name]. Hosted with GitHub Pages.
+      &copy; 2026 Daniel Zhang. Hosted on GitHub Pages.
     </footer>
   </div>
+
+  <!-- Interactive Project Filter Script -->
+  <script>
+    function filterProjects(category) {
+      const cards = document.querySelectorAll('.project-card');
+      const buttons = document.querySelectorAll('.filter-btn');
+
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      cards.forEach(card => {
+        if (category === 'all' || card.dataset.category === category) {
+          card.style.display = 'flex';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
 </body>
 </html>
