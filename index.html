@@ -425,7 +425,7 @@
       transition: filter 0.3s ease, transform 0.3s ease;
     }
 
-    .project-img-wrapper img.fit-contain {
+    .project-img-wrapper img.fit-contain, .project-img-wrapper video.fit-contain {
       object-fit: contain;
       padding: 0.5rem;
     }
@@ -753,7 +753,7 @@
       </div>
 
       <div class="projects-grid">
-        <!-- Project 1: Featured Quadruped Robot -->
+        <!-- Project 1: Featured Quadruped Robot (Assembly CAD & Chassis) -->
         <div class="project-card featured" data-category="hardware">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img class="fit-contain" src="quadriped.png" alt="Quadruped Robot Assembly" onerror="this.onerror=null; this.src='images/quadriped.png';" />
@@ -768,6 +768,28 @@
               <span class="project-tag">ESP32</span>
               <span class="project-tag">Kinematics</span>
               <span class="project-tag">C++</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 1b: Featured Quadruped Locomotion Simulation (Video: yurr.mp4) -->
+        <div class="project-card featured" data-category="simulation">
+          <div class="project-img-wrapper" onclick="openLightboxMedia('video', this.querySelector('source').src)">
+            <video autoplay loop muted playsinline class="fit-contain">
+              <source src="yurr.mp4" type="video/mp4">
+              <source src="images/yurr.mp4" type="video/mp4">
+            </video>
+            <div class="img-tag">[SIM-DYNAMICS]</div>
+          </div>
+          <div class="project-body">
+            <div>
+              <h3>Quadruped Locomotion Simulation</h3>
+              <p>Dynamic gait cycle and multi-joint kinematics simulation modeling leg trajectories, center of mass stabilization, and ground reaction forces in real time.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">Physics Sim</span>
+              <span class="project-tag">Dynamics</span>
+              <span class="project-tag">Inverse Kinematics</span>
             </div>
           </div>
         </div>
