@@ -49,7 +49,7 @@
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 255, 0, 0.03));
       z-index: 999;
       background-size: 100% 3px, 6px 100%;
       pointer-events: none;
@@ -795,10 +795,15 @@
           </div>
         </div>
 
-        <!-- Project 2: Featured Suspension POC -->
+        <!-- Project 2: Featured Suspension POC (GIF: movement.gif) -->
         <div class="project-card featured" data-category="simulation">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
-            <img class="fit-contain" src="POC suspension.png" alt="Suspension Concept" onerror="this.onerror=null; this.src='images/POC suspension.png';" />
+            <img 
+              class="fit-contain" 
+              src="movement.gif" 
+              alt="Suspension Geometry Kinematic Movement" 
+              onerror="this.onerror=null; this.src='images/movement.gif'; this.onerror=() => { this.src='movement.GIF'; this.onerror=() => { this.src='images/movement.GIF'; }; };" 
+            />
             <div class="img-tag">[CAD-PROTO]</div>
           </div>
           <div class="project-body">
@@ -905,8 +910,7 @@
           <img src="cool2.jpg" alt="Lab Test Setup" onerror="this.onerror=null; this.src='images/cool2.jpg';" />
           <div class="gallery-item-caption">// Circuits lab waveform capture - its not supposed to look like this, but it sure is pretty</div>
         </div>
-
-
+      </div>
     </section>
 
     <!-- Experience Timeline -->
