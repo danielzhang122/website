@@ -49,7 +49,7 @@
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 255, 0, 0.03));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
       z-index: 999;
       background-size: 100% 3px, 6px 100%;
       pointer-events: none;
@@ -752,45 +752,27 @@
       </div>
 
       <div class="projects-grid">
-        <!-- Project 1: Featured Quadruped Robot (Assembly CAD) -->
-        <div class="project-card featured" data-category="hardware">
-          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
-            <img class="fit-contain" src="quadriped.png" alt="Quadruped Robot Assembly" onerror="this.onerror=null; this.src='images/quadriped.png';" />
-            <div class="img-tag">[MECH-ROBOT]</div>
-          </div>
-          <div class="project-body">
-            <div>
-              <h3>Autonomous Quadruped Robot</h3>
-              <p>legged robotics chassis and multi-axis joint actuation designed for dynamic balancing and inverse kinematics locomotion. never had the chance to print it, but i plan on picking it back up eventually.</p>
-            </div>
-            <div class="project-tags">
-              <span class="project-tag">ESP32</span>
-              <span class="project-tag">Kinematics</span>
-              <span class="project-tag">C++</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Project 1b: Featured Quadruped Locomotion Simulation (GIF) -->
-        <div class="project-card featured" data-category="simulation">
+        <!-- Merged Quadruped Robot (Hardware & Simulation) -->
+        <div class="project-card featured" data-category="hardware simulation">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
               class="fit-contain" 
               src="yurr.gif" 
-              alt="Quadruped Locomotion Simulation Loop" 
+              alt="Quadruped Robot Locomotion Simulation" 
               onerror="this.onerror=null; this.src='images/yurr.gif'; this.onerror=() => { this.src='yurr.GIF'; this.onerror=() => { this.src='images/yurr.GIF'; }; };" 
             />
-            <div class="img-tag">[SIM-DYNAMICS]</div>
+            <div class="img-tag">[ROBOT-SIM]</div>
           </div>
           <div class="project-body">
             <div>
-              <h3>Quadruped Locomotion Simulation</h3>
-              <p>multi-joint kinematics simulation modeling leg trajectories, center of mass stabilization, and ground reaction forces in real time.</p>
+              <h3>Autonomous Quadruped Robot & Locomotion Sim</h3>
+              <p>legged robotics chassis and multi-axis joint actuation designed for dynamic balancing and inverse kinematics locomotion. includes multi-joint physics simulations modeling leg trajectories, center of mass stabilization, and ground reaction forces in real time. never had the chance to print it, but i plan on picking it back up eventually.</p>
             </div>
             <div class="project-tags">
+              <span class="project-tag">ESP32</span>
+              <span class="project-tag">Kinematics</span>
               <span class="project-tag">Physics Sim</span>
-              <span class="project-tag">Dynamics</span>
-              <span class="project-tag">Inverse Kinematics</span>
+              <span class="project-tag">C++</span>
             </div>
           </div>
         </div>
@@ -877,7 +859,7 @@
           <div class="project-body">
             <div>
               <h3>Oscilloscope stuff</h3>
-              <p>this isnt rlly a project, some mistake we made in our circuits lab that had the graph generate some cool visuals. just thought id share</p>
+              <p>this isnt rlly a project, some mistake we made in our circuits lab that had the graph generate some cool visuals. just thought id share.</p>
             </div>
             <div class="project-tags">
               <span class="project-tag">Oscilloscope</span>
@@ -896,6 +878,11 @@
       </div>
 
       <div class="gallery-grid">
+        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+          <img src="quadriped.png" alt="Quadruped Full Assembly CAD" onerror="this.onerror=null; this.src='images/quadriped.png';" />
+          <div class="gallery-item-caption">// Quadruped Full Assembly CAD</div>
+        </div>
+
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="quadriped leg.png" alt="Quadruped Leg Linkage" onerror="this.onerror=null; this.src='images/quadriped leg.png';" />
           <div class="gallery-item-caption">// Quadruped Leg Assembly</div>
@@ -935,7 +922,7 @@
           <div class="timeline-title">Mechanical Sub-team Member</div>
           <div class="timeline-org">Chem-E-Car Design Team</div>
           <div class="timeline-desc">
-            Wheel assembly subteam. designing the suspension, steering, tires, all that fun stuff
+            Wheel assembly subteam. designing the suspension, steering, tires, all that fun stuff.
           </div>
         </div>
 
@@ -944,7 +931,7 @@
           <div class="timeline-title">B.Eng., Mechatronics Engineering</div>
           <div class="timeline-org">McMaster University</div>
           <div class="timeline-desc">
-            Some mechanical, some electrical, an unnecessary amount of software
+            Some mechanical, some electrical, an unnecessary amount of software.
           </div>
         </div>
       </div>
@@ -970,7 +957,8 @@
       event.target.classList.add('active');
 
       cards.forEach(card => {
-        if (category === 'all' || card.dataset.category === category) {
+        const categories = card.dataset.category.split(' ');
+        if (category === 'all' || categories.includes(category)) {
           card.style.display = card.classList.contains('featured') && window.innerWidth > 900 ? 'grid' : 'flex';
         } else {
           card.style.display = 'none';
