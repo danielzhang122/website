@@ -43,6 +43,7 @@
       background-attachment: fixed;
     }
 
+    /* CRT Scanline Overlay */
     body::before {
       content: " ";
       display: block;
@@ -587,6 +588,7 @@
       line-height: 1.5;
     }
 
+    /* Lightbox Modal */
     .lightbox {
       display: none;
       position: fixed;
@@ -737,6 +739,7 @@
       </div>
     </section>
 
+    <!-- Projects Section -->
     <section id="projects">
       <div class="section-header">
         <h2>Featured Projects</h2>
@@ -751,6 +754,7 @@
       </div>
 
       <div class="projects-grid">
+        <!-- Project 1: Merged Quadruped Robot (Hardware & Simulation) -->
         <div class="project-card featured" data-category="hardware simulation">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
@@ -775,6 +779,7 @@
           </div>
         </div>
 
+        <!-- Project 2: Suspension POC -->
         <div class="project-card featured" data-category="simulation">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
@@ -799,6 +804,7 @@
           </div>
         </div>
 
+        <!-- Project 3: WheelSafe Storage -->
         <div class="project-card featured" data-category="hardware">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
@@ -823,6 +829,7 @@
           </div>
         </div>
 
+        <!-- Project 4: Real-Time Minute Wage Tracker (Software) -->
         <div class="project-card" data-category="software">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
@@ -846,7 +853,8 @@
             </div>
           </div>
         </div>
-<!-- 
+
+        <!-- Project 5: CV Robotic Arm -->
         <div class="project-card" data-category="hardware software">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
@@ -870,10 +878,10 @@
             </div>
           </div>
         </div>
-      </div>
-        --> 
+      </div> <!-- Properly closed .projects-grid -->
     </section>
 
+    <!-- Hardware & CAD Gallery -->
     <section id="gallery">
       <div class="section-header">
         <h2>Hardware & CAD Bench</h2>
@@ -893,7 +901,7 @@
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="mbedpen.jpeg" alt="Embedded Pen / Microcontroller" onerror="this.onerror=null; this.src='images/mbedpen.jpeg';" />
-          <div class="gallery-item-caption">// Custom constant-current pulse controller built for an embedded final. The professor asked no questions, gave an A, and moved on</div>
+          <div class="gallery-item-caption">// Constant-current pulse controller prototype for embedded final</div>
         </div>
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
@@ -903,6 +911,7 @@
       </div>
     </section>
 
+    <!-- Experience Timeline -->
     <section id="experience">
       <div class="section-header">
         <h2>Experience & Milestones</h2>
@@ -915,7 +924,7 @@
           <div class="timeline-title">Nuclear Engineering Co-op</div>
           <div class="timeline-org">Eclipse Automation</div>
           <div class="timeline-desc">
-            Executing Allowable Strength Design (ASD) calculations and authoring FMEAs / FAT plans for CSA N299-rated specialized tooling. Validating mechanical tooling during DVT trials and building automated audit workflows across 1,000+ technical standards for CANDU reactor refurbishment projects (Pickering, Cernavodă).
+            Spent 8+ months learning that nuclear engineering is 10% high-tolerance physics and 90% respecting paperwork. Executed ASD safety calculations, drafted design descriptions, and verified tooling for CANDU reactor refurbishment.
           </div>
         </div>
 
@@ -933,7 +942,7 @@
           <div class="timeline-title">Top 3 Finalist — ENGINEER 1P13 Showcase</div>
           <div class="timeline-org">McMaster University</div>
           <div class="timeline-desc">
-            Ranked 3rd out of 200+ teams for the client-tailored "WheelSafe" carbon-fiber wheelchair storage mechanism. Presented working prototype and engineering documentation to industry P.Eng evaluators.
+            Ranked 3rd out of 200+ teams for the client-tailored "WheelSafe" carbon-fiber wheelchair storage mechanism. Presented working prototype and engineering documentation to industry P.Eng evaluators[.
           </div>
         </div>
 
@@ -953,6 +962,7 @@
     </footer>
   </div>
 
+  <!-- Lightbox Modal -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <span class="lightbox-close">&times;</span>
     <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview">
@@ -969,7 +979,7 @@
       cards.forEach(card => {
         const categories = card.dataset.category.split(' ');
         if (category === 'all' || categories.includes(category)) {
-          card.style.display = card.classList.contains('featured') && window.innerWidth > 900 ? 'grid' : 'flex';
+          card.style.display = ''; // Clears inline styles so CSS media query grid/flex displays properly
         } else {
           card.style.display = 'none';
         }
