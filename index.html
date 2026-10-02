@@ -46,6 +46,8 @@ section{padding:4rem 0;border-top:1px dashed #2f1219;position:relative}
 .section-header h2{font-size:1.85rem;color:#fff;display:flex;align-items:center;gap:0.75rem}
 .section-header h2::before{content:"//";color:var(--blood);font-weight:800}
 .section-header p{color:var(--dark-muted);font-size:0.9rem;margin-top:0.25rem}
+.click-hint{color:var(--blood-glow);font-weight:700;font-size:0.75rem;letter-spacing:0.05em;margin-left:0.5rem;display:inline-block;animation:pulse 2s infinite}
+@keyframes pulse{0%{opacity:0.7}50%{opacity:1}100%{opacity:0.7}}
 /* 3D Orbiting Skills Carousel */
 .carousel-viewport{position:relative;width:100%;height:380px;perspective:1100px;display:flex;align-items:center;justify-content:center;overflow:hidden;user-select:none;cursor:grab;touch-action:pan-y}
 .carousel-viewport:active{cursor:grabbing}
@@ -78,9 +80,10 @@ section{padding:4rem 0;border-top:1px dashed #2f1219;position:relative}
 .gallery-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.25rem}
 .gallery-item{position:relative;height:240px;border:1px solid #20222a;overflow:hidden;cursor:pointer;background:#050608;transition:all 0.2s ease;display:flex;align-items:center;justify-content:center}
 .gallery-item:hover{border-color:var(--blood);transform:translateY(-2px)}
-.gallery-item img{width:100%;height:100%;object-fit:contain;padding:0.4rem;filter:contrast(110%);transition:all 0.3s ease}
+.gallery-item img{width:100%;height:100%;object-fit:cover;padding:0;filter:contrast(110%);transition:all 0.3s ease}
 .gallery-item:hover img{transform:scale(1.04)}
-.gallery-item-caption{position:absolute;bottom:0;left:0;right:0;background:rgba(9,9,11,0.92);border-top:1px solid var(--border-accent);padding:0.45rem 0.75rem;font-size:0.72rem;color:var(--text)}
+.gallery-item-caption{position:absolute;bottom:0;left:0;right:0;background:rgba(9,9,11,0.92);border-top:1px solid var(--border-accent);padding:0.45rem 0.75rem;font-size:0.72rem;color:var(--text);transform:translateY(100%);transition:transform 0.2s ease}
+.gallery-item:hover .gallery-item-caption{transform:translateY(0)}
 .timeline{position:relative;border-left:2px solid var(--border-accent);margin-left:0.5rem;padding-left:1.5rem;display:flex;flex-direction:column;gap:2.25rem}
 .timeline-item{position:relative}
 .timeline-item::before{content:"";position:absolute;left:calc(-1.5rem - 6px);top:0.35rem;width:10px;height:10px;background:var(--blood);box-shadow:0 0 8px var(--blood-glow)}
@@ -290,7 +293,7 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
   <section id="gallery">
     <div class="section-header">
       <h2>Hardware & CAD Bench</h2>
-      <p>Prototyping, bench testing, and empirically messing around.</p>
+      <p>Prototyping, bench testing, and empirically messing around. <span class="click-hint">[ CLICK TO ENLARGE ]</span></p>
     </div>
     <div class="gallery-grid">
       <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
@@ -324,12 +327,12 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
   <section id="art">
     <div class="section-header">
       <h2>Art Portfolio</h2>
-      <p>Digital concepts, classical sketches, and creative works.</p>
+      <p>Digital concepts, classical sketches, and creative works. <span class="click-hint">[ CLICK TO ENLARGE ]</span></p>
     </div>
     <div class="gallery-grid">
       <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
-        <img src="blender.jpg" alt="Blender animation still" onerror="this.onerror=null; this.src='images/blender.jpg';" />
-        <div class="gallery-item-caption">// blender.jpg</div>
+        <img src="blender.gif" alt="Blender animation still" onerror="this.onerror=null; this.src='images/blender.gif';" />
+        <div class="gallery-item-caption">// blender.gif</div>
       </div>
       <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
         <img src="sketch 2.jpg" alt="Figure sketch on toned paper" onerror="this.onerror=null; this.src='images/sketch 2.jpg';" />
