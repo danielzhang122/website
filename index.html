@@ -3,211 +3,1055 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Portfolio & Projects</title>
+  <title>DANIEL // MECHATRONICS</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,400;0,700;1,700&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #0f172a;
-      --card-bg: #1e293b;
-      --text: #f8fafc;
-      --muted: #94a3b8;
-      --accent: #38bdf8;
-      --border: #334155;
+      --bg: #09090b;
+      --card-bg: #111215;
+      --border: #27272a;
+      --border-accent: #540d1c;
+      --blood: #e11d48;
+      --blood-glow: #ff1e56;
+      --crimson-dim: rgba(225, 29, 72, 0.12);
+      --text: #f4f4f5;
+      --muted: #a1a1aa;
+      --dark-muted: #52525b;
+      --hazard: #ffd23f;
     }
 
     * {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      scroll-behavior: smooth;
     }
 
     body {
       background-color: var(--bg);
       color: var(--text);
+      font-family: 'JetBrains Mono', monospace;
       line-height: 1.6;
-      padding: 0 1.5rem;
+      overflow-x: hidden;
+      background-image: 
+        radial-gradient(ellipse at 85% 0%, rgba(225, 29, 72, 0.16) 0%, transparent 60%),
+        radial-gradient(ellipse at 10% 100%, rgba(136, 19, 55, 0.22) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.35) 1px, transparent 1px, transparent 3px);
+      background-attachment: fixed;
+    }
+
+    /* CRT Scanline Overlay */
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      z-index: 999;
+      background-size: 100% 3px, 6px 100%;
+      pointer-events: none;
+    }
+
+    h1, h2, h3, .logo {
+      font-family: 'Chakra Petch', sans-serif;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    nav {
+      position: sticky;
+      top: 0;
+      background: rgba(9, 9, 11, 0.94);
+      border-bottom: 2px solid var(--border-accent);
+      z-index: 100;
+      backdrop-filter: blur(6px);
+    }
+
+    .nav-container {
+      max-width: 1080px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.9rem 1.5rem;
+    }
+
+    .logo {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .logo .cross {
+      color: var(--blood);
+      font-size: 1.4rem;
+      text-shadow: 0 0 10px var(--blood-glow);
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .nav-links a {
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+    }
+
+    .nav-links a:hover {
+      color: var(--blood-glow);
+      text-shadow: 0 0 8px rgba(255, 30, 86, 0.6);
     }
 
     .container {
-      max-width: 900px;
+      max-width: 1080px;
       margin: 0 auto;
-      padding: 4rem 0;
+      padding: 0 1.5rem;
+    }
+
+    #smoke-canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.65;
     }
 
     header {
-      margin-bottom: 4rem;
+      padding: 5.5rem 0 3.5rem;
+      position: relative;
     }
 
-    .tagline {
-      color: var(--accent);
-      font-weight: 600;
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .hazard-strip {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #180509;
+      border: 1px solid var(--blood);
+      padding: 0.35rem 0.85rem;
+      color: var(--blood-glow);
+      font-size: 0.75rem;
+      font-weight: 800;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
-      font-size: 0.875rem;
-      margin-bottom: 0.5rem;
+      letter-spacing: 0.12em;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 0 12px rgba(225, 29, 72, 0.25);
     }
 
-    h1 {
-      font-size: 2.75rem;
-      line-height: 1.2;
-      margin-bottom: 1rem;
+    .hazard-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--blood-glow);
+      box-shadow: 0 0 8px var(--blood-glow);
+    }
+
+    .glitch {
+      display: block;
+      width: 100%;
+      position: relative;
+      font-size: clamp(2.5rem, 6vw, 4.25rem);
+      line-height: 1.1;
+      font-weight: 700;
+      color: #fff;
+      text-shadow: 2px 2px 0px #3f0914, 4px 4px 0px #180307;
+      margin-bottom: 1.25rem;
+    }
+
+    .glitch span {
+      color: var(--blood);
+    }
+
+    .glitch:hover::before, .glitch:hover::after {
+      content: attr(data-text);
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      clip: rect(0, 0, 0, 0);
+    }
+
+    .glitch:hover::before {
+      left: 2px;
+      text-shadow: -2px 0 var(--blood-glow);
+      animation: glitch-anim-1 0.4s infinite linear alternate-reverse;
+    }
+
+    .glitch:hover::after {
+      left: -2px;
+      text-shadow: 2px 0 #00ffff;
+      animation: glitch-anim-2 0.3s infinite linear alternate-reverse;
+    }
+
+    @keyframes glitch-anim-1 {
+      0% { clip: rect(10px, 9999px, 35px, 0); }
+      50% { clip: rect(45px, 9999px, 80px, 0); }
+      100% { clip: rect(20px, 9999px, 60px, 0); }
+    }
+
+    @keyframes glitch-anim-2 {
+      0% { clip: rect(60px, 9999px, 90px, 0); }
+      50% { clip: rect(15px, 9999px, 40px, 0); }
+      100% { clip: rect(70px, 9999px, 105px, 0); }
     }
 
     p.lead {
       color: var(--muted);
-      font-size: 1.25rem;
-      max-width: 600px;
+      font-size: 1.05rem;
+      max-width: 650px;
+      margin-bottom: 2.25rem;
+      border-left: 2px solid var(--blood);
+      padding-left: 1rem;
+      background: linear-gradient(90deg, rgba(225, 29, 72, 0.05), transparent);
     }
 
-    .links {
+    .btn-group {
       display: flex;
+      flex-wrap: wrap;
       gap: 1rem;
-      margin-top: 1.5rem;
     }
 
     .btn {
-      display: inline-block;
-      padding: 0.6rem 1.2rem;
-      border-radius: 6px;
-      font-size: 0.95rem;
-      font-weight: 500;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.4rem;
+      font-size: 0.85rem;
+      font-weight: 800;
       text-decoration: none;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
       transition: all 0.2s ease;
+      clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
     }
 
     .btn-primary {
-      background-color: var(--accent);
-      color: #0f172a;
+      background: var(--blood);
+      color: #fff;
+      box-shadow: 0 0 14px rgba(225, 29, 72, 0.4);
     }
 
     .btn-primary:hover {
-      opacity: 0.9;
+      background: var(--blood-glow);
+      box-shadow: 0 0 20px rgba(255, 30, 86, 0.8);
+      transform: translate(-1px, -1px);
     }
 
     .btn-secondary {
+      background: #14151a;
       border: 1px solid var(--border);
       color: var(--text);
     }
 
     .btn-secondary:hover {
-      border-color: var(--muted);
+      border-color: var(--blood);
+      color: var(--blood-glow);
     }
 
     section {
-      margin-bottom: 4rem;
+      padding: 4rem 0;
+      border-top: 1px dashed #2f1219;
+      position: relative;
     }
 
-    h2 {
-      font-size: 1.5rem;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 0.75rem;
-      margin-bottom: 1.5rem;
+    .section-header {
+      margin-bottom: 2rem;
     }
 
-    .grid {
+    .section-header h2 {
+      font-size: 1.85rem;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .section-header h2::before {
+      content: "//";
+      color: var(--blood);
+      font-weight: 800;
+    }
+
+    .section-header p {
+      color: var(--dark-muted);
+      font-size: 0.9rem;
+      margin-top: 0.25rem;
+    }
+
+    .skills-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .skill-card {
+      background: var(--card-bg);
+      border: 1px solid #1f2229;
+      border-left: 3px solid var(--border);
+      padding: 1.25rem;
+      transition: all 0.2s ease;
+    }
+
+    .skill-card:hover {
+      border-left-color: var(--blood);
+      background: #16181f;
+    }
+
+    .skill-card h3 {
+      font-size: 0.9rem;
+      color: var(--blood);
+      margin-bottom: 0.85rem;
+      letter-spacing: 0.08em;
+    }
+
+    .pill-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .pill {
+      background: #09090b;
+      border: 1px solid #27272a;
+      color: var(--muted);
+      font-size: 0.75rem;
+      padding: 0.25rem 0.55rem;
+    }
+
+    .filter-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1.75rem;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      background: #111215;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 0.85rem;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      border-color: var(--blood);
+      color: #fff;
+      background: var(--crimson-dim);
+      box-shadow: inset 0 0 8px rgba(225, 29, 72, 0.3);
+    }
+
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
       gap: 1.5rem;
     }
 
-    .card {
+    .project-card {
+      grid-column: span 6;
       background: var(--card-bg);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 1.5rem;
-      transition: transform 0.2s ease;
+      border: 1px solid #20222a;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      transition: all 0.2s ease;
+      overflow: hidden;
     }
 
-    .card:hover {
+    .project-card.featured {
+      grid-column: span 12;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+    }
+
+    .project-card.featured .project-img-wrapper {
+      height: 380px;
+      border-bottom: none;
+      border-right: 1px solid #20222a;
+    }
+
+    .project-card:hover {
+      border-color: var(--blood);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 20px -5px rgba(225, 29, 72, 0.3);
+    }
+
+    .project-img-wrapper {
+      position: relative;
+      width: 100%;
+      height: 280px;
+      background: #050608;
+      overflow: hidden;
+      border-bottom: 1px solid #20222a;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .project-img-wrapper img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: contrast(110%) brightness(95%);
+      transition: filter 0.3s ease, transform 0.3s ease;
+    }
+
+    .project-img-wrapper img.fit-contain {
+      object-fit: contain;
+      padding: 0.5rem;
+    }
+
+    .project-card:hover .project-img-wrapper img {
+      filter: contrast(115%) brightness(105%);
+      transform: scale(1.02);
+    }
+
+    .img-tag {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: rgba(9, 9, 11, 0.9);
+      border: 1px solid var(--border-accent);
+      color: var(--blood-glow);
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      z-index: 2;
+    }
+
+    .project-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    .project-card h3 {
+      font-size: 1.25rem;
+      color: #fff;
+      margin-bottom: 0.6rem;
+    }
+
+    .project-card p {
+      color: var(--muted);
+      font-size: 0.88rem;
+      line-height: 1.55;
+      margin-bottom: 1.25rem;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.4rem;
+      margin-top: auto;
+    }
+
+    .project-tag {
+      background: #09090b;
+      border: 1px solid var(--border-accent);
+      color: var(--blood-glow);
+      padding: 0.25rem 0.55rem;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .gallery-item {
+      position: relative;
+      height: 240px;
+      border: 1px solid #20222a;
+      overflow: hidden;
+      cursor: pointer;
+      background: #050608;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .gallery-item:hover {
+      border-color: var(--blood);
       transform: translateY(-2px);
     }
 
-    .card h3 {
-      font-size: 1.15rem;
-      margin-bottom: 0.5rem;
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      padding: 0.4rem;
+      filter: contrast(110%);
+      transition: all 0.3s ease;
     }
 
-    .card p {
-      color: var(--muted);
-      font-size: 0.95rem;
-      margin-bottom: 1rem;
+    .gallery-item:hover img {
+      transform: scale(1.04);
     }
 
-    .tags {
+    .gallery-item-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(9, 9, 11, 0.92);
+      border-top: 1px solid var(--border-accent);
+      padding: 0.45rem 0.75rem;
+      font-size: 0.72rem;
+      color: var(--text);
+    }
+
+    .timeline {
+      position: relative;
+      border-left: 2px solid var(--border-accent);
+      margin-left: 0.5rem;
+      padding-left: 1.5rem;
       display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
+      flex-direction: column;
+      gap: 2.25rem;
     }
 
-    .tag {
-      background: #0f172a;
-      border: 1px solid var(--border);
-      color: var(--accent);
-      padding: 0.2rem 0.6rem;
-      border-radius: 4px;
+    .timeline-item {
+      position: relative;
+    }
+
+    .timeline-item::before {
+      content: "";
+      position: absolute;
+      left: calc(-1.5rem - 6px);
+      top: 0.35rem;
+      width: 10px;
+      height: 10px;
+      background: var(--blood);
+      box-shadow: 0 0 8px var(--blood-glow);
+    }
+
+    .timeline-date {
       font-size: 0.75rem;
+      color: var(--blood);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.25rem;
+    }
+
+    .timeline-title {
+      font-size: 1.15rem;
+      color: #fff;
+    }
+
+    .timeline-org {
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .timeline-desc {
+      color: var(--dark-muted);
+      font-size: 0.85rem;
+      line-height: 1.5;
+    }
+
+    /* Lightbox Modal */
+    .lightbox {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(7, 8, 10, 0.96);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+      padding: 1.5rem;
+      backdrop-filter: blur(10px);
+    }
+
+    .lightbox.active {
+      display: flex;
+    }
+
+    .lightbox-content {
+      max-width: 92vw;
+      max-height: 90vh;
+      border: 2px solid var(--blood);
+      box-shadow: 0 0 35px rgba(225, 29, 72, 0.5);
+      object-fit: contain;
+      background: #000;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 1.5rem;
+      right: 2rem;
+      color: var(--blood);
+      font-size: 2.5rem;
+      cursor: pointer;
       font-family: monospace;
+      font-weight: bold;
     }
 
     footer {
-      border-top: 1px solid var(--border);
-      padding: 2rem 0;
-      color: var(--muted);
-      font-size: 0.875rem;
+      border-top: 2px solid var(--border-accent);
+      padding: 3rem 0;
       text-align: center;
+      color: var(--dark-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    @media (max-width: 900px) {
+      .project-card, .project-card.featured {
+        grid-column: span 12;
+        display: flex;
+        flex-direction: column;
+      }
+      .project-card.featured .project-img-wrapper {
+        border-right: none;
+        border-bottom: 1px solid #20222a;
+        height: 280px;
+      }
+      .nav-links {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
+
+  <nav>
+    <div class="nav-container">
+      <a href="#" class="logo"><span class="cross">✕</span> DANIEL</a>
+      <ul class="nav-links">
+        <li><a href="#about">// About</a></li>
+        <li><a href="#skills">// Skills</a></li>
+        <li><a href="#projects">// Projects</a></li>
+        <li><a href="#gallery">// Hardware & CAD</a></li>
+        <li><a href="#experience">// Timeline</a></li>
+        <li><a href="https://www.linkedin.com/in/zhangdz/" target="_blank">// LinkedIn</a></li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="container">
-    <header>
-      <div class="tagline">Engineering & Software</div>
-      <h1>Hi, I'm [Your Name].</h1>
-      <p class="lead">Building robotics, embedded systems, and automated software workflows.</p>
-      <div class="links">
-        <a href="https://github.com/[your-username]" class="btn btn-primary" target="_blank">GitHub Profile</a>
-        <a href="mailto:your-email@example.com" class="btn btn-secondary">Contact Me</a>
+    <header id="about">
+      <canvas id="smoke-canvas"></canvas>
+      <div class="hero-content">
+        <div class="hazard-strip">
+          <span class="hazard-dot"></span> STATUS: AVAILABLE FOR SPRING 2027 CO-OP
+        </div>
+        <h1 class="glitch" data-text="DANIEL ZHANG">DANIEL <span>ZHANG</span></h1>
+        <p class="lead">
+          Mechatronics student bridging the gap between mechanical tolerances that don't fit and embedded firmware that won't compile. Focused on kinematics, dynamic controls, and nuclear tooling.
+        </p>
+        <div class="btn-group">
+          <a href="#projects" class="btn btn-primary">View Projects</a>
+          <a href="https://github.com/danielzhang122" target="_blank" class="btn btn-secondary">GitHub Profile</a>
+          <a href="https://www.linkedin.com/in/zhangdz/" target="_blank" class="btn btn-secondary">LinkedIn</a>
+          <a href="mailto:zhand40@mcmaster.ca" class="btn btn-secondary">Get in Touch</a>
+        </div>
       </div>
     </header>
 
-    <section>
-      <h2>Featured Projects</h2>
-      <div class="grid">
-        <div class="card">
-          <h3>Automated Workflow Engine</h3>
-          <p>End-to-end automation pipelines designed to cross-reference databases and verify documentation accuracy.</p>
-          <div class="tags">
-            <span class="tag">Automation</span>
-            <span class="tag">Python</span>
-            <span class="tag">API</span>
+    <section id="skills">
+      <div class="section-header">
+        <h2>Technical Core</h2>
+        <p>Tools I’ve used to build systems, break prototypes, and occasionally read the documentation.</p>
+      </div>
+      <div class="skills-grid">
+        <div class="skill-card">
+          <h3>Hardware & Embedded</h3>
+          <div class="pill-list">
+            <span class="pill">ESP32</span>
+            <span class="pill">STM32</span>
+            <span class="pill">Raspberry Pi</span>
+            <span class="pill">PCA9685 / Drivers</span>
+            <span class="pill">I2C / SPI / UDP</span>
           </div>
         </div>
 
-        <div class="card">
-          <h3>Embedded Control System</h3>
-          <p>Real-time microcontroller firmware controlling multi-axis actuators with high-precision feedback loops.</p>
-          <div class="tags">
-            <span class="tag">C++</span>
-            <span class="tag">ESP32</span>
-            <span class="tag">Hardware</span>
+        <div class="skill-card">
+          <h3>CAD & Simulation</h3>
+          <div class="pill-list">
+            <span class="pill">SolidWorks</span>
+            <span class="pill">Inventor</span>
+            <span class="pill">Fusion 360</span>
+            <span class="pill">MuJoCo</span>
+            <span class="pill">FEA Stress Analysis</span>
           </div>
         </div>
 
-        <div class="card">
-          <h3>Kinematics & Dynamics Sim</h3>
-          <p>Physics-based simulation models for testing vehicle suspension stability and dynamic load distributions.</p>
-          <div class="tags">
-            <span class="tag">Simulation</span>
-            <span class="tag">CAD</span>
-            <span class="tag">Dynamics</span>
+        <div class="skill-card">
+          <h3>Software & Computation</h3>
+          <div class="pill-list">
+            <span class="pill">C / C++</span>
+            <span class="pill">Python (OpenCV)</span>
+            <span class="pill">MATLAB / Simulink</span>
+            <span class="pill">Julia</span>
+            <span class="pill">Power Automate</span>
+          </div>
+        </div>
+
+        <div class="skill-card">
+          <h3>Design & Standards</h3>
+          <div class="pill-list">
+            <span class="pill">CSA N299.2 / N299.3</span>
+            <span class="pill">ASD Verification</span>
+            <span class="pill">GD&T</span>
+            <span class="pill">FMEA & FAT Plans</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Projects Section -->
+    <section id="projects">
+      <div class="section-header">
+        <h2>Featured Projects</h2>
+        <p>From CAD files that crashed SolidWorks to mechanisms that actually survived hardware testing.</p>
+      </div>
+
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterProjects('all')">All</button>
+        <button class="filter-btn" onclick="filterProjects('hardware')">Hardware & Embedded</button>
+        <button class="filter-btn" onclick="filterProjects('software')">Software & Automation</button>
+        <button class="filter-btn" onclick="filterProjects('simulation')">Simulation & CAD</button>
+      </div>
+
+      <div class="projects-grid">
+        <!-- Project 1: Merged Quadruped Robot (Hardware & Simulation) -->
+        <div class="project-card featured" data-category="hardware simulation">
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img 
+              class="fit-contain" 
+              src="yurr.gif" 
+              alt="Quadruped Robot Locomotion Simulation" 
+              onerror="this.onerror=null; this.src='images/yurr.gif';" 
+            />
+            <div class="img-tag">[ROBOT-SIM]</div>
+          </div>
+          <div class="project-body">
+            <div>
+              <h3>Autonomous Quadruped Robot & Locomotion Sim</h3>
+              <p>12-DOF legged robotics platform built around an inverse kinematics solver and dynamic stability modeling. Simulated leg trajectories, center-of-mass stabilization, and ground reaction forces in real time. Works flawlessly in simulation, where gravity is a tidy constant and friction never betrays you.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">Inverse Kinematics</span>
+              <span class="project-tag">MuJoCo</span>
+              <span class="project-tag">ESP32</span>
+              <span class="project-tag">C++</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 2: Suspension POC -->
+        <div class="project-card featured" data-category="simulation">
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img 
+              class="fit-contain" 
+              src="movement.gif" 
+              alt="Suspension Geometry Kinematic Movement" 
+              onerror="this.onerror=null; this.src='images/movement.gif';" 
+            />
+            <div class="img-tag">[CAD-PROTO]</div>
+          </div>
+          <div class="project-body">
+            <div>
+              <h3>Double Wishbone Suspension Geometry</h3>
+              <p>Proof-of-Concept double wishbone assembly engineered in SolidWorks to control dynamic camber and stabilize a 500 mL sloshing payload over a 33 m track run. Peak mechanical over-engineering for a straight-line sprint, but the kinematic camber curves are undeniable.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">SolidWorks</span>
+              <span class="project-tag">Kinematics</span>
+              <span class="project-tag">Vehicle Dynamics</span>
+              <span class="project-tag">Chem-E-Car</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 3: WheelSafe Storage -->
+        <div class="project-card featured" data-category="hardware">
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img 
+              class="fit-contain" 
+              src="powerincommunity.jpg" 
+              alt="WheelSafe Storage Unit and Certificate" 
+              onerror="this.onerror=null; this.src='images/powerincommunity.jpg';" 
+            />
+            <div class="img-tag">[TOP 3 / SHOWCASE]</div>
+          </div>
+          <div class="project-body">
+            <div>
+              <h3>WheelSafe Storage — Accessible Mobility Aid</h3>
+              <p>Engineered an ergonomic, weatherproof wheelchair storage module designed for a client with Spina Bifida. Achieved a 3.25:1 load-to-weight ratio with a 0.4 kg carbon-fiber-reinforced structure. Awarded Top 3 out of 200+ engineering teams at the McMaster Design Showcase.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">Autodesk Inventor</span>
+              <span class="project-tag">Client Prototyping</span>
+              <span class="project-tag">Carbon Fiber</span>
+              <span class="project-tag">Top 3 Award</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 4: Real-Time Minute Wage Tracker (Software) -->
+        <div class="project-card" data-category="software">
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img 
+              class="fit-contain" 
+              src="WAGES.png" 
+              alt="Wage Tracker App Interface" 
+              onerror="this.onerror=null; this.src='images/WAGES.png';" 
+            />
+            <div class="img-tag">[APP-DEV]</div>
+          </div>
+          <div class="project-body">
+            <div>
+              <h3>Real-Time Compensation Visualizer</h3>
+              <p>A live Python dashboard that calculates and displays earnings down to the microsecond. Built to quantify the exact organizational monetary cost of a 45-minute meeting that definitely could have been an email.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">Python</span>
+              <span class="project-tag">GUI Dev</span>
+              <span class="project-tag">Process Tool</span>
+              <a href="https://github.com/danielzhang122/wage-tracker" target="_blank" style="color: var(--blood-glow); text-decoration: none; font-size: 0.7rem; font-weight: 700; margin-left: auto;">[REPO &nearr;]</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Project 5: CV Robotic Arm -->
+        <div class="project-card" data-category="hardware software">
+          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+            <img 
+              class="fit-contain" 
+              src="test.gif" 
+              alt="CV Controlled Robotic Arm" 
+              onerror="this.onerror=null; this.src='images/test.gif';" 
+            />
+            <div class="img-tag">[CV-EMBEDDED]</div>
+          </div>
+          <div class="project-body">
+            <div>
+              <h3>Vision-Guided 2-DOF Robotic Arm</h3>
+              <p>Built in 12 hours. Runs a real-time OpenCV hand-tracking pipeline transmitting coordinate deltas over UDP to an ESP32, which converts position streams into tuned stepper pulses without jitter.</p>
+            </div>
+            <div class="project-tags">
+              <span class="project-tag">Python / OpenCV</span>
+              <span class="project-tag">ESP32</span>
+              <span class="project-tag">C++ / UDP</span>
+
+            </div>
+          </div>
+        </div>
+      </div> <!-- Properly closed .projects-grid -->
+    </section>
+
+    <!-- Hardware & CAD Gallery -->
+    <section id="gallery">
+      <div class="section-header">
+        <h2>Hardware & CAD Bench</h2>
+        <p>Physical prototypes, kinematic linkages, and empirical hardware testing.</p>
+      </div>
+
+      <div class="gallery-grid">
+        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+          <img src="quadriped.png" alt="Quadruped Full Assembly CAD" onerror="this.onerror=null; this.src='images/quadriped.png';" />
+          <div class="gallery-item-caption">// Quadruped 12-DOF Full Assembly CAD</div>
+        </div>
+
+        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+          <img src="quadriped leg.png" alt="Quadruped Leg Linkage" onerror="this.onerror=null; this.src='images/quadriped leg.png';" />
+          <div class="gallery-item-caption">// Dynamic Leg Kinematic Linkage</div>
+        </div>
+
+        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+          <img src="mbedpen.jpeg" alt="Embedded Pen / Microcontroller" onerror="this.onerror=null; this.src='images/mbedpen.jpeg';" />
+          <div class="gallery-item-caption">// Constant-current pulse controller for my embedded final. The professor asked no questions, gave an A, and moved on.</div>
+        </div>
+
+        <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+          <img src="cool2.jpg" alt="Lab Test Setup" onerror="this.onerror=null; this.src='images/cool2.jpg';" />
+          <div class="gallery-item-caption">// Accidental RF Antenna: when poor probe grounding becomes generative art</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Experience Timeline -->
+    <section id="experience">
+      <div class="section-header">
+        <h2>Experience & Milestones</h2>
+        <p>Where organizations have entrusted me with high-consequence hardware and real systems.</p>
+      </div>
+
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">JAN 2026 — PRESENT // NUCLEAR INDUSTRY</div>
+          <div class="timeline-title">Nuclear Engineering Co-op</div>
+          <div class="timeline-org">Eclipse Automation</div>
+          <div class="timeline-desc">
+            Spent 8+ months learning that nuclear engineering is 10% high-tolerance physics and 90% respecting paperwork. Executed ASD safety calculations, drafted design descriptions, and verified tooling for CANDU reactor refurbishment.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">SEP 2026 — PRESENT // STUDENT DESIGN TEAM</div>
+          <div class="timeline-title">Mechanical Sub-team Member (Wheel Assembly)</div>
+          <div class="timeline-org">McMaster Chem-E-Car</div>
+          <div class="timeline-desc">
+            Architecting the team's first independent double-wishbone suspension in SolidWorks. Optimizing packaging constraints, camber angles, and straight-line tracking to protect onboard stopping sensors from liquid payload slosh.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">2024 // AWARD & SHOWCASE</div>
+          <div class="timeline-title">Top 3 Finalist — ENGINEER 1P13 Showcase</div>
+          <div class="timeline-org">McMaster University</div>
+          <div class="timeline-desc">
+            Ranked 3rd out of 200+ teams for the client-tailored "WheelSafe" carbon-fiber wheelchair storage mechanism. Presented working prototype and engineering documentation to industry P.Eng evaluators[.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">2023 — PRESENT // ACADEMIA</div>
+          <div class="timeline-title">B.Eng., Mechatronics Engineering CO-OP (Level III)</div>
+          <div class="timeline-org">McMaster University</div>
+          <div class="timeline-desc">
+            Equal parts statics/dynamics, embedded systems architecture, circuit theory, and keeping SolidWorks licenses from crashing on campus lab machines.
           </div>
         </div>
       </div>
     </section>
 
     <footer>
-      &copy; 2026 [Your Name]. Hosted with GitHub Pages.
+      [ // DANIEL ZHANG — 2026 // ALL SYSTEMS OPERATIONAL ]
     </footer>
   </div>
+
+  <!-- Lightbox Modal -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <span class="lightbox-close">&times;</span>
+    <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview">
+  </div>
+
+  <script>
+    function filterProjects(category) {
+      const cards = document.querySelectorAll('.project-card');
+      const buttons = document.querySelectorAll('.filter-btn');
+
+      buttons.forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+
+      cards.forEach(card => {
+        const categories = card.dataset.category.split(' ');
+        if (category === 'all' || categories.includes(category)) {
+          card.style.display = ''; // Clears inline styles so CSS media query grid/flex displays properly
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+
+    function openLightbox(src) {
+      const lb = document.getElementById('lightbox');
+      const img = document.getElementById('lightbox-img');
+      img.src = src;
+      lb.classList.add('active');
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('active');
+    }
+
+    const canvas = document.getElementById('smoke-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.offsetWidth;
+      canvas.height = canvas.parentElement.offsetHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * canvas.width;
+        this.y = canvas.height + Math.random() * 20;
+        this.size = Math.random() * 2.5 + 0.8;
+        this.speedY = Math.random() * 0.7 + 0.3;
+        this.speedX = (Math.random() - 0.5) * 0.4;
+        this.opacity = Math.random() * 0.7 + 0.2;
+        this.isRed = Math.random() > 0.4;
+      }
+      update() {
+        this.y -= this.speedY;
+        this.x += this.speedX;
+        this.opacity -= 0.002;
+        if (this.y < 0 || this.opacity <= 0) {
+          this.reset();
+        }
+      }
+      draw() {
+        ctx.fillStyle = this.isRed 
+          ? `rgba(225, 29, 72, ${this.opacity})` 
+          : `rgba(200, 200, 200, ${this.opacity * 0.4})`;
+        ctx.fillRect(this.x, this.y, this.size, this.size);
+      }
+    }
+
+    for (let i = 0; i < 45; i++) {
+      const p = new Particle();
+      p.y = Math.random() * canvas.height;
+      particles.push(p);
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(animate);
+    }
+    animate();
+  </script>
 </body>
 </html>
