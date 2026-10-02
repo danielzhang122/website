@@ -94,8 +94,11 @@ section{padding:4rem 0;border-top:1px dashed #2f1219;position:relative}
 /* Lightbox Modal */
 .lightbox{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(7,8,10,0.96);z-index:1000;justify-content:center;align-items:center;padding:1.5rem;backdrop-filter:blur(10px)}
 .lightbox.active{display:flex}
-.lightbox-content{max-width:92vw;max-height:90vh;border:2px solid var(--blood);box-shadow:0 0 35px rgba(225,29,72,0.5);object-fit:contain;background:#000}
-.lightbox-close{position:absolute;top:1.5rem;right:2rem;color:var(--blood);font-size:2.5rem;cursor:pointer;font-family:monospace;font-weight:bold}
+.lightbox-wrapper{display:flex;flex-direction:column;align-items:center;max-width:92vw;max-height:90vh}
+.lightbox-content{max-width:100%;max-height:80vh;border:2px solid var(--blood);box-shadow:0 0 35px rgba(225,29,72,0.5);object-fit:contain;background:#000}
+.lightbox-text{margin-top:1rem;color:var(--text);font-size:0.9rem;text-align:center;max-width:800px;background:rgba(9,9,11,0.85);padding:0.65rem 1.25rem;border-left:3px solid var(--blood);box-shadow:0 4px 15px rgba(0,0,0,0.5)}
+.lightbox-text strong{color:var(--blood-glow);text-transform:uppercase;margin-right:0.5rem;letter-spacing:0.05em}
+.lightbox-close{position:absolute;top:1.5rem;right:2rem;color:var(--blood);font-size:2.5rem;cursor:pointer;font-family:monospace;font-weight:bold;z-index:1001}
 footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:center;color:var(--dark-muted);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em}
 @media (max-width:900px){
 .project-card,.project-card.featured{grid-column:span 12;display:flex;flex-direction:column}
@@ -296,27 +299,27 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
       <p>Prototyping, bench testing, and empirically messing around. <span class="click-hint">[ CLICK TO ENLARGE ]</span></p>
     </div>
     <div class="gallery-grid">
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Quadruped CAD</strong> // Quadruped 12-DOF Full Assembly CAD')">
         <img src="quadriped.png" alt="Quadruped Full Assembly CAD" onerror="this.onerror=null; this.src='images/quadriped.png';" />
         <div class="gallery-item-caption">// Quadruped 12-DOF Full Assembly CAD</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Kinematic Linkage</strong> // Dynamic Leg Kinematic Linkage')">
         <img src="quadriped leg.png" alt="Quadruped Leg Linkage" onerror="this.onerror=null; this.src='images/quadriped leg.png';" />
         <div class="gallery-item-caption">// Dynamic Leg Kinematic Linkage</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Accidental Antenna</strong> // When poor probe grounding becomes generative art')">
         <img src="cool2.jpg" alt="Lab Test Setup" onerror="this.onerror=null; this.src='images/cool2.jpg';" />
         <div class="gallery-item-caption">// Accidental RF Antenna: when poor probe grounding becomes generative art</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>HV Discharge</strong> // Pure bench curiosity, zero practical utility')">
         <img src="taser.gif" alt="High Voltage Arc Test" onerror="this.onerror=null; this.src='images/taser.gif';" />
         <div class="gallery-item-caption">// HV pulse discharge test: pure bench curiosity, zero practical utility</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Dell Bootleg</strong> // Upgraded the CPU/RAM, kept a 24/7 Minecraft server alive for 2 months')">
         <img src="images/computer-bootleg.jpg" alt="Salvaged Dell Bench PC" onerror="this.onerror=null; this.src='computer-bootleg.jpg';" />
         <div class="gallery-item-caption">// "Acquired" from high school. upgraded the CPU/RAM, and kept a 24/7 Minecraft server alive for 2 months</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>First POST</strong> // The rarest sight in engineering—everything working on the first try')">
         <img src="images/newcomputer.jpg" alt="First POST on custom desktop rig" onerror="this.onerror=null; this.src='newcomputer.jpg';" />
         <div class="gallery-item-caption">// First POST: the rarest sight in engineering—everything working on the first try</div>
       </div>
@@ -330,45 +333,38 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
       <p>Digital concepts, classical sketches, and creative works. <span class="click-hint">[ CLICK TO ENLARGE ]</span></p>
     </div>
     <div class="gallery-grid">
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Hang In There</strong> // Because sometimes 3D rendering makes you want to do exactly this.')">
         <img src="blender.gif" alt="Blender animation still" onerror="this.onerror=null; this.src='images/blender.gif';" />
-        <div class="gallery-item-caption">// blender.gif</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Toned Back Study</strong> // Charcoal is just fancy dirt that makes you feel like a real artist.')">
         <img src="sketch 2.jpg" alt="Figure sketch on toned paper" onerror="this.onerror=null; this.src='images/sketch 2.jpg';" />
-        <div class="gallery-item-caption">// sketch 2.jpg</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Floral Heads</strong> // Painting faces is hard, so I just put flowers over them. Problem solved.')">
         <img src="painting.jpg" alt="Two figures painting" onerror="this.onerror=null; this.src='images/painting.jpg';" />
-        <div class="gallery-item-caption">// painting.jpg</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Seated Figure</strong> // I spent 45 minutes trying to get the spine right and gave up entirely on the hands.')">
         <img src="sketch.jpg" alt="Pencil figure sketch" onerror="this.onerror=null; this.src='images/sketch.jpg';" />
-        <div class="gallery-item-caption">// sketch.jpg</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Half Dead Portrait</strong> // An accurate representation of how I feel inside after a 12-hour CAD session.')">
         <img src="selfportrait 3.jpg" alt="Gouache surreal portrait" onerror="this.onerror=null; this.src='images/selfportrait 3.jpg';" />
-        <div class="gallery-item-caption">// selfportrait 3.jpg</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Dental Study</strong> // A friendly reminder to floss. Or else I will draw your teeth.')">
         <img src="digital teeth.jpg" alt="Digital art illustration of teeth" onerror="this.onerror=null; this.src='images/digital teeth.jpg';" />
-        <div class="gallery-item-caption">// digital teeth.jpg</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Flayed Skull</strong> // When the pre-workout hits but you\'re already deceased.')">
         <img src="skull.jpg" alt="Skull anatomy painting" onerror="this.onerror=null; this.src='images/skull.jpg';" />
-        <div class="gallery-item-caption">// skull.jpg</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Block Print Skull</strong> // Carving this lino block out took longer than my actual lifespan.')">
         <img src="skull2.jpg" alt="Lino cut style skull print" onerror="this.onerror=null; this.src='images/skull2.jpg';" />
-        <div class="gallery-item-caption">// skull2.jpg</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Pink Rose</strong> // The mandatory generic flower painting just to prove to my mom I can paint nice things.')">
         <img src="flower.jpg" alt="Pink rose painting" onerror="this.onerror=null; this.src='images/flower.jpg';" />
-        <div class="gallery-item-caption">// flower.jpg</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Everything Is Fine</strong> // Just a totally normal self-portrait with zero underlying metaphors.')">
         <img src="self portrait 1.jpg" alt="Painted self portrait with burning house" onerror="this.onerror=null; this.src='images/self portrait 1.jpg';" />
-        <div class="gallery-item-caption">// self portrait 1.jpg</div>
+      </div>
+      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Wood Lizard</strong> // Carved out of a block of wood. I still have all ten fingers, which is the real masterpiece here.')">
+        <img src="image_8179df.png" alt="Wood carved lizard" onerror="this.onerror=null; this.src='images/image_8179df.png';" />
       </div>
     </div>
   </section>
@@ -411,9 +407,12 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
 </div>
 
 <!-- Lightbox Modal -->
-<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+<div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
   <span class="lightbox-close">&times;</span>
-  <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview">
+  <div class="lightbox-wrapper">
+    <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview">
+    <div id="lightbox-caption" class="lightbox-text"></div>
+  </div>
 </div>
 
 <script>
@@ -427,12 +426,25 @@ function filterProjects(category){
     card.style.display=(category==='all'||categories.includes(category))?'':'none';
   });
 }
-function openLightbox(src){
+function openLightbox(src, captionHTML){
   const lb=document.getElementById('lightbox');
   document.getElementById('lightbox-img').src=src;
+  
+  const capEl=document.getElementById('lightbox-caption');
+  if(captionHTML) {
+    capEl.innerHTML = captionHTML;
+    capEl.style.display = 'block';
+  } else {
+    capEl.style.display = 'none';
+  }
+  
   lb.classList.add('active');
 }
-function closeLightbox(){document.getElementById('lightbox').classList.remove('active')}
+function closeLightbox(e){
+  // Prevent closing when clicking the image or text directly
+  if(e && (e.target.id === 'lightbox-img' || e.target.id === 'lightbox-caption')) return;
+  document.getElementById('lightbox').classList.remove('active');
+}
 
 // 3D Carousel Interactive Drag & Animation Loop
 const viewport=document.getElementById('carouselViewport');
