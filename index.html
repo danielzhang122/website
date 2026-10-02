@@ -43,7 +43,6 @@
       background-attachment: fixed;
     }
 
-    /* CRT Scanline Overlay */
     body::before {
       content: " ";
       display: block;
@@ -588,7 +587,6 @@
       line-height: 1.5;
     }
 
-    /* Lightbox Modal */
     .lightbox {
       display: none;
       position: fixed;
@@ -677,7 +675,7 @@
         </div>
         <h1 class="glitch" data-text="DANIEL ZHANG">DANIEL <span>ZHANG</span></h1>
         <p class="lead">
-          3rd year mechatronics engineering student. interested in a little bit of everything
+          Mechatronics student bridging the gap between mechanical tolerances that don't fit and embedded firmware that won't compile. Focused on kinematics, dynamic controls, and nuclear tooling.
         </p>
         <div class="btn-group">
           <a href="#projects" class="btn btn-primary">View Projects</a>
@@ -691,17 +689,17 @@
     <section id="skills">
       <div class="section-header">
         <h2>Technical Core</h2>
-        <p>my skills and whatnot. i know a lot of things, but im hardly an expert</p>
+        <p>Tools I’ve used to build systems, break prototypes, and occasionally read the documentation.</p>
       </div>
       <div class="skills-grid">
         <div class="skill-card">
           <h3>Hardware & Embedded</h3>
           <div class="pill-list">
             <span class="pill">ESP32</span>
+            <span class="pill">STM32</span>
             <span class="pill">Raspberry Pi</span>
-            <span class="pill">Motor Drivers</span>
-            <span class="pill">Actuators</span>
-            <span class="pill">I2C / SPI</span>
+            <span class="pill">PCA9685 / Drivers</span>
+            <span class="pill">I2C / SPI / UDP</span>
           </div>
         </div>
 
@@ -709,19 +707,19 @@
           <h3>CAD & Simulation</h3>
           <div class="pill-list">
             <span class="pill">SolidWorks</span>
-            <span class="pill">Autodesk Inventor</span>
+            <span class="pill">Inventor</span>
+            <span class="pill">Fusion 360</span>
             <span class="pill">MuJoCo</span>
-            <span class="pill">Gazebo</span>
-            <span class="pill">FEA</span>
+            <span class="pill">FEA Stress Analysis</span>
           </div>
         </div>
 
         <div class="skill-card">
           <h3>Software & Computation</h3>
           <div class="pill-list">
-            <span class="pill">Python</span>
             <span class="pill">C / C++</span>
-            <span class="pill">MATLAB</span>
+            <span class="pill">Python (OpenCV)</span>
+            <span class="pill">MATLAB / Simulink</span>
             <span class="pill">Julia</span>
             <span class="pill">Power Automate</span>
           </div>
@@ -730,20 +728,19 @@
         <div class="skill-card">
           <h3>Design & Standards</h3>
           <div class="pill-list">
+            <span class="pill">CSA N299.2 / N299.3</span>
+            <span class="pill">ASD Verification</span>
             <span class="pill">GD&T</span>
-            <span class="pill">FMEA</span>
-            <span class="pill">Compliance Auditing</span>
-            <span class="pill">Kinematics</span>
+            <span class="pill">FMEA & FAT Plans</span>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Projects Section -->
     <section id="projects">
       <div class="section-header">
         <h2>Featured Projects</h2>
-        <p>some projects ive done. some (most) are incomplete. but at least i tried</p>
+        <p>From CAD files that crashed SolidWorks to mechanisms that actually survived hardware testing.</p>
       </div>
 
       <div class="filter-bar">
@@ -754,220 +751,197 @@
       </div>
 
       <div class="projects-grid">
-        <!-- Project 1: Merged Quadruped Robot (Hardware & Simulation) -->
         <div class="project-card featured" data-category="hardware simulation">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
               class="fit-contain" 
               src="yurr.gif" 
               alt="Quadruped Robot Locomotion Simulation" 
-              onerror="this.onerror=null; this.src='images/yurr.gif'; this.onerror=() => { this.src='yurr.GIF'; };" 
+              onerror="this.onerror=null; this.src='images/yurr.gif';" 
             />
             <div class="img-tag">[ROBOT-SIM]</div>
           </div>
           <div class="project-body">
             <div>
               <h3>Autonomous Quadruped Robot & Locomotion Sim</h3>
-              <p>legged robotics chassis and multi-axis joint actuation designed for dynamic balancing and inverse kinematics locomotion. includes multi-joint physics simulations modeling leg trajectories, center of mass stabilization, and ground reaction forces in real time. never had the chance to print it, but i plan on picking it back up eventually.</p>
+              <p>12-DOF legged robotics platform built around an inverse kinematics solver and dynamic stability modeling. Simulated leg trajectories, center-of-mass stabilization, and ground reaction forces in real time. Works flawlessly in simulation, where gravity is a tidy constant and friction never betrays you.</p>
             </div>
             <div class="project-tags">
+              <span class="project-tag">Inverse Kinematics</span>
+              <span class="project-tag">MuJoCo</span>
               <span class="project-tag">ESP32</span>
-              <span class="project-tag">Kinematics</span>
-              <span class="project-tag">Physics Sim</span>
               <span class="project-tag">C++</span>
             </div>
           </div>
         </div>
 
-        <!-- Project 2: Featured Suspension POC (GIF: movement.gif) -->
         <div class="project-card featured" data-category="simulation">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
               class="fit-contain" 
               src="movement.gif" 
               alt="Suspension Geometry Kinematic Movement" 
-              onerror="this.onerror=null; this.src='images/movement.gif'; this.onerror=() => { this.src='movement.GIF'; };" 
+              onerror="this.onerror=null; this.src='images/movement.gif';" 
             />
             <div class="img-tag">[CAD-PROTO]</div>
           </div>
           <div class="project-body">
             <div>
-              <h3>POC Suspension Geometry</h3>
-              <p>proof-of-concept suspension linkage and double-wishbone geometry setup designed for vehicle steering and dynamic load response.</p>
+              <h3>Double Wishbone Suspension Geometry</h3>
+              <p>Independent double wishbone assembly engineered in SolidWorks to control dynamic camber and stabilize a 500 mL sloshing payload over a 33 m track run. Peak mechanical over-engineering for a straight-line sprint, but the kinematic camber curves are undeniable.</p>
             </div>
             <div class="project-tags">
               <span class="project-tag">SolidWorks</span>
               <span class="project-tag">Kinematics</span>
-              <span class="project-tag">Dynamics</span>
+              <span class="project-tag">Vehicle Dynamics</span>
+              <span class="project-tag">Chem-E-Car</span>
             </div>
           </div>
         </div>
 
-        <!-- Project 3: WheelSafe Storage (ENGINEER 1P13 Top 3 Award) -->
         <div class="project-card featured" data-category="hardware">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
               class="fit-contain" 
               src="powerincommunity.jpg" 
               alt="WheelSafe Storage Unit and Certificate" 
-              onerror="this.onerror=null; this.src='images/powerincommunity.jpg'; this.onerror=() => { this.src='powerincommunity.JPG'; };" 
+              onerror="this.onerror=null; this.src='images/powerincommunity.jpg';" 
             />
             <div class="img-tag">[TOP 3 / SHOWCASE]</div>
           </div>
           <div class="project-body">
             <div>
               <h3>WheelSafe Storage — Accessible Mobility Aid</h3>
-              <p>awarded Top 3 out of 200+ engineering groups in McMaster's ENGINEER 1P13 course and showcased at the Design Showcase. Tackled accessibility and anti-theft storage for individuals using wheelchairs and mobility aids.</p>
+              <p>Engineered an ergonomic, weatherproof wheelchair storage module designed for a client with Spina Bifida. Achieved a 3.25:1 load-to-weight ratio with a 0.4 kg carbon-fiber-reinforced structure. Awarded Top 3 out of 200+ engineering teams at the McMaster Design Showcase.</p>
             </div>
             <div class="project-tags">
+              <span class="project-tag">Autodesk Inventor</span>
               <span class="project-tag">Client Prototyping</span>
-              <span class="project-tag">Accessibility Design</span>
-              <span class="project-tag">Product Design</span>
+              <span class="project-tag">Carbon Fiber</span>
               <span class="project-tag">Top 3 Award</span>
             </div>
           </div>
         </div>
 
-        <!-- Project 4: Real-Time Minute Wage Tracker (Software) -->
         <div class="project-card" data-category="software">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
               class="fit-contain" 
               src="WAGES.png" 
               alt="Wage Tracker App Interface" 
-              onerror="this.onerror=null; this.src='images/WAGES.png'; this.onerror=() => { this.src='WAGES.PNG'; };" 
+              onerror="this.onerror=null; this.src='images/WAGES.png';" 
             />
             <div class="img-tag">[APP-DEV]</div>
           </div>
           <div class="project-body">
             <div>
-              <h3>Real-Time Minute Wage Tracker</h3>
-              <p>"minimalist" live earnings tracker that computes and visualizes exactly how much money you make by the minute and second during work shifts. built to watch the clock work for you.</p>
+              <h3>Real-Time Compensation Visualizer</h3>
+              <p>A live Python dashboard that calculates and displays earnings down to the microsecond. Built to quantify the exact organizational monetary cost of a 45-minute meeting that definitely could have been an email.</p>
             </div>
             <div class="project-tags">
               <span class="project-tag">Python</span>
-              <span class="project-tag">App Development</span>
-              <span class="project-tag">Productivity</span>
+              <span class="project-tag">GUI Dev</span>
+              <span class="project-tag">Process Tool</span>
               <a href="https://github.com/danielzhang122/wage-tracker" target="_blank" style="color: var(--blood-glow); text-decoration: none; font-size: 0.7rem; font-weight: 700; margin-left: auto;">[REPO &nearr;]</a>
             </div>
           </div>
         </div>
 
-        <!-- Project 5: High-Voltage Pulse Rig (Converted to GIF) -->
-        <div class="project-card" data-category="hardware">
+        <div class="project-card" data-category="hardware software">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
               class="fit-contain" 
-              src="taser.gif" 
-              alt="High-Voltage Pulse Arc Discharge" 
-              onerror="this.onerror=null; this.src='images/taser.gif'; this.onerror=() => { this.src='taser.GIF'; };" 
+              src="movement.gif" 
+              alt="CV Controlled Robotic Arm" 
+              onerror="this.onerror=null; this.src='images/movement.gif';" 
             />
-            <div class="img-tag">[HIGH-VOLT]</div>
+            <div class="img-tag">[CV-EMBEDDED]</div>
           </div>
           <div class="project-body">
             <div>
-              <h3>High-Voltage Pulse Discharge System</h3>
-              <p>capacitive discharge and high-voltage arc firing mechanism compatible with usb-c charging. this project isnt very safe, or all that impressive. but it was fun to mess around with HV. legally i cannot call this a taser.</p>
+              <h3>Vision-Guided 2-DOF Robotic Arm</h3>
+              <p>Built in 12 hours during a hackathon. Runs a real-time OpenCV hand-tracking pipeline transmitting coordinate deltas over UDP to an ESP32, which converts position streams into tuned stepper pulses without jitter.</p>
             </div>
             <div class="project-tags">
-              <span class="project-tag">Hardware</span>
-              <span class="project-tag">High Voltage</span>
-              <span class="project-tag">Circuitry</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Project 6: Oscilloscope Visuals (Hardware) -->
-        <div class="project-card" data-category="hardware">
-          <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
-            <img src="cool.jpg" alt="Oscilloscope Trace" onerror="this.onerror=null; this.src='images/cool.jpg';" />
-            <div class="img-tag">[SYS-SCOPE]</div>
-          </div>
-          <div class="project-body">
-            <div>
-              <h3>Oscilloscope stuff</h3>
-              <p>this isnt rlly a project, some mistake we made in our circuits lab that had the graph generate some cool visuals. just thought id share</p>
-            </div>
-            <div class="project-tags">
-              <span class="project-tag">Oscilloscope</span>
-              <span class="project-tag">Analog/Digital Electronics</span>
+              <span class="project-tag">OpenCV</span>
+              <span class="project-tag">ESP32</span>
+              <span class="project-tag">C++ / UDP</span>
+              <span class="project-tag">Hackathon</span>
             </div>
           </div>
         </div>
       </div>
     </section>
 
-    <!-- Hardware & CAD Gallery -->
     <section id="gallery">
       <div class="section-header">
         <h2>Hardware & CAD Bench</h2>
-        <p>prototypes, mechanical assemblies, and subsystem test models</p>
+        <p>Physical prototypes, kinematic linkages, and empirical hardware testing.</p>
       </div>
 
       <div class="gallery-grid">
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="quadriped.png" alt="Quadruped Full Assembly CAD" onerror="this.onerror=null; this.src='images/quadriped.png';" />
-          <div class="gallery-item-caption">// Quadruped Full Assembly CAD</div>
+          <div class="gallery-item-caption">// Quadruped 12-DOF Full Assembly CAD</div>
         </div>
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="quadriped leg.png" alt="Quadruped Leg Linkage" onerror="this.onerror=null; this.src='images/quadriped leg.png';" />
-          <div class="gallery-item-caption">// Quadruped Leg Assembly</div>
+          <div class="gallery-item-caption">// Dynamic Leg Kinematic Linkage</div>
         </div>
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="mbedpen.jpeg" alt="Embedded Pen / Microcontroller" onerror="this.onerror=null; this.src='images/mbedpen.jpeg';" />
-          <div class="gallery-item-caption">// THC pen battery for embedded final. not sure how this got approved, but i got an A</div>
+          <div class="gallery-item-caption">// Constant-current pulse controller prototype for embedded final</div>
         </div>
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="cool2.jpg" alt="Lab Test Setup" onerror="this.onerror=null; this.src='images/cool2.jpg';" />
-          <div class="gallery-item-caption">// Circuits lab waveform capture - its not supposed to look like this, but it sure is pretty</div>
+          <div class="gallery-item-caption">// Accidental RF Antenna: when poor probe grounding becomes generative art</div>
         </div>
       </div>
     </section>
 
-    <!-- Experience Timeline -->
     <section id="experience">
       <div class="section-header">
         <h2>Experience & Milestones</h2>
-        <p>jobs and teams yada yada yada</p>
+        <p>Where organizations have entrusted me with high-consequence hardware and real systems.</p>
       </div>
 
       <div class="timeline">
         <div class="timeline-item">
-          <div class="timeline-date">2026 — PRESENT // INDUSTRY</div>
-          <div class="timeline-title">Nuclear Engineering Intern</div>
+          <div class="timeline-date">JAN 2026 — PRESENT // NUCLEAR INDUSTRY</div>
+          <div class="timeline-title">Nuclear Engineering Co-op</div>
           <div class="timeline-org">Eclipse Automation</div>
           <div class="timeline-desc">
-            Assisted the nuclear engineering team. Wrote some (relatively) important documents, did some calculations, conducted a few tests, etc. working on the Pickering RFBR mainly, sometimes some other cool nuclear projects.
+            Executing Allowable Strength Design (ASD) calculations and authoring FMEAs / FAT plans for CSA N299-rated specialized tooling. Validating mechanical tooling during DVT trials and building automated audit workflows across 1,000+ technical standards for CANDU reactor refurbishment projects (Pickering, Cernavodă).
           </div>
         </div>
 
         <div class="timeline-item">
-          <div class="timeline-date">2026 — PRESENT // RACING</div>
-          <div class="timeline-title">Mechanical Sub-team Member</div>
-          <div class="timeline-org">Chem-E-Car Design Team</div>
+          <div class="timeline-date">SEP 2026 — PRESENT // STUDENT DESIGN TEAM</div>
+          <div class="timeline-title">Mechanical Sub-team Member (Wheel Assembly)</div>
+          <div class="timeline-org">McMaster Chem-E-Car</div>
           <div class="timeline-desc">
-            Wheel assembly subteam. designing the suspension, steering, tires, all that fun stuff
+            Architecting the team's first independent double-wishbone suspension in SolidWorks. Optimizing packaging constraints, camber angles, and straight-line tracking to protect onboard stopping sensors from liquid payload slosh.
           </div>
         </div>
 
         <div class="timeline-item">
           <div class="timeline-date">2024 // AWARD & SHOWCASE</div>
-          <div class="timeline-title">Top 3 Finalist — ENGINEER 1P13 Design Showcase</div>
+          <div class="timeline-title">Top 3 Finalist — ENGINEER 1P13 Showcase</div>
           <div class="timeline-org">McMaster University</div>
           <div class="timeline-desc">
-            Selected top 3 out of 200+ groups for the client-focused "WheelSafe Storage" wheelchair accessibility project. Presented physical prototype at the faculty design showcase.
+            Ranked 3rd out of 200+ teams for the client-tailored "WheelSafe" carbon-fiber wheelchair storage mechanism. Presented working prototype and engineering documentation to industry P.Eng evaluators.
           </div>
         </div>
 
         <div class="timeline-item">
           <div class="timeline-date">2023 — PRESENT // ACADEMIA</div>
-          <div class="timeline-title">B.Eng., Mechatronics Engineering</div>
+          <div class="timeline-title">B.Eng., Mechatronics Engineering CO-OP (Level III)</div>
           <div class="timeline-org">McMaster University</div>
           <div class="timeline-desc">
-            Some mechanical, some electrical, an unnecessary amount of software
+            Equal parts statics/dynamics, embedded systems architecture, circuit theory, and keeping SolidWorks licenses from crashing on campus lab machines.
           </div>
         </div>
       </div>
@@ -978,7 +952,6 @@
     </footer>
   </div>
 
-  <!-- Lightbox Modal -->
   <div class="lightbox" id="lightbox" onclick="closeLightbox()">
     <span class="lightbox-close">&times;</span>
     <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview">
