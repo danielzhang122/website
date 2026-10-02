@@ -49,7 +49,7 @@
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 255, 0, 0.03));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
       z-index: 999;
       background-size: 100% 3px, 6px 100%;
       pointer-events: none;
@@ -313,6 +313,7 @@
       overflow: hidden;
       user-select: none;
       cursor: grab;
+      touch-action: pan-y;
     }
 
     .carousel-viewport:active {
@@ -324,17 +325,7 @@
       width: 260px;
       height: 240px;
       transform-style: preserve-3d;
-      transition: transform 0.1s ease-out;
-      animation: orbit 22s linear infinite;
-    }
-
-    .carousel-viewport:hover .carousel-ring {
-      animation-play-state: paused;
-    }
-
-    @keyframes orbit {
-      from { transform: rotateY(0deg); }
-      to { transform: rotateY(-360deg); }
+      will-change: transform;
     }
 
     .carousel-card {
@@ -713,7 +704,6 @@
         overflow: visible;
       }
       .carousel-ring {
-        animation: none !important;
         width: 100%;
         height: auto;
         display: flex;
@@ -758,7 +748,7 @@
         </div>
         <h1 class="glitch" data-text="DANIEL ZHANG">DANIEL <span>ZHANG</span></h1>
         <p class="lead">
-          Mechatronics student bridging the gap between mechanical tolerances that don't fit and embedded firmware that won't compile. Focused on kinematics, dynamic controls, and nuclear tooling.
+          Mechatronics student at McMaster. I mostly spend my time building robots, designing mechanical parts, and working on nuclear tooling.
         </p>
         <div class="btn-group">
           <a href="#projects" class="btn btn-primary">View Projects</a>
@@ -1098,33 +1088,69 @@
       document.getElementById('lightbox').classList.remove('active');
     }
 
-    // 3D Carousel Drag Logic
+    // 3D Carousel Interactive Drag & Animation Loop
     const viewport = document.getElementById('carouselViewport');
     const ring = document.getElementById('carouselRing');
+
+    let currentAngle = 0;
     let isDragging = false;
     let startX = 0;
-    let currentRotation = 0;
+    let velocity = 0;
+    let isHovered = false;
+    const autoSpinSpeed = -0.15;
 
-    viewport.addEventListener('mousedown', (e) => {
-      isDragging = true;
-      startX = e.clientX;
-      ring.style.animationPlayState = 'paused';
+    viewport.addEventListener('mouseenter', () => { isHovered = true; });
+    viewport.addEventListener('mouseleave', () => { 
+      if (!isDragging) isHovered = false; 
     });
 
-    window.addEventListener('mouseup', () => {
+    function onPointerDown(e) {
+      isDragging = true;
+      startX = e.pageX || (e.touches && e.touches[0].pageX);
+      velocity = 0;
+    }
+
+    function onPointerMove(e) {
+      if (!isDragging) return;
+      const x = e.pageX || (e.touches && e.touches[0].pageX);
+      const deltaX = x - startX;
+      startX = x;
+      velocity = deltaX * 0.35;
+      currentAngle += velocity;
+    }
+
+    function onPointerUp() {
       if (isDragging) {
         isDragging = false;
-        ring.style.animationPlayState = 'running';
+        isHovered = false;
       }
-    });
+    }
 
-    window.addEventListener('mousemove', (e) => {
-      if (!isDragging) return;
-      const deltaX = e.clientX - startX;
-      startX = e.clientX;
-      currentRotation += deltaX * 0.4;
-      ring.style.transform = `rotateY(${currentRotation}deg)`;
-    });
+    viewport.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove);
+    window.addEventListener('mouseup', onPointerUp);
+
+    viewport.addEventListener('touchstart', onPointerDown, { passive: true });
+    window.addEventListener('touchmove', onPointerMove, { passive: true });
+    window.addEventListener('touchend', onPointerUp);
+
+    function animateCarousel() {
+      if (window.innerWidth > 650) {
+        if (!isDragging) {
+          if (Math.abs(velocity) > 0.01) {
+            currentAngle += velocity;
+            velocity *= 0.92;
+          } else if (!isHovered) {
+            currentAngle += autoSpinSpeed;
+          }
+        }
+        ring.style.transform = `rotateY(${currentAngle}deg)`;
+      } else {
+        ring.style.transform = 'none';
+      }
+      requestAnimationFrame(animateCarousel);
+    }
+    animateCarousel();
 
     // Background Canvas Smoke Animation
     const canvas = document.getElementById('smoke-canvas');
