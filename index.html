@@ -49,7 +49,7 @@
       display: block;
       position: fixed;
       top: 0; left: 0; bottom: 0; right: 0;
-      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.28) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 255, 0, 0.03));
       z-index: 999;
       background-size: 100% 3px, 6px 100%;
       pointer-events: none;
@@ -301,27 +301,74 @@
       margin-top: 0.25rem;
     }
 
-    .skills-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.25rem;
+    /* 3D Orbiting Skills Carousel */
+    .carousel-viewport {
+      position: relative;
+      width: 100%;
+      height: 380px;
+      perspective: 1100px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      user-select: none;
+      cursor: grab;
     }
 
-    .skill-card {
+    .carousel-viewport:active {
+      cursor: grabbing;
+    }
+
+    .carousel-ring {
+      position: relative;
+      width: 260px;
+      height: 240px;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease-out;
+      animation: orbit 22s linear infinite;
+    }
+
+    .carousel-viewport:hover .carousel-ring {
+      animation-play-state: paused;
+    }
+
+    @keyframes orbit {
+      from { transform: rotateY(0deg); }
+      to { transform: rotateY(-360deg); }
+    }
+
+    .carousel-card {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 260px;
+      height: 240px;
+      transform: rotateY(calc(var(--i) * 90deg)) translateZ(240px);
+      transform-style: preserve-3d;
+      backface-visibility: hidden;
+    }
+
+    .skill-card-inner {
+      width: 100%;
+      height: 100%;
       background: var(--card-bg);
       border: 1px solid #1f2229;
-      border-left: 3px solid var(--border);
+      border-left: 3px solid var(--border-accent);
       padding: 1.25rem;
-      transition: all 0.2s ease;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+      transition: border-color 0.2s, box-shadow 0.2s;
     }
 
-    .skill-card:hover {
+    .skill-card-inner:hover {
       border-left-color: var(--blood);
-      background: #16181f;
+      border-color: var(--border-accent);
+      box-shadow: 0 0 20px rgba(225, 29, 72, 0.35);
     }
 
-    .skill-card h3 {
-      font-size: 0.9rem;
+    .skill-card-inner h3 {
+      font-size: 0.85rem;
       color: var(--blood);
       margin-bottom: 0.85rem;
       letter-spacing: 0.08em;
@@ -339,6 +386,14 @@
       color: var(--muted);
       font-size: 0.75rem;
       padding: 0.25rem 0.55rem;
+    }
+
+    .carousel-hint {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--dark-muted);
+      margin-top: 0.5rem;
+      letter-spacing: 0.05em;
     }
 
     .filter-bar {
@@ -650,6 +705,32 @@
         display: none;
       }
     }
+
+    @media (max-width: 650px) {
+      .carousel-viewport {
+        height: auto;
+        perspective: none;
+        overflow: visible;
+      }
+      .carousel-ring {
+        animation: none !important;
+        width: 100%;
+        height: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        transform: none !important;
+      }
+      .carousel-card {
+        position: static;
+        width: 100%;
+        height: auto;
+        transform: none !important;
+      }
+      .carousel-hint {
+        display: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -688,55 +769,70 @@
       </div>
     </header>
 
+    <!-- 3D Orbiting Skills Section -->
     <section id="skills">
       <div class="section-header">
         <h2>Technical Core</h2>
         <p>Tools I’ve used to build systems, break prototypes, and occasionally read the documentation.</p>
       </div>
-      <div class="skills-grid">
-        <div class="skill-card">
-          <h3>Hardware & Embedded</h3>
-          <div class="pill-list">
-            <span class="pill">ESP32</span>
-            <span class="pill">STM32</span>
-            <span class="pill">Raspberry Pi</span>
-            <span class="pill">PCA9685 / Drivers</span>
-            <span class="pill">I2C / SPI / UDP</span>
-          </div>
-        </div>
 
-        <div class="skill-card">
-          <h3>CAD & Simulation</h3>
-          <div class="pill-list">
-            <span class="pill">SolidWorks</span>
-            <span class="pill">Inventor</span>
-            <span class="pill">Fusion 360</span>
-            <span class="pill">MuJoCo</span>
-            <span class="pill">FEA Stress Analysis</span>
+      <div class="carousel-viewport" id="carouselViewport">
+        <div class="carousel-ring" id="carouselRing">
+          
+          <div class="carousel-card" style="--i: 0;">
+            <div class="skill-card-inner">
+              <h3>Hardware & Embedded</h3>
+              <div class="pill-list">
+                <span class="pill">ESP32</span>
+                <span class="pill">STM32</span>
+                <span class="pill">Raspberry Pi</span>
+                <span class="pill">PCA9685 / Drivers</span>
+                <span class="pill">I2C / SPI / UDP</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="skill-card">
-          <h3>Software & Computation</h3>
-          <div class="pill-list">
-            <span class="pill">C / C++</span>
-            <span class="pill">Python (OpenCV)</span>
-            <span class="pill">MATLAB / Simulink</span>
-            <span class="pill">Julia</span>
-            <span class="pill">Power Automate</span>
+          <div class="carousel-card" style="--i: 1;">
+            <div class="skill-card-inner">
+              <h3>CAD & Simulation</h3>
+              <div class="pill-list">
+                <span class="pill">SolidWorks</span>
+                <span class="pill">Inventor</span>
+                <span class="pill">Fusion 360</span>
+                <span class="pill">MuJoCo</span>
+                <span class="pill">FEA Stress Analysis</span>
+              </div>
+            </div>
           </div>
-        </div>
 
-        <div class="skill-card">
-          <h3>Design & Standards</h3>
-          <div class="pill-list">
-            <span class="pill">CSA N299.2 / N299.3</span>
-            <span class="pill">ASD Verification</span>
-            <span class="pill">GD&T</span>
-            <span class="pill">FMEA & FAT Plans</span>
+          <div class="carousel-card" style="--i: 2;">
+            <div class="skill-card-inner">
+              <h3>Software & Computation</h3>
+              <div class="pill-list">
+                <span class="pill">C / C++</span>
+                <span class="pill">Python (OpenCV)</span>
+                <span class="pill">MATLAB / Simulink</span>
+                <span class="pill">Julia</span>
+                <span class="pill">Power Automate</span>
+              </div>
+            </div>
           </div>
+
+          <div class="carousel-card" style="--i: 3;">
+            <div class="skill-card-inner">
+              <h3>Design & Standards</h3>
+              <div class="pill-list">
+                <span class="pill">CSA N299.2 / N299.3</span>
+                <span class="pill">ASD Verification</span>
+                <span class="pill">GD&T</span>
+                <span class="pill">FMEA & FAT Plans</span>
+              </div>
+            </div>
+          </div>
+
         </div>
       </div>
+      <p class="carousel-hint">// Drag or hover to inspect modules</p>
     </section>
 
     <!-- Projects Section -->
@@ -754,7 +850,7 @@
       </div>
 
       <div class="projects-grid">
-        <!-- Project 1: Merged Quadruped Robot (Hardware & Simulation) -->
+        <!-- Project 1: Merged Quadruped Robot -->
         <div class="project-card featured" data-category="hardware simulation">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
@@ -829,7 +925,7 @@
           </div>
         </div>
 
-        <!-- Project 4: Real-Time Minute Wage Tracker (Software) -->
+        <!-- Project 4: Real-Time Compensation Visualizer -->
         <div class="project-card" data-category="software">
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
@@ -859,26 +955,26 @@
           <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
             <img 
               class="fit-contain" 
-              src="test.gif" 
+              src="movement.gif" 
               alt="CV Controlled Robotic Arm" 
-              onerror="this.onerror=null; this.src='images/test.gif';" 
+              onerror="this.onerror=null; this.src='images/movement.gif';" 
             />
             <div class="img-tag">[CV-EMBEDDED]</div>
           </div>
           <div class="project-body">
             <div>
               <h3>Vision-Guided 2-DOF Robotic Arm</h3>
-              <p>Built in 12 hours. Runs a real-time OpenCV hand-tracking pipeline transmitting coordinate deltas over UDP to an ESP32, which converts position streams into tuned stepper pulses without jitter.</p>
+              <p>Built in 12 hours during a hackathon. Runs a real-time OpenCV hand-tracking pipeline transmitting coordinate deltas over UDP to an ESP32, which converts position streams into tuned stepper pulses without jitter.</p>
             </div>
             <div class="project-tags">
-              <span class="project-tag">Python / OpenCV</span>
+              <span class="project-tag">OpenCV</span>
               <span class="project-tag">ESP32</span>
               <span class="project-tag">C++ / UDP</span>
-
+              <span class="project-tag">Hackathon</span>
             </div>
           </div>
         </div>
-      </div> <!-- Properly closed .projects-grid -->
+      </div>
     </section>
 
     <!-- Hardware & CAD Gallery -->
@@ -901,72 +997,69 @@
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="mbedpen.jpeg" alt="Embedded Pen / Microcontroller" onerror="this.onerror=null; this.src='images/mbedpen.jpeg';" />
-          <div class="gallery-item-caption">// Constant-current pulse controller for my embedded final. The professor asked no questions, gave an A, and moved on</div>
+          <div class="gallery-item-caption">// Constant-current pulse controller prototype for embedded final</div>
         </div>
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="cool2.jpg" alt="Lab Test Setup" onerror="this.onerror=null; this.src='images/cool2.jpg';" />
           <div class="gallery-item-caption">// Accidental RF Antenna: when poor probe grounding becomes generative art</div>
         </div>
-      
 
         <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
           <img src="taser.gif" alt="High Voltage Arc Test" onerror="this.onerror=null; this.src='images/taser.gif';" />
-          <div class="gallery-item-caption">// HV pulse discharge test: walking a fine line between ingenuity and legality</div>
+          <div class="gallery-item-caption">// 25 kV pulse discharge test: pure bench curiosity, zero practical utility</div>
         </div>
       </div>
     </section>
 
-    
-
     <!-- Experience Timeline -->
-   <section id="experience">
-  <div class="section-header">
-    <h2>Experience & Milestones</h2>
-    <p>Where organizations have entrusted me with high-consequence hardware and real systems.</p>
-  </div>
-
-  <div class="timeline">
-    <div class="timeline-item">
-      <div class="timeline-date">JAN 2026 — PRESENT // NUCLEAR INDUSTRY</div>
-      <div class="timeline-title">Nuclear Engineering Intern</div>
-      <div class="timeline-org">Eclipse Automation</div>
-      <div class="timeline-desc">
-        Spent 8+ months learning that nuclear engineering is 10% high-consequence tooling design and 90% respecting paperwork. Executed ASD safety calculations, authored FMEAs, and verified tooling for the Pickering reactor refurbishment and international CANDU sites.
+    <section id="experience">
+      <div class="section-header">
+        <h2>Experience & Milestones</h2>
+        <p>Where organizations have entrusted me with high-consequence hardware and real systems.</p>
       </div>
-    </div>
 
-    <div class="timeline-item">
-      <div class="timeline-date">SEP 2026 — PRESENT // STUDENT DESIGN TEAM</div>
-      <div class="timeline-title">Mechanical Sub-team Member (Wheel Assembly)</div>
-      <div class="timeline-org">McMaster Chem-E-Car</div>
-      <div class="timeline-desc">
-        Designing custom wheel assemblies and suspension geometry for a 33-meter run. Total mechanical overkill to keep 500 mL of water from sloshing around, but it works.
-      </div>
-    </div>
+      <div class="timeline">
+        <div class="timeline-item">
+          <div class="timeline-date">JAN 2026 — PRESENT // NUCLEAR INDUSTRY</div>
+          <div class="timeline-title">Nuclear Engineering Co-op</div>
+          <div class="timeline-org">Eclipse Automation</div>
+          <div class="timeline-desc">
+            Spent 8+ months learning that nuclear engineering is 10% high-consequence tooling design and 90% respecting paperwork. Executed ASD safety calculations, authored FMEAs, and verified tooling for the Pickering reactor refurbishment and international CANDU sites.
+          </div>
+        </div>
 
-    <div class="timeline-item">
-      <div class="timeline-date">2024 // AWARD & SHOWCASE</div>
-      <div class="timeline-title">Top 3 Finalist — ENGINEER 1P13 Showcase</div>
-      <div class="timeline-org">McMaster University</div>
-      <div class="timeline-desc">
-        Placed top 3 out of 200+ teams with a carbon-fiber wheelchair storage unit. Engineered a 3.25:1 strength-to-weight ratio and survived being cross-examined by a firing squad of skeptical P.Eng judges without breaking character.
-      </div>
-    </div>
+        <div class="timeline-item">
+          <div class="timeline-date">SEP 2026 — PRESENT // STUDENT DESIGN TEAM</div>
+          <div class="timeline-title">Mechanical Sub-team Member (Wheel Assembly)</div>
+          <div class="timeline-org">McMaster Chem-E-Car</div>
+          <div class="timeline-desc">
+            Designing custom wheel assemblies and suspension geometry for a 33-meter run. Total mechanical overkill to keep 500 mL of water from sloshing around, but it works.
+          </div>
+        </div>
 
-    <div class="timeline-item">
-      <div class="timeline-date">2023 — PRESENT // ACADEMIA</div>
-      <div class="timeline-title">B.Eng., Mechatronics Engineering CO-OP (Level III)</div>
-      <div class="timeline-org">McMaster University</div>
-      <div class="timeline-desc">
-        Equal parts statics/dynamics, embedded systems, circuit theory, and theoretical math that feels completely made up until you suddenly need it on co-op.
+        <div class="timeline-item">
+          <div class="timeline-date">2024 // AWARD & SHOWCASE</div>
+          <div class="timeline-title">Top 3 Finalist — ENGINEER 1P13 Showcase</div>
+          <div class="timeline-org">McMaster University</div>
+          <div class="timeline-desc">
+            Placed top 3 out of 200+ teams with a carbon-fiber wheelchair storage unit. Engineered a 3.25:1 strength-to-weight ratio and survived being cross-examined by a firing squad of skeptical P.Eng judges without breaking character.
+          </div>
+        </div>
+
+        <div class="timeline-item">
+          <div class="timeline-date">2023 — PRESENT // ACADEMIA</div>
+          <div class="timeline-title">B.Eng., Mechatronics Engineering CO-OP (Level III)</div>
+          <div class="timeline-org">McMaster University</div>
+          <div class="timeline-desc">
+            Equal parts statics/dynamics, embedded systems, circuit theory, and theoretical math that feels completely made up until you suddenly need it on co-op.
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
     <footer>
-      [ // DANIEL ZHANG — 2026 ]
+      [ // DANIEL ZHANG — 2026 // ALL SYSTEMS OPERATIONAL ]
     </footer>
   </div>
 
@@ -987,7 +1080,7 @@
       cards.forEach(card => {
         const categories = card.dataset.category.split(' ');
         if (category === 'all' || categories.includes(category)) {
-          card.style.display = ''; // Clears inline styles so CSS media query grid/flex displays properly
+          card.style.display = '';
         } else {
           card.style.display = 'none';
         }
@@ -1005,6 +1098,35 @@
       document.getElementById('lightbox').classList.remove('active');
     }
 
+    // 3D Carousel Drag Logic
+    const viewport = document.getElementById('carouselViewport');
+    const ring = document.getElementById('carouselRing');
+    let isDragging = false;
+    let startX = 0;
+    let currentRotation = 0;
+
+    viewport.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      startX = e.clientX;
+      ring.style.animationPlayState = 'paused';
+    });
+
+    window.addEventListener('mouseup', () => {
+      if (isDragging) {
+        isDragging = false;
+        ring.style.animationPlayState = 'running';
+      }
+    });
+
+    window.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const deltaX = e.clientX - startX;
+      startX = e.clientX;
+      currentRotation += deltaX * 0.4;
+      ring.style.transform = `rotateY(${currentRotation}deg)`;
+    });
+
+    // Background Canvas Smoke Animation
     const canvas = document.getElementById('smoke-canvas');
     const ctx = canvas.getContext('2d');
     let particles = [];
