@@ -91,14 +91,21 @@ section{padding:4rem 0;border-top:1px dashed #2f1219;position:relative}
 .timeline-title{font-size:1.15rem;color:#fff}
 .timeline-org{color:var(--muted);font-weight:600;font-size:0.85rem;margin-bottom:0.5rem;text-transform:uppercase}
 .timeline-desc{color:var(--dark-muted);font-size:0.85rem;line-height:1.5}
+
 /* Lightbox Modal */
-.lightbox{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(7,8,10,0.96);z-index:1000;justify-content:center;align-items:center;padding:1.5rem;backdrop-filter:blur(10px)}
+.lightbox{display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(7,8,10,0.96);z-index:1000;justify-content:center;align-items:center;padding:1.5rem;backdrop-filter:blur(10px);user-select:none}
 .lightbox.active{display:flex}
-.lightbox-wrapper{display:flex;flex-direction:column;align-items:center;max-width:92vw;max-height:90vh}
+.lightbox-wrapper{display:flex;flex-direction:column;align-items:center;max-width:92vw;max-height:90vh;position:relative}
 .lightbox-content{max-width:100%;max-height:80vh;border:2px solid var(--blood);box-shadow:0 0 35px rgba(225,29,72,0.5);object-fit:contain;background:#000}
 .lightbox-text{margin-top:1rem;color:var(--text);font-size:0.9rem;text-align:center;max-width:800px;background:rgba(9,9,11,0.85);padding:0.65rem 1.25rem;border-left:3px solid var(--blood);box-shadow:0 4px 15px rgba(0,0,0,0.5)}
 .lightbox-text strong{color:var(--blood-glow);text-transform:uppercase;margin-right:0.5rem;letter-spacing:0.05em}
-.lightbox-close{position:absolute;top:1.5rem;right:2rem;color:var(--blood);font-size:2.5rem;cursor:pointer;font-family:monospace;font-weight:bold;z-index:1001}
+.lightbox-close{position:absolute;top:1.5rem;right:2rem;color:var(--blood);font-size:2.5rem;cursor:pointer;font-family:monospace;font-weight:bold;z-index:1001;transition:color .2s}
+.lightbox-close:hover{color:var(--blood-glow)}
+.lightbox-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(17,18,21,0.8);border:1px solid var(--border-accent);color:var(--text);font-size:2rem;padding:0.75rem 1rem;cursor:pointer;transition:all 0.2s ease;z-index:1010;font-family:monospace}
+.lightbox-btn:hover{border-color:var(--blood);color:var(--blood-glow);box-shadow:0 0 15px rgba(225,29,72,0.4)}
+.lightbox-prev{left:1.5rem}
+.lightbox-next{right:1.5rem}
+
 footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:center;color:var(--dark-muted);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.1em}
 @media (max-width:900px){
 .project-card,.project-card.featured{grid-column:span 12;display:flex;flex-direction:column}
@@ -108,48 +115,49 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
 .carousel-viewport{height:auto;perspective:none;overflow:visible}
 .carousel-ring{width:100%;height:auto;display:flex;flex-direction:column;gap:1rem;transform:none !important}
 .carousel-card{position:static;width:100%;height:auto;transform:none !important}
-.carousel-hint{display:none}}
+.carousel-hint{display:none}
+.lightbox-btn{padding:0.4rem 0.6rem;font-size:1.5rem}}
+
 /* ===== Alley FX (flicker, wires, rain, neon) ===== */
-  .container{position:relative;z-index:1}
-  .afx-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
-  .afx-spill{position:absolute}
-  .afx-cyan{left:-15%;bottom:-20%;width:60vw;height:60vh;background:radial-gradient(closest-side,rgba(34,211,238,.09),transparent);animation:afx-hum 9s ease-in-out infinite}
-  .afx-red{right:-20%;top:30%;width:55vw;height:65vh;background:radial-gradient(closest-side,rgba(255,30,86,.12),transparent);animation:afx-flick 11s infinite}
-  .afx-tube{position:absolute;top:0;left:10%;width:360px;height:300px;background:radial-gradient(ellipse at 50% 0,rgba(125,249,255,.14),transparent 70%);animation:afx-tube 8s infinite}
-  #afx-rain{position:absolute;inset:0;width:100%;height:100%}
-  .afx-vignette{position:fixed;inset:0;z-index:997;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5))}
-  .afx-flash{position:fixed;inset:0;z-index:996;pointer-events:none;opacity:0;transition:opacity .15s;background:radial-gradient(ellipse at 50% 0,rgba(255,30,86,.18),transparent 60%)}
-  #afx-wires{position:fixed;left:0;z-index:90;pointer-events:none}
+.container{position:relative;z-index:1}
+.afx-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.afx-spill{position:absolute}
+.afx-cyan{left:-15%;bottom:-20%;width:60vw;height:60vh;background:radial-gradient(closest-side,rgba(34,211,238,.09),transparent);animation:afx-hum 9s ease-in-out infinite}
+.afx-red{right:-20%;top:30%;width:55vw;height:65vh;background:radial-gradient(closest-side,rgba(255,30,86,.12),transparent);animation:afx-flick 11s infinite}
+.afx-tube{position:absolute;top:0;left:10%;width:360px;height:300px;background:radial-gradient(ellipse at 50% 0,rgba(125,249,255,.14),transparent 70%);animation:afx-tube 8s infinite}
+#afx-rain{position:absolute;inset:0;width:100%;height:100%}
+.afx-vignette{position:fixed;inset:0;z-index:997;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.5))}
+.afx-flash{position:fixed;inset:0;z-index:996;pointer-events:none;opacity:0;transition:opacity .15s;background:radial-gradient(ellipse at 50% 0,rgba(255,30,86,.18),transparent 60%)}
+#afx-wires{position:fixed;left:0;z-index:90;pointer-events:none}
 
-  .afx-sign{position:absolute;right:0;top:3.2rem;z-index:1}
-  .afx-sign::before{content:"";position:absolute;left:50%;bottom:100%;width:2px;height:3.2rem;background:#2a2a35}
-  .afx-sign b{display:block;writing-mode:vertical-rl;font:700 1.6rem/1 'Chakra Petch',sans-serif;letter-spacing:.3em;color:#d5fbff;padding:1.1rem .75rem;border:2px solid #22d3ee;background:rgba(4,22,28,.55);text-shadow:0 0 6px #22d3ee,0 0 18px #22d3ee;box-shadow:0 0 10px rgba(34,211,238,.6),inset 0 0 12px rgba(34,211,238,.3);animation:afx-sign 7s infinite}
-  .afx-sign .dead{animation:afx-dead 5s infinite}
+.afx-sign{position:absolute;right:0;top:3.2rem;z-index:1}
+.afx-sign::before{content:"";position:absolute;left:50%;bottom:100%;width:2px;height:3.2rem;background:#2a2a35}
+.afx-sign b{display:block;writing-mode:vertical-rl;font:700 1.6rem/1 'Chakra Petch',sans-serif;letter-spacing:.3em;color:#d5fbff;padding:1.1rem .75rem;border:2px solid #22d3ee;background:rgba(4,22,28,.55);text-shadow:0 0 6px #22d3ee,0 0 18px #22d3ee;box-shadow:0 0 10px rgba(34,211,238,.6),inset 0 0 12px rgba(34,211,238,.3);animation:afx-sign 7s infinite}
+.afx-sign .dead{animation:afx-dead 5s infinite}
 
-  .logo .cross{animation:afx-neon 6s infinite}
-  .hazard-dot{animation:afx-neon 3.5s infinite 1s}
-  .section-header h2::before{animation:afx-neon 8s infinite}
-  .img-tag{animation:afx-neon 10s infinite}
-  .project-card:nth-child(even) .img-tag{animation-delay:-4s}
-  .timeline-item::before{animation:afx-neon 9s infinite}
-  .timeline-item:nth-child(2)::before{animation-delay:-3s}
-  .timeline-item:nth-child(3)::before{animation-delay:-6s}
-  .timeline-item:nth-child(4)::before{animation-delay:-1.5s}
-  .glitch span{animation:afx-name 7s infinite}
+.logo .cross{animation:afx-neon 6s infinite}
+.hazard-dot{animation:afx-neon 3.5s infinite 1s}
+.section-header h2::before{animation:afx-neon 8s infinite}
+.img-tag{animation:afx-neon 10s infinite}
+.project-card:nth-child(even) .img-tag{animation-delay:-4s}
+.timeline-item::before{animation:afx-neon 9s infinite}
+.timeline-item:nth-child(2)::before{animation-delay:-3s}
+.timeline-item:nth-child(3)::before{animation-delay:-6s}
+.timeline-item:nth-child(4)::before{animation-delay:-1.5s}
+.glitch span{animation:afx-name 7s infinite}
 
-  @keyframes afx-neon{0%,18%,22%,25%,53%,57%,100%{opacity:1}20%,24%{opacity:.2}55%{opacity:.45}}
-  @keyframes afx-flick{0%,100%,9%,13%,61%,66%{opacity:1}7%{opacity:.35}11%{opacity:.5}63%{opacity:.3}}
-  @keyframes afx-hum{0%,100%{opacity:.7}50%{opacity:1}}
-  @keyframes afx-tube{0%,100%,9%,52%,55%{opacity:1}3%{opacity:.2}5%{opacity:.9}6%{opacity:.1}53%{opacity:.3}}
-  @keyframes afx-sign{0%,100%,8%,12%,70%,74%{opacity:1}6%{opacity:.35}10%{opacity:.25}72%{opacity:.5}}
-  @keyframes afx-dead{0%,100%{opacity:.15}3%,6%{opacity:1}4.5%{opacity:.2}48%{opacity:.15}50%{opacity:.9}52%{opacity:.15}}
-  @keyframes afx-name{
-    0%,17%,19%,21%,60%,62%,100%{color:#e11d48;text-shadow:2px 2px 0 #3f0914,4px 4px 0 #180307,0 0 22px rgba(255,30,86,.65)}
-    18%,20%,61%{color:#7a1230;text-shadow:2px 2px 0 #3f0914,4px 4px 0 #180307}
-  }
-  @media(max-width:900px){.afx-sign{display:none}}
-  @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}#afx-rain,#afx-wires,.afx-flash{display:none}}
-  
+@keyframes afx-neon{0%,18%,22%,25%,53%,57%,100%{opacity:1}20%,24%{opacity:.2}55%{opacity:.45}}
+@keyframes afx-flick{0%,100%,9%,13%,61%,66%{opacity:1}7%{opacity:.35}11%{opacity:.5}63%{opacity:.3}}
+@keyframes afx-hum{0%,100%{opacity:.7}50%{opacity:1}}
+@keyframes afx-tube{0%,100%,9%,52%,55%{opacity:1}3%{opacity:.2}5%{opacity:.9}6%{opacity:.1}53%{opacity:.3}}
+@keyframes afx-sign{0%,100%,8%,12%,70%,74%{opacity:1}6%{opacity:.35}10%{opacity:.25}72%{opacity:.5}}
+@keyframes afx-dead{0%,100%{opacity:.15}3%,6%{opacity:1}4.5%{opacity:.2}48%{opacity:.15}50%{opacity:.9}52%{opacity:.15}}
+@keyframes afx-name{
+  0%,17%,19%,21%,60%,62%,100%{color:#e11d48;text-shadow:2px 2px 0 #3f0914,4px 4px 0 #180307,0 0 22px rgba(255,30,86,.65)}
+  18%,20%,61%{color:#7a1230;text-shadow:2px 2px 0 #3f0914,4px 4px 0 #180307}
+}
+@media(max-width:900px){.afx-sign{display:none}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important}#afx-rain,#afx-wires,.afx-flash{display:none}}
 </style>
 </head>
 <body>
@@ -217,7 +225,7 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
     <div class="projects-grid">
       <!-- Project 1: Merged Quadruped Robot -->
       <div class="project-card featured" data-category="hardware simulation">
-        <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+        <div class="project-img-wrapper" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Autonomous Quadruped</strong> // 12-DOF legged robotics platform & locomotion sim')">
           <img class="fit-contain" src="yurr.gif" alt="Quadruped Robot Locomotion Simulation" onerror="this.onerror=null; this.src='images/yurr.gif';" />
           <div class="img-tag">[ROBOT-SIM]</div>
         </div>
@@ -232,7 +240,7 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
 
       <!-- Project 2: Suspension POC -->
       <div class="project-card featured" data-category="simulation">
-        <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+        <div class="project-img-wrapper" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Double Wishbone Suspension</strong> // Dynamic camber stabilization for 500 mL payload')">
           <img class="fit-contain" src="movement.gif" alt="Suspension Geometry Kinematic Movement" onerror="this.onerror=null; this.src='images/movement.gif';" />
           <div class="img-tag">[CAD-PROTO]</div>
         </div>
@@ -247,7 +255,7 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
 
       <!-- Project 3: WheelSafe Storage -->
       <div class="project-card featured" data-category="hardware">
-        <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+        <div class="project-img-wrapper" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>WheelSafe Storage</strong> // Accessible carbon-fiber mobility aid, Top 3 Award')">
           <img class="fit-contain" src="powerincommunity.jpg" alt="WheelSafe Storage Unit and Certificate" onerror="this.onerror=null; this.src='images/powerincommunity.jpg';" />
           <div class="img-tag">[TOP 3 / SHOWCASE]</div>
         </div>
@@ -262,7 +270,7 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
 
       <!-- Project 4: Real-Time Compensation Visualizer -->
       <div class="project-card" data-category="software">
-        <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+        <div class="project-img-wrapper" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Wage Tracker</strong> // Real-time Python dashboard calculating microsecond earnings')">
           <img class="fit-contain" src="WAGES.png" alt="Wage Tracker App Interface" onerror="this.onerror=null; this.src='images/WAGES.png';" />
           <div class="img-tag">[APP-DEV]</div>
         </div>
@@ -277,7 +285,7 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
 
       <!-- Project 5: CV Robotic Arm -->
       <div class="project-card" data-category="hardware software">
-        <div class="project-img-wrapper" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src)">
+        <div class="project-img-wrapper" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Vision-Guided Arm</strong> // Real-time OpenCV hand tracking over UDP to ESP32')">
           <img class="fit-contain" src="test.gif" alt="CV Controlled Robotic Arm" onerror="this.onerror=null; this.src='images/test.gif';" />
           <div class="img-tag">[CV-EMBEDDED]</div>
         </div>
@@ -299,27 +307,27 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
       <p>Prototyping, bench testing, and empirically messing around. <span class="click-hint">[ CLICK TO ENLARGE ]</span></p>
     </div>
     <div class="gallery-grid">
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Quadruped CAD</strong> // Quadruped 12-DOF Full Assembly CAD')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Quadruped CAD</strong> // Quadruped 12-DOF Full Assembly CAD')">
         <img src="quadriped.png" alt="Quadruped Full Assembly CAD" onerror="this.onerror=null; this.src='images/quadriped.png';" />
         <div class="gallery-item-caption">// Quadruped 12-DOF Full Assembly CAD</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Kinematic Linkage</strong> // Dynamic Leg Kinematic Linkage')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Kinematic Linkage</strong> // Dynamic Leg Kinematic Linkage')">
         <img src="quadriped leg.png" alt="Quadruped Leg Linkage" onerror="this.onerror=null; this.src='images/quadriped leg.png';" />
         <div class="gallery-item-caption">// Dynamic Leg Kinematic Linkage</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Accidental Antenna</strong> // When poor probe grounding becomes generative art')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Accidental Antenna</strong> // When poor probe grounding becomes generative art')">
         <img src="cool2.jpg" alt="Lab Test Setup" onerror="this.onerror=null; this.src='images/cool2.jpg';" />
         <div class="gallery-item-caption">// Accidental RF Antenna: when poor probe grounding becomes generative art</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>HV Discharge</strong> // Pure bench curiosity, zero practical utility')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>HV Discharge</strong> // Pure bench curiosity, zero practical utility')">
         <img src="taser.gif" alt="High Voltage Arc Test" onerror="this.onerror=null; this.src='images/taser.gif';" />
         <div class="gallery-item-caption">// HV pulse discharge test: pure bench curiosity, zero practical utility</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Dell Bootleg</strong> // Upgraded the CPU/RAM, kept a 24/7 Minecraft server alive for 2 months')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Dell Bootleg</strong> // Upgraded the CPU/RAM, kept a 24/7 Minecraft server alive for 2 months')">
         <img src="images/computer-bootleg.jpg" alt="Salvaged Dell Bench PC" onerror="this.onerror=null; this.src='computer-bootleg.jpg';" />
-        <div class="gallery-item-caption">// "Acquired" from high school. upgraded the CPU/RAM, and kept a 24/7 Minecraft server alive for 2 months</div>
+        <div class="gallery-item-caption">// &quot;Acquired&quot; from high school. upgraded the CPU/RAM, and kept a 24/7 Minecraft server alive for 2 months</div>
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>First POST</strong> // The rarest sight in engineering—everything working on the first try')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>First POST</strong> // The rarest sight in engineering—everything working on the first try')">
         <img src="images/newcomputer.jpg" alt="First POST on custom desktop rig" onerror="this.onerror=null; this.src='newcomputer.jpg';" />
         <div class="gallery-item-caption">// First POST: the rarest sight in engineering—everything working on the first try</div>
       </div>
@@ -327,54 +335,50 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
   </section>
 
   <!-- Art Gallery -->
-
-
-
-  
   <section id="art">
     <div class="section-header">
       <h2>Art Portfolio</h2>
       <p>Digital concepts, classical sketches, and creative works. <span class="click-hint">[ CLICK TO ENLARGE ]</span></p>
-      <p style="color: var(--dark-muted); font-size: 0.75rem; margin-top: 0.5rem; font-style: italic;">// // Proof that I have hobbies outside of staring at spreadsheets and accidentally breaking mechanical prototypes.</p>
+      <p style="color: var(--dark-muted); font-size: 0.75rem; margin-top: 0.5rem; font-style: italic;">// Proof that I have hobbies outside of staring at spreadsheets and accidentally breaking mechanical prototypes.</p>
     </div>
     <div class="gallery-grid">
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Hang In There</strong> //  A visual reminder to save your work before attempting a render.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Hang In There</strong> // A visual reminder to save your work before attempting a render.')">
         <img src="blender.gif" alt="Blender animation still" onerror="this.onerror=null; this.src='images/blender.gif';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Toned Back Study</strong> //  Charcoal on paper. I still find black dust from this on my desk.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Toned Back Study</strong> // Charcoal on paper. I still find black dust from this on my desk.')">
         <img src="sketch 2.jpg" alt="Figure sketch on toned paper" onerror="this.onerror=null; this.src='images/sketch 2.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Floral Heads</strong> //  Painting faces requires perfect symmetry. Painting flowers over them does not. Efficiency.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Floral Heads</strong> // Painting faces requires perfect symmetry. Painting flowers over them does not. Efficiency.')">
         <img src="painting.jpg" alt="Two figures painting" onerror="this.onerror=null; this.src='images/painting.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Live Figure Drawing</strong> // Stared intensely at a naked guy\'s back for an hour just to avoid drawing his hands.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Live Figure Drawing</strong> // Stared intensely at a naked guy\'s back for an hour just to avoid drawing his hands.')">
         <img src="sketch.jpg" alt="Pencil figure sketch" onerror="this.onerror=null; this.src='images/sketch.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Half Dead Portrait</strong> //  Acrylic self-portrait. Basically how it feels to fix broken CAD constraints at 2 AM.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Half Dead Portrait</strong> // Acrylic self-portrait. Basically how it feels to fix broken CAD constraints at 2 AM.')">
         <img src="selfportrait 3.jpg" alt="Gouache surreal portrait" onerror="this.onerror=null; this.src='images/selfportrait 3.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Dental Study</strong> // A reminder to floss. Or else I will draw your teeth.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Dental Study</strong> // A reminder to floss. Or else I will draw your teeth.')">
         <img src="digital teeth.jpg" alt="Digital art illustration of teeth" onerror="this.onerror=null; this.src='images/digital teeth.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Flayed Skull</strong> // Anatomical study of facial musculature. Mostly an excuse to use up my red paint.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Flayed Skull</strong> // Anatomical study of facial musculature. Mostly an excuse to use up my red paint.')">
         <img src="skull.jpg" alt="Skull anatomy painting" onerror="this.onerror=null; this.src='images/skull.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Block Print Skull</strong> // Linocut print. The hardest part was trying not to slip and gouge my thumb with the carving tool.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Block Print Skull</strong> // Linocut print. The hardest part was trying not to slip and gouge my thumb with the carving tool.')">
         <img src="skull2.jpg" alt="Lino cut style skull print" onerror="this.onerror=null; this.src='images/skull2.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Pink Rose</strong> // The mandatory generic flower painting just to prove to my mom I can paint nice things.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Pink Rose</strong> // The mandatory generic flower painting just to prove to my mom I can paint nice things.')">
         <img src="flower.jpg" alt="Pink rose painting" onerror="this.onerror=null; this.src='images/flower.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Everything Is Fine</strong> // Just a totally normal self-portrait with zero underlying metaphors.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Everything Is Fine</strong> // Just a totally normal self-portrait with zero underlying metaphors.')">
         <img src="self portrait 1.jpg" alt="Painted self portrait with burning house" onerror="this.onerror=null; this.src='images/self portrait 1.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Wood Lizard</strong> //  Carved from a single block of wood. The chisel slipped and I ended up needing 11 stitches in my hand.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Wood Lizard</strong> // Carved from a single block of wood. The chisel slipped and I ended up needing 11 stitches in my hand.')">
         <img src="chameleon.jpg" alt="Wood carved lizard" onerror="this.onerror=null; this.src='images/chameleon.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Lake Reflection</strong> // A digital landscape that won a local contest. Naturally, they printed it on a municipal utility box.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Lake Reflection</strong> // A digital landscape that won a local contest. Naturally, they printed it on a municipal utility box.')">
         <img src="b91768fc-c60e-405e-af9a-1a3e961c3cf4.jpg" alt="Digital landscape of a lake reflection" onerror="this.onerror=null; this.src='images/b91768fc-c60e-405e-af9a-1a3e961c3cf4.jpg';" />
       </div>
-      <div class="gallery-item" onclick="openLightbox(this.querySelector('img').currentSrc || this.querySelector('img').src, '<strong>Utility Box Install</strong> // Here it is in the wild, circa 2022. I can now legally claim I have public infrastructure installations.')">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Utility Box Install</strong> // Here it is in the wild, circa 2022. I can now legally claim I have public infrastructure installations.')">
         <img src="09d807cf-c8e4-4a66-a3bf-dbae582978ba.jpg" alt="Lake reflection art wrapped around an electrical box" onerror="this.onerror=null; this.src='images/09d807cf-c8e4-4a66-a3bf-dbae582978ba.jpg';" />
       </div>
     </div>
@@ -419,11 +423,13 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
 
 <!-- Lightbox Modal -->
 <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
-  <span class="lightbox-close">&times;</span>
+  <span class="lightbox-close" onclick="closeLightbox()">&times;</span>
+  <button class="lightbox-btn lightbox-prev" onclick="prevLightboxImage(event)">&lsaquo;</button>
   <div class="lightbox-wrapper">
     <img class="lightbox-content" id="lightbox-img" src="" alt="Enlarged preview">
     <div id="lightbox-caption" class="lightbox-text"></div>
   </div>
+  <button class="lightbox-btn lightbox-next" onclick="nextLightboxImage(event)">&rsaquo;</button>
 </div>
 
 <script>
@@ -437,25 +443,96 @@ function filterProjects(category){
     card.style.display=(category==='all'||categories.includes(category))?'':'none';
   });
 }
-function openLightbox(src, captionHTML){
-  const lb=document.getElementById('lightbox');
-  document.getElementById('lightbox-img').src=src;
+
+// ---------------- Lightbox Navigation & Keyboard Controls ----------------
+let galleryItems = [];
+let currentLightboxIndex = 0;
+
+function refreshGalleryItems() {
+  const wrappers = document.querySelectorAll('.project-img-wrapper, .gallery-item');
+  galleryItems = [];
+  wrappers.forEach(wrap => {
+    const img = wrap.querySelector('img');
+    if (!img) return;
+    
+    // Extract caption: check onclick parameter or .gallery-item-caption
+    let caption = '';
+    const clickAttr = wrap.getAttribute('onclick') || '';
+    const match = clickAttr.match(/,\s*(['"])(.*?)\1\s*\)/s);
+    if (match) {
+      caption = match[2];
+    } else {
+      const capEl = wrap.querySelector('.gallery-item-caption');
+      if (capEl) caption = capEl.innerHTML;
+    }
+    
+    galleryItems.push({
+      src: img.currentSrc || img.src,
+      caption: caption
+    });
+  });
+}
+
+function openLightboxFromElement(imgElement, captionHTML) {
+  refreshGalleryItems();
+  const currentSrc = imgElement.currentSrc || imgElement.src;
+  currentLightboxIndex = galleryItems.findIndex(item => item.src === currentSrc);
+  if (currentLightboxIndex === -1) currentLightboxIndex = 0;
   
-  const capEl=document.getElementById('lightbox-caption');
-  if(captionHTML) {
-    capEl.innerHTML = captionHTML;
+  if (captionHTML && galleryItems[currentLightboxIndex]) {
+    galleryItems[currentLightboxIndex].caption = captionHTML;
+  }
+  
+  updateLightbox();
+  document.getElementById('lightbox').classList.add('active');
+}
+
+function updateLightbox() {
+  if (galleryItems.length === 0) return;
+  const current = galleryItems[currentLightboxIndex];
+  document.getElementById('lightbox-img').src = current.src;
+  
+  const capEl = document.getElementById('lightbox-caption');
+  if (current.caption && current.caption.trim() !== '') {
+    capEl.innerHTML = current.caption;
     capEl.style.display = 'block';
   } else {
     capEl.style.display = 'none';
   }
-  
-  lb.classList.add('active');
 }
+
+function nextLightboxImage(e) {
+  if (e) e.stopPropagation();
+  if (galleryItems.length === 0) return;
+  currentLightboxIndex = (currentLightboxIndex + 1) % galleryItems.length;
+  updateLightbox();
+}
+
+function prevLightboxImage(e) {
+  if (e) e.stopPropagation();
+  if (galleryItems.length === 0) return;
+  currentLightboxIndex = (currentLightboxIndex - 1 + galleryItems.length) % galleryItems.length;
+  updateLightbox();
+}
+
 function closeLightbox(e){
-  // Prevent closing when clicking the image or text directly
-  if(e && (e.target.id === 'lightbox-img' || e.target.id === 'lightbox-caption')) return;
+  if(e && (e.target.id === 'lightbox-img' || e.target.id === 'lightbox-caption' || e.target.closest('.lightbox-btn'))) return;
   document.getElementById('lightbox').classList.remove('active');
 }
+
+// Arrow Key & Escape Listener
+window.addEventListener('keydown', (e) => {
+  const lb = document.getElementById('lightbox');
+  if (!lb || !lb.classList.contains('active')) return;
+  
+  if (e.key === 'ArrowRight') {
+    nextLightboxImage();
+  } else if (e.key === 'ArrowLeft') {
+    prevLightboxImage();
+  } else if (e.key === 'Escape') {
+    closeLightbox();
+  }
+});
 
 // 3D Carousel Interactive Drag & Animation Loop
 const viewport=document.getElementById('carouselViewport');
@@ -530,7 +607,6 @@ animate();
 
 <script>
 (() => {
-
   document.body.insertAdjacentHTML('afterbegin', `
     <div class="afx-layer" aria-hidden="true">
       <div class="afx-spill afx-cyan"></div>
@@ -580,7 +656,7 @@ animate();
 
   function sizeWires() {
     W = wc.width = innerWidth;
-    H = wc.height = innerWidth < 650 ? 180 : 270;
+    H = innerWidth < 650 ? 180 : 270;
     const k = H / 270;
     wc.style.top = nav.offsetHeight + 'px';
     swags = [
@@ -592,7 +668,6 @@ animate();
       .map(([s, t, len], i) => ({ s, t, len: len * k, ph: i * 1.7, burst: 0 }));
   }
 
-  // point on a swaying quadratic swag
   const sw = (c, t, time) => {
     const mx = (c.x1 + c.x2) / 2 + Math.sin(time * .6 + c.ph) * 8;
     const my = (c.y1 + c.y2) / 2 + c.sag * 2 + Math.sin(time * .9 + c.ph) * 5;
@@ -604,7 +679,6 @@ animate();
     };
   };
 
-  // dark cable body + thin crimson rim light on top edge
   function cable(build, w) {
     wx.lineCap = 'round';
     wx.beginPath(); build(0); wx.strokeStyle = '#23232d'; wx.lineWidth = w; wx.stroke();
@@ -625,7 +699,6 @@ animate();
       cable(d => { wx.moveTo(c.x1, c.y1 + d); wx.quadraticCurveTo(m.mx, m.my + d, c.x2, c.y2 + d); }, c.w);
     }
 
-    // energy pulses travelling along the cables
     for (const c of swags) {
       c.p = (c.p + c.sp) % 1;
       const q = sw(c, c.p, time);
@@ -634,7 +707,6 @@ animate();
       wx.shadowBlur = 0;
     }
 
-    // loose cables with live ends
     for (const h of hangs) {
       const s = sw(swags[h.s], h.t, time), sx = Math.sin(time * 1.1 + h.ph);
       const ex = s.x + sx * 9, ey = s.y + h.len;
@@ -656,7 +728,6 @@ animate();
       wx.fillStyle = g; wx.fillRect(ex - 30, ey - 25, 60, 60);
     }
 
-    // falling sparks
     for (const s of sparks) {
       s.vy += .22; s.x += s.vx; s.y += s.vy; s.life--;
       wx.strokeStyle = `rgba(${s.c},${Math.max(s.life, 0) / 32})`; wx.lineWidth = 1.5;
