@@ -118,6 +118,31 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
 .carousel-hint{display:none}
 .lightbox-btn{padding:0.4rem 0.6rem;font-size:1.5rem}}
 
+/* ===== CSWA credential ===== */
+.strip-row{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem}
+.strip-row .hazard-strip{margin-bottom:0}
+a.hazard-strip{text-decoration:none;transition:all .2s ease}
+.hazard-strip.cert{background:#06181d;border-color:#22d3ee;color:#d5fbff;box-shadow:0 0 10px rgba(34,211,238,.2)}
+.hazard-strip.cert .hazard-dot{background:#22d3ee;box-shadow:0 0 8px #22d3ee}
+a.hazard-strip.cert:hover{box-shadow:0 0 18px rgba(34,211,238,.55);transform:translate(-1px,-1px)}
+a.pill{text-decoration:none;transition:all .2s ease}
+a.pill:hover{border-color:var(--blood);color:var(--blood-glow)}
+.cert-card{display:grid;grid-template-columns:170px 1fr 280px;gap:1.75rem;align-items:center;background:var(--card-bg);border:1px solid #20222a;padding:1.75rem;transition:all .2s ease}
+.cert-card:hover{border-color:var(--blood);box-shadow:0 4px 20px -5px rgba(225,29,72,.3)}
+.cert-badge{display:block;transition:transform .2s ease,filter .2s ease}
+.cert-badge:hover{transform:scale(1.04);filter:drop-shadow(0 0 14px rgba(34,211,238,.45))}
+.cert-badge img{display:block;width:100%;height:auto}
+.cert-card h3{font-size:1.25rem;color:#fff;margin-bottom:.4rem}
+.cert-meta{color:var(--blood);font-size:.75rem;font-weight:700;letter-spacing:.05em;margin-bottom:.75rem;text-transform:uppercase}
+.cert-card p{color:var(--muted);font-size:.88rem;line-height:1.55;margin-bottom:1.25rem}
+.cert-thumb{height:200px}
+.cert-thumb img{object-fit:contain;padding:.5rem}
+@media(max-width:900px){.cert-card{grid-template-columns:140px 1fr}.cert-thumb{grid-column:1/-1}}
+@media(max-width:650px){.cert-card{grid-template-columns:1fr;justify-items:start}.cert-badge{width:140px}.cert-thumb{width:100%}}
+.timeline-link{color:var(--blood-glow);text-decoration:none;font-weight:700;font-size:.75rem;margin-left:.4rem}
+.timeline-link:hover{text-shadow:0 0 8px rgba(255,30,86,.6)}
+.timeline-item:nth-child(5)::before{animation-delay:-4.5s}
+
 /* ===== Alley FX (flicker, wires, rain, neon) ===== */
 .container{position:relative;z-index:1}
 .afx-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
@@ -172,6 +197,7 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
       <li><a href="#gallery">// Hardware & CAD</a></li>
       <li><a href="#art">// Art</a></li>
       <li><a href="#experience">// Timeline</a></li>
+      <li><a href="#certs">// Certs</a></li>
       <li><a href="https://www.linkedin.com/in/zhangdz/" target="_blank">// LinkedIn</a></li>
     </ul>
   </div>
@@ -181,7 +207,10 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
   <header id="about">
     <canvas id="smoke-canvas"></canvas>
     <div class="hero-content">
-      <div class="hazard-strip"><span class="hazard-dot"></span> STATUS: AVAILABLE FOR SPRING 2027 CO-OP</div>
+      <div class="strip-row">
+        <div class="hazard-strip"><span class="hazard-dot"></span> STATUS: AVAILABLE FOR SPRING 2027 CO-OP</div>
+        <a class="hazard-strip cert" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener"><span class="hazard-dot"></span> CSWA // CERTIFIED SOLIDWORKS ASSOCIATE</a>
+      </div>
       <h1 class="glitch" data-text="DANIEL ZHANG">DANIEL <span>ZHANG</span></h1>
       <p class="lead">Mechatronics Engineering student at McMaster. I mostly spend my time building robots, designing mechanical parts, and working on nuclear tooling.</p>
       <div class="btn-group">
@@ -202,7 +231,7 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
     <div class="carousel-viewport" id="carouselViewport">
       <div class="carousel-ring" id="carouselRing">
         <div class="carousel-card" style="--i: 0;"><div class="skill-card-inner"><h3>Hardware & Embedded</h3><div class="pill-list"><span class="pill">ESP32</span><span class="pill">STM32</span><span class="pill">Raspberry Pi</span><span class="pill">PCA9685 / Drivers</span><span class="pill">I2C / SPI / UDP</span></div></div></div>
-        <div class="carousel-card" style="--i: 1;"><div class="skill-card-inner"><h3>CAD & Simulation</h3><div class="pill-list"><span class="pill">SolidWorks</span><span class="pill">Inventor</span><span class="pill">Fusion 360</span><span class="pill">MuJoCo</span><span class="pill">FEA Stress Analysis</span></div></div></div>
+        <div class="carousel-card" style="--i: 1;"><div class="skill-card-inner"><h3>CAD & Simulation</h3><div class="pill-list"><a class="pill pill-cert" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener" draggable="false">CSWA</a><span class="pill">SolidWorks</span><span class="pill">Inventor</span><span class="pill">Fusion 360</span><span class="pill">MuJoCo</span><span class="pill">FEA Stress Analysis</span></div></div></div>
         <div class="carousel-card" style="--i: 2;"><div class="skill-card-inner"><h3>Software & Computation</h3><div class="pill-list"><span class="pill">C / C++</span><span class="pill">Python (OpenCV)</span><span class="pill">MATLAB / Simulink</span><span class="pill">Julia</span><span class="pill">Power Automate</span></div></div></div>
         <div class="carousel-card" style="--i: 3;"><div class="skill-card-inner"><h3>Design & Standards</h3><div class="pill-list"><span class="pill">CSA N299.2 / N299.3</span><span class="pill">ASD Verification</span><span class="pill">GD&T</span><span class="pill">FMEA & FAT Plans</span></div></div></div>
       </div>
@@ -398,6 +427,12 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
         <div class="timeline-desc">Spent 8+ months learning that nuclear engineering is 10% high-consequence tooling design and 90% respecting paperwork. Executed ASD safety calculations, authored FMEAs, and verified tooling for the Pickering reactor refurbishment and international CANDU sites.</div>
       </div>
       <div class="timeline-item">
+        <div class="timeline-date">OCT 2026 // CERTIFICATION</div>
+        <div class="timeline-title">Certified SOLIDWORKS Associate (CSWA)</div>
+        <div class="timeline-org">Dassault Systèmes</div>
+        <div class="timeline-desc">Passed the timed SolidWorks modeling exam covering parts, assemblies, and drawings.<a class="timeline-link" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener">[VERIFY &nearr;]</a></div>
+      </div>
+      <div class="timeline-item">
         <div class="timeline-date">SEP 2026 — PRESENT // STUDENT DESIGN TEAM</div>
         <div class="timeline-title">Mechanical Sub-team Member (Wheel Assembly)</div>
         <div class="timeline-org">McMaster Chem-E-Car</div>
@@ -414,6 +449,29 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
         <div class="timeline-title">B.Eng., Mechatronics Engineering CO-OP (Level III)</div>
         <div class="timeline-org">McMaster University</div>
         <div class="timeline-desc">Equal parts statics/dynamics, embedded systems, circuit theory, and theoretical math that feels completely made up until you suddenly need it on co-op.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certifications -->
+  <section id="certs">
+    <div class="section-header">
+      <h2>Certifications</h2>
+      <p>Credentials, with receipts. Click the badge to verify it on Credly.</p>
+    </div>
+    <div class="cert-card">
+      <a class="cert-badge" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener" aria-label="Verify CSWA badge on Credly">
+        <img src="images/cswa-badge.png" alt="SOLIDWORKS Design Associate badge" onerror="this.onerror=null; this.src='cswa-badge.png';" />
+      </a>
+      <div class="cert-body">
+        <h3>SOLIDWORKS Design Associate (CSWA)</h3>
+        <div class="cert-meta">Dassault Systèmes // Oct 5, 2026 // ID C-TVPDAF78ML</div>
+        <p>Timed exam on SolidWorks part modeling, assemblies, and drawings, issued by Dassault Systèmes.</p>
+        <div class="project-tags"><span class="project-tag">SolidWorks</span><span class="project-tag">Part Modeling</span><span class="project-tag">Assemblies</span><span class="project-tag">Drawings</span><a class="timeline-link" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener" style="margin-left:auto;">[VERIFY &nearr;]</a></div>
+      </div>
+      <div class="gallery-item cert-thumb" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>CSWA Certificate</strong> // Issued by Dassault Systèmes, Oct 5 2026')">
+        <img src="images/cswa-certificate.png" alt="CSWA certificate issued to Daniel Zhang" onerror="this.onerror=null; this.src='cswa-certificate.png';" />
+        <div class="gallery-item-caption">// Certificate C-TVPDAF78ML</div>
       </div>
     </div>
   </section>
@@ -537,15 +595,16 @@ window.addEventListener('keydown', (e) => {
 // 3D Carousel Interactive Drag & Animation Loop
 const viewport=document.getElementById('carouselViewport');
 const ring=document.getElementById('carouselRing');
-let currentAngle=0,isDragging=false,startX=0,velocity=0,isHovered=false;
+let currentAngle=0,isDragging=false,startX=0,velocity=0,isHovered=false,dragDist=0;
 const autoSpinSpeed=-0.15;
 viewport.addEventListener('mouseenter',()=>{isHovered=true});
 viewport.addEventListener('mouseleave',()=>{if(!isDragging)isHovered=false});
-function onPointerDown(e){isDragging=true;startX=e.pageX||(e.touches&&e.touches[0].pageX);velocity=0}
+function onPointerDown(e){isDragging=true;dragDist=0;startX=e.pageX||(e.touches&&e.touches[0].pageX);velocity=0}
 function onPointerMove(e){
   if(!isDragging)return;
   const x=e.pageX||(e.touches&&e.touches[0].pageX);
   const deltaX=x-startX;
+  dragDist+=Math.abs(deltaX);
   startX=x;
   velocity=deltaX*0.35;
   currentAngle+=velocity;
@@ -554,6 +613,7 @@ function onPointerUp(){if(isDragging){isDragging=false;isHovered=false}}
 viewport.addEventListener('mousedown',onPointerDown);
 window.addEventListener('mousemove',onPointerMove);
 window.addEventListener('mouseup',onPointerUp);
+viewport.addEventListener('click',e=>{if(dragDist>6&&e.target.closest('a'))e.preventDefault()});
 viewport.addEventListener('touchstart',onPointerDown,{passive:true});
 window.addEventListener('touchmove',onPointerMove,{passive:true});
 window.addEventListener('touchend',onPointerUp);
