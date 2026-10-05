@@ -18,7 +18,7 @@ nav{position:sticky;top:0;background:rgba(9,9,11,0.94);border-bottom:2px solid v
 .nav-container{max-width:1080px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0.9rem 1.5rem}
 .logo{font-weight:700;font-size:1.25rem;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:0.4rem}
 .logo .cross{color:var(--blood);font-size:1.4rem;text-shadow:0 0 10px var(--blood-glow)}
-.nav-links{display:flex;gap:1.5rem;list-style:none}
+.nav-links{display:flex;gap:1.1rem;list-style:none}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:0.85rem;font-weight:600;transition:all 0.2s ease;text-transform:uppercase}
 .nav-links a:hover{color:var(--blood-glow);text-shadow:0 0 8px rgba(255,30,86,0.6)}
 .container{max-width:1080px;margin:0 auto;padding:0 1.5rem}
@@ -143,6 +143,12 @@ a.pill:hover{border-color:var(--blood);color:var(--blood-glow)}
 .timeline-link:hover{text-shadow:0 0 8px rgba(255,30,86,.6)}
 .timeline-item:nth-child(5)::before{animation-delay:-4.5s}
 
+/* ===== Resume ===== */
+.resume-card{grid-template-columns:1fr 280px}
+.resume-thumb{height:360px}
+.resume-thumb img{object-fit:contain;padding:.5rem}
+@media(max-width:650px){.resume-card{grid-template-columns:1fr}.resume-thumb{width:100%}}
+
 /* ===== Alley FX (flicker, wires, rain, neon) ===== */
 .container{position:relative;z-index:1}
 .afx-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
@@ -195,9 +201,10 @@ a.pill:hover{border-color:var(--blood);color:var(--blood-glow)}
       <li><a href="#skills">// Skills</a></li>
       <li><a href="#projects">// Projects</a></li>
       <li><a href="#gallery">// Hardware & CAD</a></li>
-      <li><a href="#art">// Art</a></li>
       <li><a href="#experience">// Timeline</a></li>
       <li><a href="#certs">// Certs</a></li>
+      <li><a href="#resume">// Resume</a></li>
+      <li><a href="#art">// Art</a></li>
       <li><a href="https://www.linkedin.com/in/zhangdz/" target="_blank">// LinkedIn</a></li>
     </ul>
   </div>
@@ -209,7 +216,7 @@ a.pill:hover{border-color:var(--blood);color:var(--blood-glow)}
     <div class="hero-content">
       <div class="strip-row">
         <div class="hazard-strip"><span class="hazard-dot"></span> STATUS: AVAILABLE FOR SPRING 2027 CO-OP</div>
-        <a class="hazard-strip cert" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener"><span class="hazard-dot"></span> CSWA // CERTIFIED SOLIDWORKS ASSOCIATE</a>
+        <a class="hazard-strip cert" href="#certs"><span class="hazard-dot"></span> CSWA // CERTIFIED SOLIDWORKS ASSOCIATE</a>
       </div>
       <h1 class="glitch" data-text="DANIEL ZHANG">DANIEL <span>ZHANG</span></h1>
       <p class="lead">Mechatronics Engineering student at McMaster. I mostly spend my time building robots, designing mechanical parts, and working on nuclear tooling.</p>
@@ -363,56 +370,6 @@ a.pill:hover{border-color:var(--blood);color:var(--blood-glow)}
     </div>
   </section>
 
-  <!-- Art Gallery -->
-  <section id="art">
-    <div class="section-header">
-      <h2>Art Portfolio</h2>
-      <p>Digital concepts, classical sketches, and creative works. <span class="click-hint">[ CLICK TO ENLARGE ]</span></p>
-      <p style="color: var(--dark-muted); font-size: 0.75rem; margin-top: 0.5rem; font-style: italic;">// Proof that I have hobbies outside of staring at spreadsheets and accidentally breaking mechanical prototypes.</p>
-    </div>
-    <div class="gallery-grid">
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Hang In There</strong> // A visual reminder to save your work before attempting a render.')">
-        <img src="blender.gif" alt="Blender animation still" onerror="this.onerror=null; this.src='images/blender.gif';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Toned Back Study</strong> // Charcoal on paper. I still find black dust from this on my desk.')">
-        <img src="sketch 2.jpg" alt="Figure sketch on toned paper" onerror="this.onerror=null; this.src='images/sketch 2.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Floral Heads</strong> // Painting faces requires perfect symmetry. Painting flowers over them does not. Efficiency.')">
-        <img src="painting.jpg" alt="Two figures painting" onerror="this.onerror=null; this.src='images/painting.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Live Figure Drawing</strong> // Stared intensely at the back of a naked man for an hour just to avoid drawing his hands.')">
-        <img src="sketch.jpg" alt="Pencil figure sketch" onerror="this.onerror=null; this.src='images/sketch.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Half Dead Portrait</strong> // Acrylic self-portrait. Basically how it feels to fix broken CAD constraints at 2 AM.')">
-        <img src="selfportrait 3.jpg" alt="Gouache surreal portrait" onerror="this.onerror=null; this.src='images/selfportrait 3.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Dental Study</strong> // A reminder to floss. Or else I will draw your teeth.')">
-        <img src="digital teeth.jpg" alt="Digital art illustration of teeth" onerror="this.onerror=null; this.src='images/digital teeth.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Flayed Skull</strong> // Anatomical study of facial musculature. Mostly an excuse to use up my red paint.')">
-        <img src="skull.jpg" alt="Skull anatomy painting" onerror="this.onerror=null; this.src='images/skull.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Block Print Skull</strong> // Linocut print. The hardest part was trying not to slip and gouge my thumb with the carving tool.')">
-        <img src="skull2.jpg" alt="Lino cut style skull print" onerror="this.onerror=null; this.src='images/skull2.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Pink Rose</strong> // The mandatory generic flower painting just to prove to my mom I can paint nice things.')">
-        <img src="flower.jpg" alt="Pink rose painting" onerror="this.onerror=null; this.src='images/flower.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Everything Is Fine</strong> // Just a totally normal self-portrait with zero underlying metaphors.')">
-        <img src="self portrait 1.jpg" alt="Painted self portrait with burning house" onerror="this.onerror=null; this.src='images/self portrait 1.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Wood Lizard</strong> // Carved from a single block of wood. The chisel slipped and I ended up needing 11 stitches in my hand.')">
-        <img src="chameleon.jpg" alt="Wood carved lizard" onerror="this.onerror=null; this.src='images/chameleon.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Lake Reflection</strong> // A digital landscape that won a local contest. Naturally, they printed it on a municipal utility box.')">
-        <img src="b91768fc-c60e-405e-af9a-1a3e961c3cf4.jpg" alt="Digital landscape of a lake reflection" onerror="this.onerror=null; this.src='images/b91768fc-c60e-405e-af9a-1a3e961c3cf4.jpg';" />
-      </div>
-      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Utility Box Install</strong> // Here it is in the wild, circa 2022. I can now legally claim I have public infrastructure installations.')">
-        <img src="09d807cf-c8e4-4a66-a3bf-dbae582978ba.jpg" alt="Lake reflection art wrapped around an electrical box" onerror="this.onerror=null; this.src='images/09d807cf-c8e4-4a66-a3bf-dbae582978ba.jpg';" />
-      </div>
-    </div>
-  </section>
-
   <!-- Experience Timeline -->
   <section id="experience">
     <div class="section-header">
@@ -472,6 +429,79 @@ a.pill:hover{border-color:var(--blood);color:var(--blood-glow)}
       <div class="gallery-item cert-thumb" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>CSWA Certificate</strong> // Issued by Dassault Systèmes, Oct 5 2026')">
         <img src="images/cswa-certificate.png" alt="CSWA certificate issued to Daniel Zhang" onerror="this.onerror=null; this.src='cswa-certificate.png';" />
         <div class="gallery-item-caption">// Certificate C-TVPDAF78ML</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resume -->
+  <section id="resume">
+    <div class="section-header">
+      <h2>Resume</h2>
+      <p>One page, updated Oct 2026. Download it or click the preview to read it here.</p>
+    </div>
+    <div class="cert-card resume-card">
+      <div class="cert-body">
+        <h3>Daniel Zhang — Resume</h3>
+        <div class="cert-meta">PDF // 1 page // Updated Oct 2026</div>
+        <p>Mechatronics Engineering co-op at McMaster. Nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and vision projects.</p>
+        <div class="btn-group">
+          <a class="btn btn-primary" href="Daniel_Zhang_Resume.pdf" download="Daniel_Zhang_Resume.pdf">Download PDF</a>
+          <a class="btn btn-secondary" href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener">Open in new tab</a>
+        </div>
+      </div>
+      <div class="gallery-item resume-thumb" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Resume</strong> // Daniel Zhang, Mechatronics Engineering')">
+        <img src="images/resume-preview.png" alt="Preview of Daniel Zhang's resume" onerror="this.onerror=null; this.src='resume-preview.png';" />
+        <div class="gallery-item-caption">// Click to enlarge</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Art Gallery -->
+  <section id="art">
+    <div class="section-header">
+      <h2>Art Portfolio</h2>
+      <p>Digital concepts, classical sketches, and creative works. <span class="click-hint">[ CLICK TO ENLARGE ]</span></p>
+      <p style="color: var(--dark-muted); font-size: 0.75rem; margin-top: 0.5rem; font-style: italic;">// Proof that I have hobbies outside of staring at spreadsheets and accidentally breaking mechanical prototypes.</p>
+    </div>
+    <div class="gallery-grid">
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Hang In There</strong> // A visual reminder to save your work before attempting a render.')">
+        <img src="blender.gif" alt="Blender animation still" onerror="this.onerror=null; this.src='images/blender.gif';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Toned Back Study</strong> // Charcoal on paper. I still find black dust from this on my desk.')">
+        <img src="sketch 2.jpg" alt="Figure sketch on toned paper" onerror="this.onerror=null; this.src='images/sketch 2.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Floral Heads</strong> // Painting faces requires perfect symmetry. Painting flowers over them does not. Efficiency.')">
+        <img src="painting.jpg" alt="Two figures painting" onerror="this.onerror=null; this.src='images/painting.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Live Figure Drawing</strong> // Stared intensely at the back of a naked man for an hour just to avoid drawing his hands.')">
+        <img src="sketch.jpg" alt="Pencil figure sketch" onerror="this.onerror=null; this.src='images/sketch.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Half Dead Portrait</strong> // Acrylic self-portrait. Basically how it feels to fix broken CAD constraints at 2 AM.')">
+        <img src="selfportrait 3.jpg" alt="Gouache surreal portrait" onerror="this.onerror=null; this.src='images/selfportrait 3.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Dental Study</strong> // A reminder to floss. Or else I will draw your teeth.')">
+        <img src="digital teeth.jpg" alt="Digital art illustration of teeth" onerror="this.onerror=null; this.src='images/digital teeth.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Flayed Skull</strong> // Anatomical study of facial musculature. Mostly an excuse to use up my red paint.')">
+        <img src="skull.jpg" alt="Skull anatomy painting" onerror="this.onerror=null; this.src='images/skull.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Block Print Skull</strong> // Linocut print. The hardest part was trying not to slip and gouge my thumb with the carving tool.')">
+        <img src="skull2.jpg" alt="Lino cut style skull print" onerror="this.onerror=null; this.src='images/skull2.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Pink Rose</strong> // The mandatory generic flower painting just to prove to my mom I can paint nice things.')">
+        <img src="flower.jpg" alt="Pink rose painting" onerror="this.onerror=null; this.src='images/flower.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Everything Is Fine</strong> // Just a totally normal self-portrait with zero underlying metaphors.')">
+        <img src="self portrait 1.jpg" alt="Painted self portrait with burning house" onerror="this.onerror=null; this.src='images/self portrait 1.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Wood Lizard</strong> // Carved from a single block of wood. The chisel slipped and I ended up needing 11 stitches in my hand.')">
+        <img src="chameleon.jpg" alt="Wood carved lizard" onerror="this.onerror=null; this.src='images/chameleon.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Lake Reflection</strong> // A digital landscape that won a local contest. Naturally, they printed it on a municipal utility box.')">
+        <img src="b91768fc-c60e-405e-af9a-1a3e961c3cf4.jpg" alt="Digital landscape of a lake reflection" onerror="this.onerror=null; this.src='images/b91768fc-c60e-405e-af9a-1a3e961c3cf4.jpg';" />
+      </div>
+      <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Utility Box Install</strong> // Here it is in the wild, circa 2022. I can now legally claim I have public infrastructure installations.')">
+        <img src="09d807cf-c8e4-4a66-a3bf-dbae582978ba.jpg" alt="Lake reflection art wrapped around an electrical box" onerror="this.onerror=null; this.src='images/09d807cf-c8e4-4a66-a3bf-dbae582978ba.jpg';" />
       </div>
     </div>
   </section>
