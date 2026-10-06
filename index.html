@@ -18,7 +18,7 @@ nav{position:sticky;top:0;background:rgba(9,9,11,0.94);border-bottom:2px solid v
 .nav-container{max-width:1080px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;padding:0.9rem 1.5rem}
 .logo{font-weight:700;font-size:1.25rem;color:var(--text);text-decoration:none;display:flex;align-items:center;gap:0.4rem}
 .logo .cross{color:var(--blood);font-size:1.4rem;text-shadow:0 0 10px var(--blood-glow)}
-.nav-links{display:flex;gap:1.5rem;list-style:none}
+.nav-links{display:flex;gap:1.1rem;list-style:none}
 .nav-links a{color:var(--muted);text-decoration:none;font-size:0.85rem;font-weight:600;transition:all 0.2s ease;text-transform:uppercase}
 .nav-links a:hover{color:var(--blood-glow);text-shadow:0 0 8px rgba(255,30,86,0.6)}
 .container{max-width:1080px;margin:0 auto;padding:0 1.5rem}
@@ -118,6 +118,37 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
 .carousel-hint{display:none}
 .lightbox-btn{padding:0.4rem 0.6rem;font-size:1.5rem}}
 
+/* ===== CSWA credential ===== */
+.strip-row{display:flex;flex-wrap:wrap;gap:.75rem;margin-bottom:1.25rem}
+.strip-row .hazard-strip{margin-bottom:0}
+a.hazard-strip{text-decoration:none;transition:all .2s ease}
+.hazard-strip.cert{background:#06181d;border-color:#22d3ee;color:#d5fbff;box-shadow:0 0 10px rgba(34,211,238,.2)}
+.hazard-strip.cert .hazard-dot{background:#22d3ee;box-shadow:0 0 8px #22d3ee}
+a.hazard-strip.cert:hover{box-shadow:0 0 18px rgba(34,211,238,.55);transform:translate(-1px,-1px)}
+a.pill{text-decoration:none;transition:all .2s ease}
+a.pill:hover{border-color:var(--blood);color:var(--blood-glow)}
+.cert-card{display:grid;grid-template-columns:170px 1fr 280px;gap:1.75rem;align-items:center;background:var(--card-bg);border:1px solid #20222a;padding:1.75rem;transition:all .2s ease}
+.cert-card:hover{border-color:var(--blood);box-shadow:0 4px 20px -5px rgba(225,29,72,.3)}
+.cert-badge{display:block;transition:transform .2s ease,filter .2s ease}
+.cert-badge:hover{transform:scale(1.04);filter:drop-shadow(0 0 14px rgba(34,211,238,.45))}
+.cert-badge img{display:block;width:100%;height:auto}
+.cert-card h3{font-size:1.25rem;color:#fff;margin-bottom:.4rem}
+.cert-meta{color:var(--blood);font-size:.75rem;font-weight:700;letter-spacing:.05em;margin-bottom:.75rem;text-transform:uppercase}
+.cert-card p{color:var(--muted);font-size:.88rem;line-height:1.55;margin-bottom:1.25rem}
+.cert-thumb{height:200px}
+.cert-thumb img{object-fit:contain;padding:.5rem}
+@media(max-width:900px){.cert-card{grid-template-columns:140px 1fr}.cert-thumb{grid-column:1/-1}}
+@media(max-width:650px){.cert-card{grid-template-columns:1fr;justify-items:start}.cert-badge{width:140px}.cert-thumb{width:100%}}
+.timeline-link{color:var(--blood-glow);text-decoration:none;font-weight:700;font-size:.75rem;margin-left:.4rem}
+.timeline-link:hover{text-shadow:0 0 8px rgba(255,30,86,.6)}
+.timeline-item:nth-child(5)::before{animation-delay:-4.5s}
+
+/* ===== Resume ===== */
+.resume-card{grid-template-columns:1fr 280px}
+.resume-thumb{height:360px}
+.resume-thumb img{object-fit:contain;padding:.5rem}
+@media(max-width:650px){.resume-card{grid-template-columns:1fr}.resume-thumb{width:100%}}
+
 /* ===== Alley FX (flicker, wires, rain, neon) ===== */
 .container{position:relative;z-index:1}
 .afx-layer{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
@@ -170,8 +201,10 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
       <li><a href="#skills">// Skills</a></li>
       <li><a href="#projects">// Projects</a></li>
       <li><a href="#gallery">// Hardware & CAD</a></li>
-      <li><a href="#art">// Art</a></li>
       <li><a href="#experience">// Timeline</a></li>
+      <li><a href="#certs">// Certs</a></li>
+      <li><a href="#resume">// Resume</a></li>
+      <li><a href="#art">// Art</a></li>
       <li><a href="https://www.linkedin.com/in/zhangdz/" target="_blank">// LinkedIn</a></li>
     </ul>
   </div>
@@ -181,7 +214,10 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
   <header id="about">
     <canvas id="smoke-canvas"></canvas>
     <div class="hero-content">
-      <div class="hazard-strip"><span class="hazard-dot"></span> STATUS: AVAILABLE FOR SPRING 2027 CO-OP</div>
+      <div class="strip-row">
+        <div class="hazard-strip"><span class="hazard-dot"></span> STATUS: AVAILABLE FOR SPRING 2027 CO-OP</div>
+        <a class="hazard-strip cert" href="#certs"><span class="hazard-dot"></span> CSWA // CERTIFIED SOLIDWORKS ASSOCIATE</a>
+      </div>
       <h1 class="glitch" data-text="DANIEL ZHANG">DANIEL <span>ZHANG</span></h1>
       <p class="lead">Mechatronics Engineering student at McMaster. I mostly spend my time building robots, designing mechanical parts, and working on nuclear tooling.</p>
       <div class="btn-group">
@@ -202,7 +238,7 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
     <div class="carousel-viewport" id="carouselViewport">
       <div class="carousel-ring" id="carouselRing">
         <div class="carousel-card" style="--i: 0;"><div class="skill-card-inner"><h3>Hardware & Embedded</h3><div class="pill-list"><span class="pill">ESP32</span><span class="pill">STM32</span><span class="pill">Raspberry Pi</span><span class="pill">PCA9685 / Drivers</span><span class="pill">I2C / SPI / UDP</span></div></div></div>
-        <div class="carousel-card" style="--i: 1;"><div class="skill-card-inner"><h3>CAD & Simulation</h3><div class="pill-list"><span class="pill">SolidWorks</span><span class="pill">Inventor</span><span class="pill">Fusion 360</span><span class="pill">MuJoCo</span><span class="pill">FEA Stress Analysis</span></div></div></div>
+        <div class="carousel-card" style="--i: 1;"><div class="skill-card-inner"><h3>CAD & Simulation</h3><div class="pill-list"><a class="pill pill-cert" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener" draggable="false">CSWA</a><span class="pill">SolidWorks</span><span class="pill">Inventor</span><span class="pill">Fusion 360</span><span class="pill">MuJoCo</span><span class="pill">FEA Stress Analysis</span></div></div></div>
         <div class="carousel-card" style="--i: 2;"><div class="skill-card-inner"><h3>Software & Computation</h3><div class="pill-list"><span class="pill">C / C++</span><span class="pill">Python (OpenCV)</span><span class="pill">MATLAB / Simulink</span><span class="pill">Julia</span><span class="pill">Power Automate</span></div></div></div>
         <div class="carousel-card" style="--i: 3;"><div class="skill-card-inner"><h3>Design & Standards</h3><div class="pill-list"><span class="pill">CSA N299.2 / N299.3</span><span class="pill">ASD Verification</span><span class="pill">GD&T</span><span class="pill">FMEA & FAT Plans</span></div></div></div>
       </div>
@@ -334,6 +370,92 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
     </div>
   </section>
 
+  <!-- Experience Timeline -->
+  <section id="experience">
+    <div class="section-header">
+      <h2>Experience & Milestones</h2>
+      <p>Where organizations have entrusted me with high-consequence hardware and real systems.</p>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">JAN 2026 — PRESENT // NUCLEAR INDUSTRY</div>
+        <div class="timeline-title">Nuclear Engineering Intern</div>
+        <div class="timeline-org">Eclipse Automation</div>
+        <div class="timeline-desc">Spent 8+ months learning that nuclear engineering is 10% high-consequence tooling design and 90% respecting paperwork. Executed ASD safety calculations, authored FMEAs, and verified tooling for the Pickering reactor refurbishment and international CANDU sites.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">OCT 2026 // CERTIFICATION</div>
+        <div class="timeline-title">Certified SOLIDWORKS Associate (CSWA)</div>
+        <div class="timeline-org">Dassault Systèmes</div>
+        <div class="timeline-desc">Passed the timed SolidWorks modeling exam covering parts, assemblies, and drawings.<a class="timeline-link" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener">[VERIFY &nearr;]</a></div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">SEP 2026 — PRESENT // STUDENT DESIGN TEAM</div>
+        <div class="timeline-title">Mechanical Sub-team Member (Wheel Assembly)</div>
+        <div class="timeline-org">McMaster Chem-E-Car</div>
+        <div class="timeline-desc">Designing custom wheel assemblies and suspension geometry for a 33-meter run. Total mechanical overkill to keep 500 mL of water from sloshing around, but it works.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2024 // AWARD & SHOWCASE</div>
+        <div class="timeline-title">Top 3 Finalist — ENGINEER 1P13 Showcase</div>
+        <div class="timeline-org">McMaster University</div>
+        <div class="timeline-desc">Placed top 3 out of 200+ teams with a carbon-fiber wheelchair storage unit. Engineered a 3.25:1 strength-to-weight ratio and survived being cross-examined by a firing squad of skeptical P.Eng judges without breaking character.</div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-date">2023 — PRESENT // ACADEMIA</div>
+        <div class="timeline-title">B.Eng., Mechatronics Engineering CO-OP (Level III)</div>
+        <div class="timeline-org">McMaster University</div>
+        <div class="timeline-desc">Equal parts statics/dynamics, embedded systems, circuit theory, and theoretical math that feels completely made up until you suddenly need it on co-op.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Certifications -->
+  <section id="certs">
+    <div class="section-header">
+      <h2>Certifications</h2>
+      <p>Credentials, with receipts. Click the badge to verify it on Credly.</p>
+    </div>
+    <div class="cert-card">
+      <a class="cert-badge" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener" aria-label="Verify CSWA badge on Credly">
+        <img src="images/cswa-badge.png" alt="SOLIDWORKS Design Associate badge" onerror="this.onerror=null; this.src='cswa-badge.png';" />
+      </a>
+      <div class="cert-body">
+        <h3>SOLIDWORKS Design Associate (CSWA)</h3>
+        <div class="cert-meta">Dassault Systèmes // Oct 5, 2026 // ID C-TVPDAF78ML</div>
+        <p>Timed exam on SolidWorks part modeling, assemblies, and drawings, issued by Dassault Systèmes.</p>
+        <div class="project-tags"><span class="project-tag">SolidWorks</span><span class="project-tag">Part Modeling</span><span class="project-tag">Assemblies</span><span class="project-tag">Drawings</span><a class="timeline-link" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener" style="margin-left:auto;">[VERIFY &nearr;]</a></div>
+      </div>
+      <div class="gallery-item cert-thumb" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>CSWA Certificate</strong> // Issued by Dassault Systèmes, Oct 5 2026')">
+        <img src="images/cswa-certificate.png" alt="CSWA certificate issued to Daniel Zhang" onerror="this.onerror=null; this.src='cswa-certificate.png';" />
+        <div class="gallery-item-caption">// Certificate C-TVPDAF78ML</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Resume -->
+  <section id="resume">
+    <div class="section-header">
+      <h2>Resume</h2>
+      <p>One page, updated Oct 2026. Download it or click the preview to read it here.</p>
+    </div>
+    <div class="cert-card resume-card">
+      <div class="cert-body">
+        <h3>Daniel Zhang — Resume</h3>
+        <div class="cert-meta">PDF // 1 page // Updated Oct 2026</div>
+        <p>Mechatronics Engineering co-op at McMaster. Nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and vision projects.</p>
+        <div class="btn-group">
+          <a class="btn btn-primary" href="Daniel_Zhang_Resume.pdf" download="Daniel_Zhang_Resume.pdf">Download PDF</a>
+          <a class="btn btn-secondary" href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener">Open in new tab</a>
+        </div>
+      </div>
+      <div class="gallery-item resume-thumb" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Resume</strong> // Daniel Zhang, Mechatronics Engineering')">
+        <img src="images/resume-preview.png" alt="Preview of Daniel Zhang's resume" onerror="this.onerror=null; this.src='resume-preview.png';" />
+        <div class="gallery-item-caption">// Click to enlarge</div>
+      </div>
+    </div>
+  </section>
+
   <!-- Art Gallery -->
   <section id="art">
     <div class="section-header">
@@ -380,40 +502,6 @@ footer{border-top:2px solid var(--border-accent);padding:3rem 0;text-align:cente
       </div>
       <div class="gallery-item" onclick="openLightboxFromElement(this.querySelector('img'), '<strong>Utility Box Install</strong> // Here it is in the wild, circa 2022. I can now legally claim I have public infrastructure installations.')">
         <img src="09d807cf-c8e4-4a66-a3bf-dbae582978ba.jpg" alt="Lake reflection art wrapped around an electrical box" onerror="this.onerror=null; this.src='images/09d807cf-c8e4-4a66-a3bf-dbae582978ba.jpg';" />
-      </div>
-    </div>
-  </section>
-
-  <!-- Experience Timeline -->
-  <section id="experience">
-    <div class="section-header">
-      <h2>Experience & Milestones</h2>
-      <p>Where organizations have entrusted me with high-consequence hardware and real systems.</p>
-    </div>
-    <div class="timeline">
-      <div class="timeline-item">
-        <div class="timeline-date">JAN 2026 — PRESENT // NUCLEAR INDUSTRY</div>
-        <div class="timeline-title">Nuclear Engineering Intern</div>
-        <div class="timeline-org">Eclipse Automation</div>
-        <div class="timeline-desc">Spent 8+ months learning that nuclear engineering is 10% high-consequence tooling design and 90% respecting paperwork. Executed ASD safety calculations, authored FMEAs, and verified tooling for the Pickering reactor refurbishment and international CANDU sites.</div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-date">SEP 2026 — PRESENT // STUDENT DESIGN TEAM</div>
-        <div class="timeline-title">Mechanical Sub-team Member (Wheel Assembly)</div>
-        <div class="timeline-org">McMaster Chem-E-Car</div>
-        <div class="timeline-desc">Designing custom wheel assemblies and suspension geometry for a 33-meter run. Total mechanical overkill to keep 500 mL of water from sloshing around, but it works.</div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-date">2024 // AWARD & SHOWCASE</div>
-        <div class="timeline-title">Top 3 Finalist — ENGINEER 1P13 Showcase</div>
-        <div class="timeline-org">McMaster University</div>
-        <div class="timeline-desc">Placed top 3 out of 200+ teams with a carbon-fiber wheelchair storage unit. Engineered a 3.25:1 strength-to-weight ratio and survived being cross-examined by a firing squad of skeptical P.Eng judges without breaking character.</div>
-      </div>
-      <div class="timeline-item">
-        <div class="timeline-date">2023 — PRESENT // ACADEMIA</div>
-        <div class="timeline-title">B.Eng., Mechatronics Engineering CO-OP (Level III)</div>
-        <div class="timeline-org">McMaster University</div>
-        <div class="timeline-desc">Equal parts statics/dynamics, embedded systems, circuit theory, and theoretical math that feels completely made up until you suddenly need it on co-op.</div>
       </div>
     </div>
   </section>
@@ -537,15 +625,16 @@ window.addEventListener('keydown', (e) => {
 // 3D Carousel Interactive Drag & Animation Loop
 const viewport=document.getElementById('carouselViewport');
 const ring=document.getElementById('carouselRing');
-let currentAngle=0,isDragging=false,startX=0,velocity=0,isHovered=false;
+let currentAngle=0,isDragging=false,startX=0,velocity=0,isHovered=false,dragDist=0;
 const autoSpinSpeed=-0.15;
 viewport.addEventListener('mouseenter',()=>{isHovered=true});
 viewport.addEventListener('mouseleave',()=>{if(!isDragging)isHovered=false});
-function onPointerDown(e){isDragging=true;startX=e.pageX||(e.touches&&e.touches[0].pageX);velocity=0}
+function onPointerDown(e){isDragging=true;dragDist=0;startX=e.pageX||(e.touches&&e.touches[0].pageX);velocity=0}
 function onPointerMove(e){
   if(!isDragging)return;
   const x=e.pageX||(e.touches&&e.touches[0].pageX);
   const deltaX=x-startX;
+  dragDist+=Math.abs(deltaX);
   startX=x;
   velocity=deltaX*0.35;
   currentAngle+=velocity;
@@ -554,6 +643,7 @@ function onPointerUp(){if(isDragging){isDragging=false;isHovered=false}}
 viewport.addEventListener('mousedown',onPointerDown);
 window.addEventListener('mousemove',onPointerMove);
 window.addEventListener('mouseup',onPointerUp);
+viewport.addEventListener('click',e=>{if(dragDist>6&&e.target.closest('a'))e.preventDefault()});
 viewport.addEventListener('touchstart',onPointerDown,{passive:true});
 window.addEventListener('touchmove',onPointerMove,{passive:true});
 window.addEventListener('touchend',onPointerUp);
