@@ -97,6 +97,7 @@ body::before{content:"";position:fixed;inset:0;z-index:999;pointer-events:none;b
 #aura{position:fixed;width:520px;height:520px;margin:-260px 0 0 -260px;z-index:0;pointer-events:none;background:radial-gradient(closest-side,rgba(255,30,86,.13),transparent);left:50%;top:30%}
 #boot{position:fixed;inset:0;background:#050506;z-index:2000;display:flex;align-items:center;padding:2rem;color:var(--gl);font-size:.85rem;transition:opacity .5s;cursor:pointer;animation:bootout .01s linear 5s forwards}
 #boot.off{opacity:0;pointer-events:none}#boot b{color:var(--cy)}
+#bp{height:8.5em;line-height:1.6}
 @keyframes bootout{to{opacity:0;visibility:hidden;pointer-events:none}}
 .glitch{position:relative}
 .glitch:hover::before,.glitch:hover::after{content:attr(data-text);position:absolute;left:0;top:0;width:100%;clip:rect(0,0,0,0)}
@@ -125,8 +126,8 @@ body::before{content:"";position:fixed;inset:0;z-index:999;pointer-events:none;b
 .signs{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:none;overflow:visible}
 .sign-rig{--sy:200px;position:absolute;top:31px;width:max-content;display:grid;grid-template-rows:calc(var(--sy) - 31px) auto;justify-items:center;pointer-events:none}
 .sign-rig.l{right:calc(50% + 562px + var(--ox,0px))}.sign-rig.r{left:calc(50% + 562px + var(--ox,0px))}
-.sign-rig::before,.sign-rig::after{content:"";grid-row:1;position:absolute;top:0;width:2px;height:100%;background:linear-gradient(90deg,#ff1e56,#8b1027 48%,#2b0a12);box-shadow:0 0 6px rgba(225,29,72,.55);transform-origin:top}
-.sign-rig::before{left:23%}.sign-rig::after{right:23%}
+.sw{position:absolute;top:0;left:0;width:100%;height:100%;overflow:visible}
+.sw line{stroke-linecap:round}.sw .gw{stroke:#e11d48;stroke-width:7;opacity:.22}.sw .cw{stroke:#ff3a6e;stroke-width:2}
 .sn{position:relative;grid-row:2;font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;letter-spacing:.22em;line-height:1.2;border:2px solid;font-size:var(--fs,1.6rem);text-align:center;white-space:nowrap;z-index:2;transform-origin:50% 0;will-change:transform}
 .sn i{font-style:normal;animation:neon 2.1s infinite .3s}
 .sn.v{writing-mode:vertical-rl;padding:.9rem .5rem}
@@ -150,7 +151,7 @@ body::before{content:"";position:fixed;inset:0;z-index:999;pointer-events:none;b
 <script>function fb(e){e.onerror=null;var s=e.getAttribute("src");e.src=s.indexOf("images/")===0?s.slice(7):"images/"+s}</script>
 </head>
 <body>
-<div id="boot"><pre id="bp"></pre></div><div id="prog"></div><svg id="wx" aria-hidden="true"></svg><canvas id="fx" aria-hidden="true"></canvas><div id="aura" aria-hidden="true"></div><div class="signs" aria-hidden="true"><div class="sign-rig l" style="--fs:1.8rem"><div class="sn v cy f1">メカトロニクス</div></div></div>
+<div id="boot"><pre id="bp"></pre></div><div id="prog"></div><svg id="wx" aria-hidden="true"></svg><canvas id="fx" aria-hidden="true"></canvas><div id="aura" aria-hidden="true"></div><div class="signs" aria-hidden="true"><svg class="sw"><line class="gw"/><line class="cw"/><line class="gw"/><line class="cw"/></svg><div class="sign-rig l" style="--fs:1.8rem"><div class="sn v cy f1">メカトロニクス</div></div></div>
 <nav><div class="nv"><a href="#about" class="logo"><i>✕</i>DANIEL<span id="clk"></span></a>
 <button id="mb" aria-label="Toggle menu" aria-expanded="false">☰</button><ul class="nl" id="nl"><li><a href="#about">About</a></li><li><a href="#skills">Skills</a></li><li><a href="#projects">Projects</a></li><li><a href="#gallery">Hardware</a></li><li><a href="#experience">Timeline</a></li><li><a href="#certs">Certs</a></li><li><a href="#resume">Resume</a></li><li><a href="#art">Art</a></li><li><a href="https://www.linkedin.com/in/zhangdz/" target="_blank" rel="noopener">LinkedIn</a></li></ul></div></nav>
 <main>
@@ -233,14 +234,18 @@ $('#cp').onclick=async e=>{const b=e.currentTarget;try{await navigator.clipboard
 /* ---------- SIGN: one hanging sign with pendulum physics ---------- */
 const SG=$('.signs'),RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
 let MX=-999,MY=-999,LX=null; // cursor in viewport coords (embers use them too)
-const S={el:$('.sign-rig'),sn:$('.sn'),jx:Math.random(),jy:Math.random(),a:.05,av:0,v:false,cx:0,top:0,h:0,wd:0,K:5,sw:.04,wf:.9,ph:Math.random()*6.28,MAX:.6};
+const S={el:$('.sign-rig'),sn:$('.sn'),jx:Math.random(),jy:Math.random(),a:RM?0:.05,av:0,v:false,cx:0,top:0,h:0,wd:0,K:5,sw:.04,wf:.9,ph:Math.random()*6.28,MAX:.6};
 function placeSigns(){ // random spot in the left gutter beside the hero, re-rolled each page load
   if(getComputedStyle(SG).display==='none'){S.v=false;return}
   S.v=true;
   const W=SG.clientWidth,hi=Math.max(0,Math.min(W/2-570-S.el.offsetWidth,300));
   S.el.style.setProperty('--ox',(hi*S.jx).toFixed(1)+'px');
   S.el.style.setProperty('--sy',(170+S.jy*200).toFixed(0)+'px');
-  const r=S.el.getBoundingClientRect();S.h=S.sn.offsetHeight;S.wd=r.width;S.cx=r.left+scrollX+r.width/2;S.top=r.bottom+scrollY-S.h}
+  const r=S.el.getBoundingClientRect();S.h=S.sn.offsetHeight;S.wd=r.width;S.cx=r.left+scrollX+r.width/2;S.top=r.bottom+scrollY-S.h;WL.forEach((l,i)=>{l.setAttribute('x1',(S.cx+(i<2?-1:1)*S.wd*.27).toFixed(1));l.setAttribute('y1',0)});wires()}
+const WL=$$('.sw line');
+function wires(){ // each wire runs from a fixed point at the top of the page to the sign's rotated top corner
+  const u=S.wd*.27,c=Math.cos(S.a),n=Math.sin(S.a);
+  WL.forEach((l,i)=>{const d=i<2?-u:u;l.setAttribute('x2',(S.cx+d*c).toFixed(1));l.setAttribute('y2',(S.top+d*n).toFixed(1))})}
 if(!RM){
   const cl=(v,m)=>Math.max(-m,Math.min(m,v));
   addEventListener('mousemove',e=>{ // sweep the cursor past the sign to shove it; low hits have more leverage
@@ -258,7 +263,7 @@ if(!RM){
       S.av+=(-S.K*Math.sin(S.a)-.38*S.av+S.K*S.sw*Math.sin(now/1000*S.wf+S.ph))*dt; // gravity + damping + breeze
       S.a+=S.av*dt;
       if(Math.abs(S.a)>S.MAX){S.a=Math.sign(S.a)*S.MAX;S.av*=-.35}
-      if(S.top+S.h>scrollY-60&&S.top<scrollY+innerHeight+60)S.sn.style.transform=`rotate(${S.a.toFixed(4)}rad)`}
+      if(S.top+S.h>scrollY-60&&S.top<scrollY+innerHeight+60){S.sn.style.transform=`rotate(${S.a.toFixed(4)}rad)`;wires()}}
     requestAnimationFrame(tick)})(performance.now());
 }
 
@@ -441,7 +446,7 @@ const ln=['<b>[ OK ]</b> mounting /dev/portfolio','<b>[ OK ]</b> calibrating ser
 const end=()=>{b.classList.add('off');setTimeout(()=>b.remove(),600);try{sessionStorage.setItem('b',1)}catch(e){}};
 const iv=setInterval(()=>{$('#bp').innerHTML+=ln[i++]+'\n';if(i==ln.length){clearInterval(iv);setTimeout(end,450)}},170);b.onclick=()=>{clearInterval(iv);end()}})();
 const KS='ArrowUpArrowUpArrowDownArrowDownArrowLeftArrowRightArrowLeftArrowRightba';let kb='';
-addEventListener('keydown',e=>{kb=(kb+e.key).slice(-KS.length);if(kb==KS)document.body.classList.toggle('g')});
+addEventListener('keydown',e=>{kb=(kb+e.key).toLowerCase().slice(-KS.length);if(kb==KS.toLowerCase())document.body.classList.toggle('g')});
 </script>
 </body>
 </html>
