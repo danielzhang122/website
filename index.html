@@ -11,7 +11,7 @@
 :root{--bg:#09090b;--card:#111215;--bd:#27272a;--bd2:#540d1c;--bl:#e11d48;--gl:#ff1e56;--dim:rgba(225,29,72,.12);--tx:#f4f4f5;--mu:#a1a1aa;--dk:#6b6b76;--cy:#22d3ee;--am:#f59e0b;--gr:#10b981}
 *{box-sizing:border-box;margin:0;padding:0}
 html{scroll-behavior:smooth;scroll-padding-top:70px}
-body{background:var(--bg);color:var(--tx);font:400 15px/1.65 'JetBrains Mono',monospace;overflow-x:hidden;transition:filter .6s;background-image:radial-gradient(ellipse at 85% 0,rgba(225,29,72,.16),transparent 60%),radial-gradient(ellipse at 10% 100%,rgba(136,19,55,.22),transparent 50%);background-attachment:fixed}
+body{position:relative;background:var(--bg);color:var(--tx);font:400 15px/1.65 'JetBrains Mono',monospace;overflow-x:hidden;transition:filter .6s;background-image:radial-gradient(ellipse at 85% 0,rgba(225,29,72,.16),transparent 60%),radial-gradient(ellipse at 10% 100%,rgba(136,19,55,.22),transparent 50%);background-attachment:fixed}
 body.g{filter:hue-rotate(150deg) saturate(1.3)}
 body::before{content:"";position:fixed;inset:0;z-index:999;pointer-events:none;background:linear-gradient(rgba(0,0,0,0) 50%,rgba(0,0,0,.25) 50%),linear-gradient(90deg,rgba(255,0,0,.03),rgba(0,255,0,.01),rgba(0,0,255,.03));background-size:100% 3px,6px 100%}
 h1,h2,h3,.logo{font-family:'Chakra Petch',sans-serif;text-transform:uppercase;letter-spacing:.03em}
@@ -41,7 +41,6 @@ section{padding:4.5rem 0 1rem;border-top:1px dashed #2f1219}
 
 /* Hero Section & Wire Overlays */
 .hero{padding:5rem 1.5rem 3.5rem;display:grid;grid-template-columns:1.15fr 1fr;gap:3.5rem;align-items:center;position:relative}
-.wire-backdrop{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;overflow:visible}
 .strips{display:flex;flex-wrap:wrap;gap:.7rem;margin-bottom:1.3rem;position:relative;z-index:2}
 .strip{display:inline-flex;align-items:center;gap:.5rem;background:#180509;border:1px solid var(--bl);padding:.35rem .8rem;color:var(--gl);font-size:.7rem;font-weight:800;letter-spacing:.1em;text-decoration:none;box-shadow:0 0 12px rgba(225,29,72,.25)}
 .strip u{width:6px;height:6px;background:var(--gl);box-shadow:0 0 8px var(--gl);animation:neon 3.5s infinite 1s}
@@ -69,14 +68,19 @@ section{padding:4.5rem 0 1rem;border-top:1px dashed #2f1219}
 .cur{animation:neon 1s steps(2) infinite;color:var(--gl)}
 
 /* Multilingual Neon Signs & Rigging */
-.sign-rig{position:absolute;right:-6.5rem;top:-1.5rem;display:flex;gap:.9rem;align-items:flex-start;z-index:4}
-.sign-box{position:relative;display:flex;flex-direction:column;align-items:center}
-.sign-box::before{content:"";position:absolute;top:-4rem;width:2px;height:4rem;background:linear-gradient(to bottom,transparent,#3a3b47,#1c1d24)}
-.nsign{font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;letter-spacing:.25em;border:2px solid;box-shadow:0 0 20px rgba(0,0,0,.85);user-select:none;text-align:center}
-.nsign i{font-style:normal;animation:neon 2.1s infinite .3s}
-.nsign.v{writing-mode:vertical-rl;padding:1.1rem .65rem}
-.nsign.h{writing-mode:horizontal-tb;padding:.4rem .9rem;letter-spacing:.2em;font-size:.72rem;margin-top:.6rem}
 
+/* Neon signs along the page gutters */
+.signs{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:none}
+.sg{position:absolute;font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;letter-spacing:.22em;line-height:1.2;border:2px solid;font-size:var(--fs,1.6rem);user-select:none;text-align:center;white-space:nowrap}
+.sg::before{content:"";position:absolute;bottom:100%;left:50%;width:2px;height:4rem;background:linear-gradient(to bottom,transparent,#3a3b47,#1c1d24)}
+.sg i{font-style:normal;animation:neon 2.1s infinite .3s}
+.sg.l{right:calc(50% + 562px + var(--ox,0px))}
+.sg.r{left:calc(50% + 562px + var(--ox,0px))}
+.sg.v{writing-mode:vertical-rl;padding:.9rem .5rem}
+.sg.h{display:none;padding:.35rem .8rem;letter-spacing:.16em}
+@media(min-width:1280px){.signs{display:block}}
+@media(min-width:1400px){.sg.h{display:block}}
+@media(min-width:1600px){.sg{font-size:calc(var(--fs,1.6rem)*1.2)}.sg.o{--ox:130px}}
 .c-cyan{color:#d5fbff;border-color:var(--cy);background:rgba(4,22,28,.82);text-shadow:0 0 6px var(--cy),0 0 16px var(--cy);box-shadow:0 0 14px rgba(34,211,238,.5),inset 0 0 10px rgba(34,211,238,.3)}
 .c-red{color:#ffe4e6;border-color:var(--bl);background:rgba(28,4,8,.82);text-shadow:0 0 6px var(--bl),0 0 16px var(--gl);box-shadow:0 0 14px rgba(225,29,72,.5),inset 0 0 10px rgba(225,29,72,.3)}
 .c-amber{color:#fef3c7;border-color:var(--am);background:rgba(28,20,4,.82);text-shadow:0 0 6px var(--am),0 0 14px var(--am);box-shadow:0 0 12px rgba(245,158,11,.45),inset 0 0 10px rgba(245,158,11,.25)}
@@ -161,8 +165,8 @@ footer small{display:block;margin-top:.6rem;font-size:.65rem;opacity:.6}
 #lx{top:1rem;right:1.2rem}#lp{left:1rem;top:50%}#lnx{right:1rem;top:50%}
 .rv{opacity:0;transform:translateY(22px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
 
-@media(max-width:1250px){.sign-rig{right:-1.5rem;top:0}.hero{gap:2.5rem}}
-@media(max-width:1024px){.hero{grid-template-columns:1fr;padding-right:1.5rem}.sign-rig,.wire-backdrop{display:none}.card,.card.f{grid-column:span 12;display:flex}.f .im{height:280px;border:0;border-bottom:1px solid #20222a}.card.f.fl .im{border:0;border-bottom:1px solid #20222a}.cc{grid-template-columns:140px 1fr}.cc .gi,.cc.r .gi{grid-column:1/-1}.cc.r{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stats div:nth-child(2){border:0}.stats div:nth-child(-n+2){border-bottom:1px dashed #2f1219}#mb{display:block}.nl{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:rgba(9,9,11,.98);padding:1rem 1.5rem;border-bottom:2px solid var(--bd2)}.nl.open{display:flex}#clk{display:none}}
+@media(max-width:1250px){.hero{gap:2.5rem}}
+@media(max-width:1024px){.hero{grid-template-columns:1fr;padding-right:1.5rem}.card,.card.f{grid-column:span 12;display:flex}.f .im{height:280px;border:0;border-bottom:1px solid #20222a}.card.f.fl .im{border:0;border-bottom:1px solid #20222a}.cc{grid-template-columns:140px 1fr}.cc .gi,.cc.r .gi{grid-column:1/-1}.cc.r{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.stats div:nth-child(2){border:0}.stats div:nth-child(-n+2){border-bottom:1px dashed #2f1219}#mb{display:block}.nl{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:rgba(9,9,11,.98);padding:1rem 1.5rem;border-bottom:2px solid var(--bd2)}.nl.open{display:flex}#clk{display:none}}
 @media(max-width:650px){.cv{height:auto;perspective:none;overflow:visible}.rg{width:100%;height:auto;display:flex;flex-direction:column;gap:1rem;transform:none!important}.sk{position:static;transform:none!important;height:auto}.hint{display:none}.cc{grid-template-columns:1fr}.bd{width:140px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx,#aura,#boot{display:none}.rv{opacity:1;transform:none}}
 </style>
@@ -178,34 +182,28 @@ footer small{display:block;margin-top:.6rem;font-size:.65rem;opacity:.6}
 <li><a href="#about">About</a></li><li><a href="#skills">Skills</a></li><li><a href="#projects">Projects</a></li><li><a href="#gallery">Hardware</a></li><li><a href="#experience">Timeline</a></li><li><a href="#certs">Certs</a></li><li><a href="#resume">Resume</a></li><li><a href="#art">Art</a></li><li><a href="https://www.linkedin.com/in/zhangdz/" target="_blank" rel="noopener">LinkedIn</a></li>
 </ul></div></nav>
 
+<div class="signs" aria-hidden="true">
+<div class="sg l v c-cyan flicker-1" style="top:3%;--fs:1.9rem">電<i>脳</i>街</div>
+<div class="sg l h c-green flicker-4" style="top:12%;--fs:.85rem">LIVE 24V</div>
+<div class="sg l v c-red flicker-2 o" style="top:21%;--fs:1.7rem">高電圧<i>危</i>険</div>
+<div class="sg l v c-amber flicker-3" style="top:35%;--fs:1.5rem">SERVO BAR</div>
+<div class="sg l h c-cyan flicker-1" style="top:46%;--fs:.85rem">24H 営業中</div>
+<div class="sg l v c-green flicker-2 o" style="top:54%;--fs:1.8rem">非常<i>停</i>止</div>
+<div class="sg l v c-red flicker-4" style="top:69%;--fs:1.7rem">反<i>应</i>堆</div>
+<div class="sg l h c-amber flicker-3" style="top:82%;--fs:.85rem">NO SIGNAL</div>
+<div class="sg l v c-cyan flicker-2 o" style="top:89%;--fs:1.6rem">ZERO·G·CLUB</div>
+<div class="sg r v c-red flicker-3" style="top:6%;--fs:1.9rem">重水<i>炉</i></div>
+<div class="sg r h c-cyan flicker-1" style="top:17%;--fs:.85rem">REPAIRS</div>
+<div class="sg r v c-amber flicker-2 o" style="top:26%;--fs:1.7rem">零件<i>修</i>理</div>
+<div class="sg r v c-green flicker-4" style="top:41%;--fs:1.8rem">夜<i>勤</i></div>
+<div class="sg r h c-red flicker-3" style="top:52%;--fs:.85rem">E-STOP</div>
+<div class="sg r v c-cyan flicker-1 o" style="top:60%;--fs:1.6rem">無限<i>ル</i>ープ</div>
+<div class="sg r v c-amber flicker-2" style="top:75%;--fs:1.8rem">钢铁<i>之</i>心</div>
+<div class="sg r h c-green flicker-4" style="top:87%;--fs:.85rem">BOOT_OK</div>
+</div>
+
 <main>
 <div class="wrap hero" id="about">
-  <!-- Loose industrial wires and conduits draping through the backdrop and signs -->
-  <svg class="wire-backdrop" viewBox="0 0 1200 520" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-    <path d="M 450,-20 C 510,180 720,230 1150,110" stroke="#161720" stroke-width="3" stroke-linecap="round"/>
-    <path d="M 520,-20 C 600,260 840,290 1220,180" stroke="#1f202b" stroke-width="2.2" stroke-linecap="round"/>
-    <path d="M 780,-10 C 820,130 940,160 1020,40" stroke="#2a1219" stroke-width="2" stroke-dasharray="7 5"/>
-    <path d="M 960,110 C 980,240 920,380 970,540" stroke="#14151e" stroke-width="2.5"/>
-    <path d="M 1030,135 C 1020,280 1080,390 1090,530" stroke="#0e1017" stroke-width="3.5"/>
-    <path d="M 1090,140 C 1110,220 1130,310 1120,490" stroke="#2b0d16" stroke-width="1.8"/>
-  </svg>
-
-  <!-- Multilingual Neon Sign Cluster (Japanese, Chinese, English) -->
-  <div class="sign-rig" aria-hidden="true">
-    <div class="sign-box">
-      <div class="nsign v c-cyan flicker-1">メカト<i>ロ</i>ニクス</div>
-      <div class="nsign h c-green flicker-4">LIVE 24V</div>
-    </div>
-    <div class="sign-box">
-      <div class="nsign v c-red flicker-2">机电<i>工</i>程</div>
-      <div class="nsign h c-amber flicker-sub">CAUTION</div>
-    </div>
-    <div class="sign-box">
-      <div class="nsign v c-amber flicker-3" style="font-size:1.15rem;padding:.8rem .55rem">ROBOT<i>I</i>CS</div>
-      <div class="nsign h c-red flicker-1">核能</div>
-    </div>
-  </div>
-
   <div>
     <div class="strips"><span class="strip"><u></u>STATUS: AVAILABLE FOR SPRING 2027 CO-OP</span><a class="strip c" href="#certs"><u></u>CSWA // CERTIFIED SOLIDWORKS ASSOCIATE</a></div>
     <h1 class="glitch" data-text="DANIEL ZHANG">DANIEL <span>ZHANG</span></h1>
