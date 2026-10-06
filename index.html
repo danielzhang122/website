@@ -73,6 +73,7 @@ section{padding:4.5rem 0 1rem;border-top:1px dashed #2f1219}
 .sign-box{position:relative;display:flex;flex-direction:column;align-items:center}
 .sign-box::before{content:"";position:absolute;top:-4rem;width:2px;height:4rem;background:linear-gradient(to bottom,transparent,#3a3b47,#1c1d24)}
 .nsign{font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;letter-spacing:.25em;border:2px solid;box-shadow:0 0 20px rgba(0,0,0,.85);user-select:none;text-align:center}
+.nsign i{font-style:normal;animation:neon 2.1s infinite .3s}
 .nsign.v{writing-mode:vertical-rl;padding:1.1rem .65rem}
 .nsign.h{writing-mode:horizontal-tb;padding:.4rem .9rem;letter-spacing:.2em;font-size:.72rem;margin-top:.6rem}
 
@@ -121,7 +122,8 @@ a.pill{border-color:var(--cy);color:#d5fbff}a.pill:hover{box-shadow:0 0 10px rgb
 .pb h3{font-size:1.25rem;margin-bottom:.6rem}.pb p{color:var(--mu);font-size:.86rem}
 .tags{display:flex;flex-wrap:wrap;gap:.4rem;align-items:center}
 .tags span{background:var(--bg);border:1px solid var(--bd2);color:var(--gl);padding:.22rem .55rem;font-size:.7rem;font-weight:600}
-.tags a,.tl a{color:var(--gl);text-decoration:none;font-weight:700;font-size:.72rem;margin-left:auto}
+.tags a{color:var(--gl);text-decoration:none;font-weight:700;font-size:.72rem;margin-left:auto}
+a.tl{color:var(--gl);text-decoration:none;font-weight:700;font-size:.72rem}
 .gg{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:1.2rem}
 .gi{position:relative;height:240px;border:1px solid #20222a;overflow:hidden;cursor:zoom-in;background:#050608;transition:.2s}
 .gi:hover{border-color:var(--bl);transform:translateY(-2px)}
@@ -164,6 +166,7 @@ footer small{display:block;margin-top:.6rem;font-size:.65rem;opacity:.6}
 @media(max-width:650px){.cv{height:auto;perspective:none;overflow:visible}.rg{width:100%;height:auto;display:flex;flex-direction:column;gap:1rem;transform:none!important}.sk{position:static;transform:none!important;height:auto}.hint{display:none}.cc{grid-template-columns:1fr}.bd{width:140px}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}#fx,#aura,#boot{display:none}.rv{opacity:1;transform:none}}
 </style>
+<script>function fb(e){e.onerror=null;var s=e.getAttribute("src");e.src=s.indexOf("images/")===0?s.slice(7):"images/"+s}</script>
 </head>
 <body>
 <div id="boot"><pre id="bp"></pre></div>
@@ -225,7 +228,7 @@ footer small{display:block;margin-top:.6rem;font-size:.65rem;opacity:.6}
 
 <div class="wrap"><section id="projects">
 <div class="sh"><h2>Featured Projects</h2><p>From CAD files that crashed SolidWorks to mechanisms that actually survived hardware testing.</p></div>
-<div class="fb" id="fb"></div><div class="pg" id="pg"></div>
+<div class="fb" id="fbar"></div><div class="pg" id="pg"></div>
 </section></div>
 
 <div class="wrap"><section id="gallery">
@@ -269,7 +272,6 @@ footer small{display:block;margin-top:.6rem;font-size:.65rem;opacity:.6}
 
 <script>
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
-function fb(e){e.onerror=null;const s=e.getAttribute('src');e.src=s.startsWith('images/')?s.slice(7):'images/'+s}
 const im=(s,a,c='')=>`<img class="${c}" src="${s}" alt="${a}" loading="lazy" onerror="fb(this)">`;
 const CRED='https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6';
 
@@ -323,14 +325,19 @@ $('#st').innerHTML=STATS.map(s=>`<div><b data-n="${s[0]}" data-s="${s[1]}">0</b>
 $('#rg').innerHTML=SKILLS.map((s,i)=>`<div class="sk" style="--i:${i}"><div><h3>${s[0]}</h3><div class="pl">${s[1].map(p=>Array.isArray(p)?`<a class="pill" href="${p[1]}" target="_blank" rel="noopener" draggable="false">${p[0]}</a>`:`<span class="pill">${p}</span>`).join('')}</div></div></div>`).join('');
 $('#pg').innerHTML=P.map((p,i)=>`<article class="card rv${p.f?' f':''}${p.f&&i%2?' fl':''}" data-c="${p.c}"><div class="im" data-g="proj" data-i="${i}" tabindex="0">${im(p.i,p.t,'ct')}<div class="tag">[${p.b}]</div></div><div class="pb"><div><h3>${p.t}</h3><p>${p.d}</p></div><div class="tags">${p.g.map(g=>`<span>${g}</span>`).join('')}${p.r?`<a href="${p.r}" target="_blank" rel="noopener">[REPO ↗]</a>`:''}</div></div></article>`).join('');
 const cats=[['all','All'],['hardware','Hardware & Embedded'],['software','Software & Automation'],['simulation','Simulation & CAD']];
-$('#fb').innerHTML=cats.map((c,i)=>`<button data-f="${c[0]}"${i?'':' class="on"'}>${c[1]}<sup>${c[0]=='all'?P.length:P.filter(p=>p.c.includes(c[0])).length}</sup></button>`).join('');
+$('#fbar').innerHTML=cats.map((c,i)=>`<button data-f="${c[0]}"${i?'':' class="on"'}>${c[1]}<sup>${c[0]=='all'?P.length:P.filter(p=>p.c.includes(c[0])).length}</sup></button>`).join('');
 $('#bg').innerHTML=B.map((b,i)=>gi('bench',i,b[0],b[1],b[3])).join('');
 $('#ar').innerHTML=A.map((a,i)=>gi('art',i,a[0],a[1],'')).join('');
 $('#tl').innerHTML=T.map(t=>`<div class="ti rv"><div class="td">${t[0]}</div><h3>${t[1]}</h3><div class="to">${t[2]}</div><p>${t[3]}${t[4]?` <a class="tl" href="${t[4]}" target="_blank" rel="noopener">[VERIFY ↗]</a>`:''}</p></div>`).join('');
 $$('.gi[data-g=cert],.gi[data-g=res]').forEach(e=>e.dataset.i=0);
 
 /* ---------- FILTER ---------- */
-$('#fb').onclick=e=>{const b=e.target.closest('button');if(!b)return;$$('#fb button').forEach(x=>x.classList.toggle('on',x==b));$$('.card').forEach(c=>c.style.display=b.dataset.f=='all'\vert{}\vert{}c.dataset.c.includes(b.dataset.f)?'':'none')};  /* ---------- LIGHTBOX ---------- */ let cg='',ci=0; function show(){const el=$$(`[data-g="${cg}"]`)[ci],n=$$(`[data-g="${cg}"]`).length,c=CAP[cg][ci];$('#li').src=$('img',el).currentSrc;$('#li').alt=c[0];$('#lc').innerHTML=`<strong>${c[0]}</strong> // ${c[1]}`;$('#ln').textContent=`${String(ci+1).padStart(2,'0')} / ${String(n).padStart(2,'0')}`;$$('#lp,#lnx').forEach(b=>b.style.display=n>1?'':'none')} function step(d){const n=$$(`[data-g="${cg}"]`).length;ci=(ci+d+n)%n;show()}
+$('#fbar').onclick=e=>{const b=e.target.closest('button');if(!b)return;$$('#fbar button').forEach(x=>x.classList.toggle('on',x==b));$$('.card').forEach(c=>c.style.display=(b.dataset.f=='all'||c.dataset.c.includes(b.dataset.f))?'':'none')};
+
+/* ---------- LIGHTBOX ---------- */
+let cg='',ci=0;
+function show(){const el=$$(`[data-g="${cg}"]`)[ci],n=$$(`[data-g="${cg}"]`).length,c=CAP[cg][ci];$('#li').src=$('img',el).currentSrc;$('#li').alt=c[0];$('#lc').innerHTML=`<strong>${c[0]}</strong> // ${c[1]}`;$('#ln').textContent=`${String(ci+1).padStart(2,'0')} / ${String(n).padStart(2,'0')}`;$$('#lp,#lnx').forEach(b=>b.style.display=n>1?'':'none')}
+function step(d){const n=$$(`[data-g="${cg}"]`).length;ci=(ci+d+n)%n;show()}
 function closeLb(){$('#lb').classList.remove('on');document.body.style.overflow=''}
 document.addEventListener('click',e=>{const t=e.target.closest('[data-g]');if(t){cg=t.dataset.g;ci=+t.dataset.i;show();$('#lb').classList.add('on');document.body.style.overflow='hidden'}});
 document.addEventListener('keydown',e=>{if((e.key=='Enter')&&document.activeElement.dataset.g)document.activeElement.click();if(!$('#lb').classList.contains('on'))return;if(e.key=='ArrowRight')step(1);if(e.key=='ArrowLeft')step(-1);if(e.key=='Escape')closeLb()});
@@ -339,14 +346,17 @@ $('#lb').onclick=e=>{if(e.target.id=='lb')closeLb()};
 let sx=0;$('#lb').addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});$('#lb').addEventListener('touchend',e=>{const d=e.changedTouches[0].clientX-sx;if(Math.abs(d)>50)step(d<0?1:-1)});
 
 /* ---------- NAV ---------- */
-$('#mb').onclick=()=>{const o=$('#nl').classList.toggle('open');$('#mb').setAttribute('aria-expanded',o)}; $$('#nl a').forEach(a=>a.addEventListener('click',()=>$('#nl').classList.remove('open')));
+$('#mb').onclick=()=>{const o=$('#nl').classList.toggle('open');$('#mb').setAttribute('aria-expanded',o)};
+$$('#nl a').forEach(a=>a.addEventListener('click',()=>$('#nl').classList.remove('open')));
 addEventListener('scroll',()=>{const h=document.documentElement;$('#prog').style.width=(h.scrollTop/(h.scrollHeight-h.clientHeight)*100)+'%'},{passive:true});
 const secs=$$('section[id],#about'),links=$$('#nl a[href^="#"]');
-new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(l=>l.classList.toggle('on',l.hash=='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'}).observe&&secs.forEach(s=>new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(l=>l.classList.toggle('on',l.hash=='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'}).observe(s));
+const spy=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)links.forEach(l=>l.classList.toggle('on',l.hash=='#'+e.target.id))}),{rootMargin:'-45% 0px -50% 0px'});
+secs.forEach(s=>spy.observe(s));
 setInterval(()=>$('#clk').textContent='// '+new Date().toTimeString().slice(0,8),1000);
 
 /* ---------- REVEAL + COUNTERS ---------- */
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');io.unobserve(e.target);$$('[data-n]',e.target).forEach(b=>{const n=+b.dataset.n,d=n\%1?2:0,t0=performance.now();(function f(t){const k=Math.min((t-t0)/1200,1);b.textContent=(n*(1-Math.pow(1-k,3))).toFixed(d)+b.dataset.s;if(k<1)requestAnimationFrame(f)})(t0)})}),{threshold:.12});$$('.rv').forEach(e=>io.observe(e));
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(!e.isIntersecting)return;e.target.classList.add('in');io.unobserve(e.target);$$('[data-n]',e.target).forEach(b=>{const n=+b.dataset.n,d=n%1?2:0,t0=performance.now();(function f(t){const k=Math.min((t-t0)/1200,1);b.textContent=(n*(1-Math.pow(1-k,3))).toFixed(d)+b.dataset.s;if(k<1)requestAnimationFrame(f)})(t0)})}),{threshold:.12});
+$$('.rv').forEach(e=>io.observe(e));
 
 /* ---------- CARD SPOTLIGHT ---------- */
 document.addEventListener('mousemove',e=>{const c=e.target.closest('.card');if(c){const r=c.getBoundingClientRect();c.style.setProperty('--mx',e.clientX-r.left+'px');c.style.setProperty('--my',e.clientY-r.top+'px')}$('#aura').style.transform=`translate(${e.clientX-innerWidth/2}px,${e.clientY-innerHeight*.3}px)`});
@@ -376,9 +386,9 @@ if(Math.random()<.002)fl=8;if(fl>0){x.fillStyle=`rgba(255,30,86,${fl*.012})`;x.f
 requestAnimationFrame(f)})()}
 
 /* ---------- TERMINAL ---------- */
-const L=['<em>$</em> whoami','<b>daniel</b> // mechatronics, mcmaster','<em>$</em> cat status.txt','co-op: <b>spring 2027, open</b>','cert: <b>CSWA verified</b>','<em>$</em> now_building --'],W=['robots','mechanical parts','nuclear tooling','things that survive hardware testing'];
+const L=['<em>$</em> whoami','<b>daniel</b> // mechatronics, mcmaster','<em>$</em> cat status.txt','co-op: <b>spring 2027, open</b>','cert: <b>CSWA verified</b>','<em>$</em> now_building --'],WD=['robots','mechanical parts','nuclear tooling','things that survive hardware testing'];
 (function(){const t=$('#tm');t.innerHTML=L.join('<br>')+' <b id="ty"></b><span class="cur">█</span>';let w=0,i=0,del=false;const y=$('#ty');
-(function k(){const s=W[w];i+=del?-1:1;y.textContent=s.slice(0,i);let d=del?35:70;if(!del&&i==s.length){del=true;d=1400}else if(del&&i==0){del=false;w=(w+1)%W.length;d=300}setTimeout(k,d)})()})();
+(function k(){const s=WD[w];i+=del?-1:1;y.textContent=s.slice(0,i);let d=del?35:70;if(!del&&i==s.length){del=true;d=1400}else if(del&&i==0){del=false;w=(w+1)%WD.length;d=300}setTimeout(k,d)})()})();
 
 $('#cp').onclick=async e=>{const b=e.currentTarget;try{await navigator.clipboard.writeText('zhand40@mcmaster.ca');b.textContent='Copied'}catch(_){b.textContent='Ctrl+C it'}setTimeout(()=>b.textContent='Copy',1600)};
 
