@@ -119,26 +119,29 @@ body::before{content:"";position:fixed;inset:0;z-index:999;pointer-events:none;b
 .gi small{position:absolute;inset:auto 0 0;background:rgba(9,9,11,.93);border-top:1px solid var(--bd2);padding:.45rem .75rem;font-size:.72rem;transform:translateY(100%);transition:.2s}.gi:hover small,.gi:focus-visible small{transform:none}
 .gi img{transition:.3s}.gi:hover img{transform:scale(1.04)}
 .rv{opacity:0;transform:translateY(22px);transition:opacity .7s,transform .7s}.rv.in{opacity:1;transform:none}
-.signs{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:none}
-.sn{position:absolute;font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;letter-spacing:.22em;line-height:1.2;border:2px solid;font-size:var(--fs,1.6rem);text-align:center;white-space:nowrap}
-.sn::before,.sn::after{content:"";position:absolute;z-index:-1;pointer-events:none}
-.sn.v::before,.sn.v::after{top:-88px;width:2px;height:88px;background:linear-gradient(90deg,#4a4a55,#15151a 55%,#050506);box-shadow:0 0 7px rgba(0,0,0,.9)}
-.sn.v::before{left:23%}.sn.v::after{right:23%}
-.sn.h::before,.sn.h::after{top:-46px;width:2px;height:46px;background:#24252c;box-shadow:0 0 6px rgba(0,0,0,.8)}
-.sn.h::before{left:24%}.sn.h::after{right:24%}
+
+/* ---------- HANGING SIGNS (position + swing are driven by JS) ---------- */
+.signs{position:absolute;top:0;left:0;width:100%;height:100%;z-index:0;pointer-events:none;display:none;overflow:visible}
+.sign-rig{--sy:200px;position:absolute;top:31px;width:max-content;display:grid;grid-template-rows:calc(var(--sy) - 31px) auto;justify-items:center;pointer-events:none}
+.sign-rig.l{right:calc(50% + 562px + var(--ox,0px))}.sign-rig.r{left:calc(50% + 562px + var(--ox,0px))}
+.sign-rig::before,.sign-rig::after{content:"";grid-row:1;position:absolute;top:0;width:2px;height:100%;background:linear-gradient(90deg,#ff1e56,#8b1027 48%,#2b0a12);box-shadow:0 0 6px rgba(225,29,72,.55);transform-origin:top}
+.sign-rig::before{left:23%}.sign-rig::after{right:23%}
+.sn{position:relative;grid-row:2;font-family:'Chakra Petch','Noto Sans SC',sans-serif;font-weight:700;letter-spacing:.22em;line-height:1.2;border:2px solid;font-size:var(--fs,1.6rem);text-align:center;white-space:nowrap;z-index:2;transform-origin:50% 0;will-change:transform}
 .sn i{font-style:normal;animation:neon 2.1s infinite .3s}
-.sn.l{right:calc(50% + 562px + var(--ox,0px))}.sn.r{left:calc(50% + 562px + var(--ox,0px))}
-.sn.v{writing-mode:vertical-rl;padding:.9rem .5rem;transform-origin:top center;animation:signdangle 5.5s ease-in-out infinite}
-.sn.h{display:none;padding:.35rem .8rem;letter-spacing:.16em;transform-origin:top center;animation:signdangle 6.2s ease-in-out infinite}
-@keyframes signdangle{0%,100%{transform:rotate(-1.2deg)}50%{transform:rotate(1.2deg)}}
+.sn.v{writing-mode:vertical-rl;padding:.9rem .5rem}
+.sn.h{display:none;padding:.35rem .8rem;letter-spacing:.16em}
 @media(min-width:1280px){.signs{display:block}}@media(min-width:1400px){.sn.h{display:block}}
-@media(min-width:1600px){.sn{font-size:calc(var(--fs,1.6rem)*1.2)}.sn.o{--ox:130px}}
+@media(min-width:1600px){.sn{font-size:calc(var(--fs,1.6rem)*1.2)}}
+
 .cy{color:#d5fbff;border-color:#22d3ee;background:rgba(4,22,28,.82);text-shadow:0 0 6px #22d3ee,0 0 16px #22d3ee;box-shadow:0 0 14px rgba(34,211,238,.5),inset 0 0 10px rgba(34,211,238,.3)}
 .rd{color:#ffe4e6;border-color:#e11d48;background:rgba(28,4,8,.82);text-shadow:0 0 6px #e11d48,0 0 16px #ff1e56;box-shadow:0 0 14px rgba(225,29,72,.5),inset 0 0 10px rgba(225,29,72,.3)}
 .am{color:#fef3c7;border-color:#f59e0b;background:rgba(28,20,4,.82);text-shadow:0 0 6px #f59e0b;box-shadow:0 0 12px rgba(245,158,11,.45),inset 0 0 10px rgba(245,158,11,.25)}
 .gn{color:#d1fae5;border-color:#10b981;background:rgba(4,26,18,.82);text-shadow:0 0 6px #10b981;box-shadow:0 0 12px rgba(16,185,129,.45),inset 0 0 10px rgba(16,185,129,.25)}
 .wd{color:#d1bfae;border-color:#2b1d14;background:repeating-linear-gradient(10deg,rgba(0,0,0,.1) 0,rgba(0,0,0,.1) 2px,transparent 2px,transparent 8px),linear-gradient(170deg,#3d2817,#24150b,#1a0f07);box-shadow:8px 8px 15px rgba(0,0,0,.7)}
-.f1{animation:neon 7.5s infinite}.f2{animation:neon 4.8s infinite .8s}.f3{animation:neon 6.2s infinite 1.7s}.f4{animation:neon 3.4s infinite 2.2s}
+.sn.f1{animation:neon 7.5s infinite}
+.sn.f2{animation:neon 4.8s infinite .8s}
+.sn.f3{animation:neon 6.2s infinite 1.7s}
+.sn.f4{animation:neon 3.4s infinite 2.2s}
 @media(max-width:900px){.pg{grid-template-columns:repeat(12,1fr)}.card,.card.f{grid-column:span 12;display:flex}.f .im{height:280px;border:0;border-bottom:1px solid #20222a}.card.f.fl .im{border:0;border-bottom:1px solid #20222a}#mb{display:block}.nl{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;background:rgba(9,9,11,.98);padding:1rem 1.5rem;border-bottom:2px solid var(--bd2)}.nl.open{display:flex}#clk{display:none}}
 @media(max-width:650px){.cv{height:auto;perspective:none;overflow:visible}.rg{width:100%;height:auto;display:flex;flex-direction:column;gap:1rem;transform:none!important}.sk{position:static;transform:none!important}.hint{display:none}}
 @media(prefers-reduced-motion:reduce){#fx,#aura,#boot{display:none}.rv{opacity:1;transform:none}}
@@ -146,7 +149,7 @@ body::before{content:"";position:fixed;inset:0;z-index:999;pointer-events:none;b
 <script>function fb(e){e.onerror=null;var s=e.getAttribute("src");e.src=s.indexOf("images/")===0?s.slice(7):"images/"+s}</script>
 </head>
 <body>
-<div id="boot"><pre id="bp"></pre></div><div id="prog"></div><svg id="wx" aria-hidden="true"></svg><canvas id="fx" aria-hidden="true"></canvas><div id="aura" aria-hidden="true"></div><div class="signs" aria-hidden="true"><div class="sn l v cy f1 " style="top:5%;--fs:1.8rem">メカトロニクス</div><div class="sn l h wd " style="top:15%;--fs:.95rem">PROTOTYPE</div><div class="sn l v am f2 o" style="top:25%;--fs:1.6rem">公差<i>限界</i></div><div class="sn l h gn f4 " style="top:40%;--fs:.85rem">SYS_NOMINAL</div><div class="sn l v wd o" style="top:50%;--fs:1.6rem">ASSEMBLY</div><div class="sn l h cy f2 " style="top:65%;--fs:.9rem">DYNAMICS</div><div class="sn l v rd f3 " style="top:75%;--fs:1.7rem">反復<i>工程</i></div><div class="sn r v wd " style="top:8%;--fs:1.8rem">WORKSHOP</div><div class="sn r h cy f1 " style="top:20%;--fs:.9rem">動力学</div><div class="sn r v rd f3 o" style="top:30%;--fs:1.7rem">較正<i>中</i></div><div class="sn r h wd " style="top:45%;--fs:1rem">MATERIALS</div><div class="sn r v gn f4 " style="top:55%;--fs:1.8rem">製造<i>ライン</i></div><div class="sn r h am f2 " style="top:70%;--fs:.85rem">01_STARTUP</div><div class="sn r v cy f1 o" style="top:80%;--fs:1.6rem">KINETICS</div></div>
+<div id="boot"><pre id="bp"></pre></div><div id="prog"></div><svg id="wx" aria-hidden="true"></svg><canvas id="fx" aria-hidden="true"></canvas><div id="aura" aria-hidden="true"></div><div class="signs" aria-hidden="true"><div class="sign-rig l" style="--fs:1.8rem"><div class="sn l v cy f1">メカトロニクス</div></div><div class="sign-rig l" style="--fs:.95rem"><div class="sn l h wd">PROTOTYPE</div></div><div class="sign-rig l" style="--fs:1.6rem"><div class="sn l v am f2">公差<i>限界</i></div></div><div class="sign-rig l" style="--fs:.85rem"><div class="sn l h gn f4">SYS_NOMINAL</div></div><div class="sign-rig l" style="--fs:1.6rem"><div class="sn l v wd">ASSEMBLY</div></div><div class="sign-rig l" style="--fs:.9rem"><div class="sn l h cy f2">DYNAMICS</div></div><div class="sign-rig l" style="--fs:1.7rem"><div class="sn l v rd f3">反復<i>工程</i></div></div><div class="sign-rig r" style="--fs:1.8rem"><div class="sn r v wd">WORKSHOP</div></div><div class="sign-rig r" style="--fs:.9rem"><div class="sn r h cy f1">動力学</div></div><div class="sign-rig r" style="--fs:1.7rem"><div class="sn r v rd f3">較正<i>中</i></div></div><div class="sign-rig r" style="--fs:1rem"><div class="sn r h wd">MATERIALS</div></div><div class="sign-rig r" style="--fs:1.8rem"><div class="sn r v gn f4">製造<i>ライン</i></div></div><div class="sign-rig r" style="--fs:.85rem"><div class="sn r h am f2">01_STARTUP</div></div><div class="sign-rig r" style="--fs:1.6rem"><div class="sn r v cy f1">KINETICS</div></div></div>
 <nav><div class="nv"><a href="#about" class="logo"><i>✕</i>DANIEL<span id="clk"></span></a>
 <button id="mb" aria-label="Toggle menu" aria-expanded="false">☰</button><ul class="nl" id="nl"><li><a href="#about">About</a></li><li><a href="#skills">Skills</a></li><li><a href="#projects">Projects</a></li><li><a href="#gallery">Hardware</a></li><li><a href="#experience">Timeline</a></li><li><a href="#certs">Certs</a></li><li><a href="#resume">Resume</a></li><li><a href="#art">Art</a></li><li><a href="https://www.linkedin.com/in/zhangdz/" target="_blank" rel="noopener">LinkedIn</a></li></ul></div></nav>
 <main>
@@ -225,6 +228,54 @@ $$('[data-n]').forEach(b=>io.observe(b));
 const L=['<em>$</em> whoami','<b>daniel</b> // mechatronics, mcmaster','<em>$</em> cat status.txt','co-op: <b>spring 2027, open</b>','cert: <b>CSWA verified</b>','<em>$</em> now_building --'],WD=['robots','mechanical parts','nuclear tooling','things that survive hardware testing'];
 (function(){$('#tm').innerHTML=L.join('<br>')+' <b id="ty"></b><span>█</span>';let w=0,i=0,del=false;const y=$('#ty');(function k(){const s=WD[w];i+=del?-1:1;y.textContent=s.slice(0,i);let d=del?35:70;if(!del&&i==s.length){del=true;d=1400}else if(del&&i==0){del=false;w=(w+1)%WD.length;d=300}setTimeout(k,d)})()})();
 $('#cp').onclick=async e=>{const b=e.currentTarget;try{await navigator.clipboard.writeText('zhand40@mcmaster.ca');b.textContent='Copied'}catch(_){b.textContent='Ctrl+C it'}setTimeout(()=>b.textContent='Copy',1600)};
+
+/* ---------- SIGNS: random stagger + pendulum physics ---------- */
+const SG=$('.signs'),RM=matchMedia('(prefers-reduced-motion:reduce)').matches;
+let MX=-999,MY=-999,LX=null; // MX/MY = cursor in viewport coords (embers use them too)
+const RG=$$('.sign-rig').map(r=>({el:r,sn:$('.sn',r),s:r.classList.contains('l')?'l':'r',
+  k:Math.random(),k2:Math.random(),jx:Math.random(),jy:Math.random(),   // random band / lane / jitter
+  a:(Math.random()-.5)*.12,av:0,fl:0,v:false,cx:0,top:0,h:0,wd:0,mx:.5, // angle, angular velocity, flash, layout cache
+  K:4+Math.random()*3.5,                                                // stiffness -> each sign has its own swing period
+  sw:(1.5+Math.random()*2.3)*Math.PI/180,wf:.6+Math.random()*.8,ph:Math.random()*6.28})); // ambient breeze
+function placeSigns(){
+  if(getComputedStyle(SG).display==='none'){RG.forEach(o=>o.v=false);return}
+  const W=SG.clientWidth,H=Math.max(document.body.scrollHeight,innerHeight);
+  RG.forEach(o=>{o.el.style.display='';o.v=getComputedStyle(o.sn).display!=='none';o.el.style.display=o.v?'':'none'});
+  for(const s of['l','r']){
+    const g=RG.filter(o=>o.s===s&&o.v),n=g.length;if(!n)continue;
+    const lane=[...g].sort((a,b)=>a.k2-b.k2),top=s==='l'?150:150+(H-250)/n/2,band=(H-100-top)/n;
+    [...g].sort((a,b)=>a.k-b.k).forEach((o,i)=>{
+      const w=o.el.offsetWidth,h=o.sn.offsetHeight,lo=0,hi=Math.max(lo,Math.min(W/2-570-w,520));
+      o.el.style.setProperty('--ox',(lo+(hi-lo)/n*(lane.indexOf(o)+.1+.8*o.jx)).toFixed(1)+'px');
+      o.el.style.setProperty('--sy',(top+i*band+Math.max(0,band-h)*o.jy).toFixed(0)+'px')})}
+  RG.forEach(o=>{if(!o.v)return;const r=o.el.getBoundingClientRect();o.h=o.sn.offsetHeight;o.wd=r.width;o.cx=r.left+scrollX+r.width/2;o.top=r.bottom+scrollY-o.h;o.mx=o.wd>100?.35:.6})}
+if(!RM){
+  const cl=(v,m)=>Math.max(-m,Math.min(m,v));
+  // sweeping the cursor past a sign shoves it; hits low on the sign have more leverage
+  addEventListener('mousemove',e=>{
+    MX=e.clientX;MY=e.clientY;
+    const x=e.pageX,y=e.pageY,dx=LX===null?0:cl(x-LX,80);LX=x;if(!dx)return;
+    for(const o of RG){if(!o.v)continue;
+      const ex=Math.max(Math.abs(x-o.cx)-o.wd/2,0),ey=Math.max(o.top-y,y-o.top-o.h,0),f=Math.max(0,1-Math.hypot(ex,ey)/70);
+      if(!f)continue;
+      const lv=Math.max(.15,Math.min(1,(y-o.top)/o.h)),dv=-dx*f*f*lv*.03;
+      o.av=cl(o.av+dv,6);o.fl=Math.min(1,o.fl+Math.abs(dv)*3)}});
+  // clicking near a sign kicks it away from the cursor
+  addEventListener('mousedown',e=>{for(const o of RG){if(!o.v)continue;
+    const dx=o.cx-e.pageX,dy=o.top+o.h/2-e.pageY,d=Math.hypot(dx,dy);
+    if(d<180){o.av=cl(o.av-Math.sign(dx||1)*(1-d/180)*4,6);o.fl=1}}});
+  let TL=performance.now();
+  (function tick(now){
+    const dt=Math.min((now-TL)/1000,.05)||.016,t=now/1000,vt=scrollY-60,vb=scrollY+innerHeight+60;TL=now;
+    for(const o of RG){if(!o.v)continue;
+      o.av+=(-o.K*Math.sin(o.a)-.38*o.av+o.K*o.sw*Math.sin(t*o.wf+o.ph))*dt; // gravity + damping + breeze
+      o.a+=o.av*dt;
+      if(Math.abs(o.a)>o.mx){o.a=Math.sign(o.a)*o.mx;o.av*=-.35}             // bounce off the tilt limit
+      if(o.top+o.h>vt&&o.top<vb){                                           // only paint signs on screen
+        o.sn.style.transform=`rotate(${o.a.toFixed(4)}rad)`;
+        if(o.fl>.01){o.fl*=.9;o.sn.style.filter=`brightness(${(1+o.fl*1.1).toFixed(2)})`}else if(o.fl){o.fl=0;o.sn.style.filter=''}}}
+    requestAnimationFrame(tick)})(performance.now());
+}
 
 /* ---------- WIRES: edge-anchored, draped, plus intentional top dangling drops ---------- */
 const svg=$('#wx'),NS='http://www.w3.org/2000/svg';let seed=11;
@@ -353,6 +404,8 @@ function build(){
     tip(mx-g,y,0,R(0,2));
     tip(mx+g,y,Math.PI,R(0,2));
   }
+
+  placeSigns();
 }
 
 let rt;
@@ -378,7 +431,7 @@ addEventListener('touchmove',e=>{if(!drag)return;const d=px(e)-sxp;dd+=Math.abs(
 addEventListener('mouseup',()=>{drag=false;hov=false});addEventListener('touchend',()=>drag=false);
 cv.addEventListener('click',e=>{if(dd>6&&e.target.closest('a'))e.preventDefault()});
 (function sp(){if(innerWidth>650){if(!drag){if(Math.abs(vel)>.01){ang+=vel;vel*=.92}else if(!hov)ang-=.15}rg.style.transform=`rotateY(${ang}deg)`}requestAnimationFrame(sp)})();
-/* rain + embers + flash */
+/* rain + embers (embers are pushed away by the cursor) + flash */
 if(!matchMedia('(prefers-reduced-motion:reduce)').matches){
 const c=$('#fx'),x=c.getContext('2d');let W,H,rain=[],em=[];const Rr=(a,b)=>a+Math.random()*(b-a);
 const mk=()=>({x:Rr(0,W+200),y:Rr(-H,0),l:Rr(12,30),v:Rr(11,21),a:Rr(.06,.22),r:Math.random()<.15});
@@ -387,7 +440,8 @@ function rs(){W=c.width=innerWidth;H=c.height=innerHeight;rain=Array.from({lengt
 rs();addEventListener('resize',rs);let fl=0;
 (function f(){x.clearRect(0,0,W,H);x.lineWidth=1;
 for(const d of rain){x.strokeStyle=d.r?`rgba(255,60,100,${d.a})`:`rgba(160,185,220,${d.a})`;x.beginPath();x.moveTo(d.x,d.y);x.lineTo(d.x+d.l*.18,d.y-d.l);x.stroke();d.y+=d.v;d.x-=d.v*.18;if(d.y-d.l>H)Object.assign(d,mk(),{y:-10})}
-for(const e of em){x.fillStyle=e.r?`rgba(225,29,72,${e.a})`:`rgba(200,200,200,${e.a*.4})`;x.fillRect(e.x,e.y,e.s,e.s);e.y-=e.v;e.x+=e.dx;e.a-=.0015;if(e.y<0||e.a<=0)Object.assign(e,me())}
+for(const e of em){const ex=e.x-MX,ey=e.y-MY,ed=Math.hypot(ex,ey);if(ed<130&&ed>0){const k=(1-ed/130)*2.4;e.x+=ex/ed*k;e.y+=ey/ed*k}
+x.fillStyle=e.r?`rgba(225,29,72,${e.a})`:`rgba(200,200,200,${e.a*.4})`;x.fillRect(e.x,e.y,e.s,e.s);e.y-=e.v;e.x+=e.dx;e.a-=.0015;if(e.y<0||e.a<=0)Object.assign(e,me())}
 if(Math.random()<.002)fl=8;if(fl>0){x.fillStyle=`rgba(255,30,86,${fl*.012})`;x.fillRect(0,0,W,H);fl--}
 requestAnimationFrame(f)})()}
 /* boot + konami */
