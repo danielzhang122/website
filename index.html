@@ -214,7 +214,7 @@ body::before{content:"";position:fixed;inset:0;z-index:999;pointer-events:none;b
 const $=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
 const im=(s,a)=>`<img src="${s}" alt="${a}" loading="lazy" decoding="async" onerror="fb(this)">`;
 const CRED='https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6';
-const STATS=[[12,'','DOF quadruped platform'],[3.25,':1','strength-to-weight, WheelSafe'],[200,'+','teams outranked, top 3'],[8,'+','months in nuclear tooling']];
+  <!-- const STATS=[[12,'','DOF quadruped platform'],[3.25,':1','strength-to-weight, WheelSafe'],[200,'+','teams outranked, top 3'],[8,'+','months in nuclear tooling']]; -->
 const SKILLS=[['Hardware & Embedded',['ESP32','STM32','Raspberry Pi','PCA9685 / Drivers','I2C / SPI / UDP']],['CAD & Simulation',[['CSWA',CRED],'SolidWorks','Inventor','Fusion 360','MuJoCo','FEA Stress Analysis']],['Software & Computation',['C / C++','Python (OpenCV)','MATLAB / Simulink','Julia','Power Automate']],['Design & Standards',['CSA N299.2 / N299.3','ASD Verification','GD&T','FMEA & FAT Plans']]];
 const P=[
 {t:'Autonomous Quadruped Robot & Locomotion Sim',d:'12-DOF legged robotics platform built around an inverse kinematics solver and dynamic stability modeling. Simulated leg trajectories, center-of-mass stabilization, and ground reaction forces in real time. Works flawlessly in simulation, where gravity is a tidy constant and friction never betrays you.',g:['Inverse Kinematics','MuJoCo','ESP32','C++'],i:'yurr.gif',b:'ROBOT-SIM',c:'hardware simulation',x:'12-DOF legged robotics platform & locomotion sim',f:1},
