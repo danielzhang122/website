@@ -1,0 +1,7 @@
+# Daniel Zhang
+
+> Personal website of Daniel Zhang.
+
+- [Resume](https://danielzhang122.github.io/Daniel_Zhang_Resume.pdf): Resume and work history
+- [LinkedIn](https://www.linkedin.com/in/zhangdz/): Professional profile
+- [GitHub](https://github.com/danielzhang122): Code and projects
