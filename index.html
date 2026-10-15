@@ -133,7 +133,8 @@ footer{margin-top:4rem;border-top:2px solid var(--bd2);padding:3rem 1rem;text-al
 .sn.f1{animation:neon 7.5s infinite}.sn.f2{animation:neon 4.8s infinite .8s}.sn.f3{animation:neon 6.2s infinite 1.7s}.sn.f4{animation:neon 3.4s infinite 2.2s}
 @media(min-width:1280px){.signs{display:block}}@media(min-width:1400px){.sn.h{display:block}}
 @media(min-width:1600px){.sn{font-size:calc(var(--fs,1.6rem)*1.2)}}
-body{transition:filter .6s}body.g{filter:hue-rotate(150deg) saturate(1.3)}
+body{transition:filter .6s}body.g{filter:hue-rotate(150deg) saturate(1.3)}body.g img{filter:saturate(.77) hue-rotate(-150deg)}
+
 body::before{content:"";position:fixed;inset:0;z-index:999;pointer-events:none;background:linear-gradient(rgba(0,0,0,0) 50%,rgba(0,0,0,.25) 50%),linear-gradient(90deg,rgba(255,0,0,.03),rgba(0,255,0,.01),rgba(0,0,255,.03));background-size:100% 3px,6px 100%}
 @keyframes neon{0%,18%,22%,25%,53%,57%,100%{opacity:1}20%,24%{opacity:.2}55%{opacity:.45}}
 @keyframes nm{0%,17%,19%,21%,60%,62%,100%{color:#e11d48;text-shadow:0 0 22px rgba(255,30,86,.65)}18%,20%,61%{color:#7a1230;text-shadow:none}}
