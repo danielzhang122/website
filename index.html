@@ -229,9 +229,17 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 .fig{position:relative;height:min(70vh,520px);pointer-events:none;mix-blend-mode:screen;
   -webkit-mask-image:radial-gradient(closest-side,#000 60%,transparent);
   mask-image:radial-gradient(closest-side,#000 60%,transparent)}
-.fig-in{position:absolute;inset:0;isolation:isolate;background:#000}
+.fig-in{position:absolute;inset:0;isolation:isolate;background:#000;overflow:hidden;clip-path:inset(0 0 14% 0)}
 .fig-in::after{content:"";position:absolute;inset:0;background:#ff2a4d;mix-blend-mode:multiply;pointer-events:none}
-.fig-in>[data-us-project]{position:absolute;inset:0;width:100%;height:100%;min-height:420px}
+.fig-in>[data-us-project]{position:absolute;inset:0;width:100%;height:100%;min-height:420px;
+  transform-origin:50% 50%;transform:translateX(var(--tx,0)) scale(var(--s,1))}
+/* per-figure framing: the two scenes sit off-centre in their frames and differ in size, so nudge + scale to match.
+   tweak --tx (shift) and --s (zoom) if you want to fine-tune */
+.fig:nth-child(1){--tx:15.5%;--s:1}
+.fig:nth-child(2){--tx:-34%;--s:1.5}
+/* hide the attribution badge */
+[data-us-project] a[href*="unicorn"],[data-us-project] [class*="brand"],[data-us-project] [class*="credit"],[data-us-project] [class*="watermark"]{
+  display:none!important;visibility:hidden!important;opacity:0!important}
 .fig-in *{pointer-events:none!important}
 @media(prefers-reduced-motion:reduce){
   .figs{display:none!important}
@@ -291,7 +299,7 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 <div class="sk" style="--i:2"><div><h3>Software &amp; Computation</h3><span>C / C++</span><span>Python (OpenCV)</span><span>MATLAB / Simulink</span><span>Julia</span><span>Power Automate</span></div></div>
 <div class="sk" style="--i:3"><div><h3>Design &amp; Standards</h3><span>CSA N299.2 / N299.3</span><span>ASD Verification</span><span>GD&amp;T</span><span>FMEA &amp; FAT Plans</span></div></div>
 </div></div>
-<p class="hint">// Drag to spin · hover or click to pause <button id="cvp" class="pbtn" type="button" aria-pressed="false">❚❚ PAUSE</button></p></section>
+<p class="hint">// Drag to spin · click to pause <button id="cvp" class="pbtn" type="button" aria-pressed="false">❚❚ PAUSE</button></p></section>
 
 <section id="projects">
 <div class="sh"><small>02 / PROJECTS</small><h2>Featured work</h2><p>From CAD files that crashed SolidWorks to mechanisms that survived hardware testing.</p></div>
@@ -490,7 +498,7 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
 (()=>{
   const cv=document.getElementById('cv'),rg=document.getElementById('rg');
   const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  let ang=0,vel=0,lastX=0,moved=0,drag=false,hover=false,paused=false,on=false,raf=0;
+  let ang=0,vel=0,lastX=0,moved=0,drag=false,paused=false,on=false,raf=0;
   const px=e=>e.touches?e.touches[0].pageX:e.pageX;
   const down=e=>{drag=true;moved=0;lastX=px(e);vel=0};
   const move=e=>{if(!drag)return;const d=px(e)-lastX;moved+=Math.abs(d);lastX=px(e);vel=d*.35;ang+=vel};
@@ -498,7 +506,6 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
   cv.addEventListener('mousedown',down);cv.addEventListener('touchstart',down,{passive:true});
   addEventListener('mousemove',move);addEventListener('touchmove',move,{passive:true});
   addEventListener('mouseup',up);addEventListener('touchend',up);
-  cv.addEventListener('mouseenter',()=>hover=true);cv.addEventListener('mouseleave',()=>hover=false);
   const pb=document.getElementById('cvp');
   const sync=()=>{pb.textContent=paused?'▶ PLAY':'❚❚ PAUSE';pb.setAttribute('aria-pressed',paused)};
   pb.addEventListener('click',()=>{paused=!paused;sync()});
@@ -512,7 +519,7 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
     if(innerWidth>650){
       if(!drag){
         if(Math.abs(vel)>.01){ang+=vel;vel*=.92}      // momentum after a flick
-        else if(!hover&&!paused&&!still)ang-=.15;      // slow idle drift
+        else if(!paused&&!still)ang-=.15;      // slow idle drift
       }
       rg.style.transform=`rotateY(${ang}deg)`;
     }
@@ -572,6 +579,12 @@ addEventListener('load',()=>{
     'https://cdn.unicorn.studio/v1.4.29/unicornStudio.umd.js',
     'https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js'
   ];
+  const hideBadge=()=>document.querySelectorAll('.fig-in [data-us-project] *').forEach(el=>{
+    if(el.tagName==='CANVAS'||el.querySelector('canvas'))return;
+    const t=(el.textContent||'').toLowerCase(),h=(el.getAttribute('href')||'').toLowerCase();
+    if(t.includes('made with')||h.includes('unicorn.studio'))el.style.setProperty('display','none','important');
+  });
+  new MutationObserver(hideBadge).observe(document.querySelector('.figs'),{childList:true,subtree:true});
   function boot(){
     // wait until the figure boxes have a real size, otherwise the WebGL canvas gets 0 width/height and throws IndexSizeError
     let tries=0;
