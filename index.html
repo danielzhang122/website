@@ -160,7 +160,7 @@ footer a{color:var(--hot);font-size:1rem;font-weight:600;text-decoration:none}
 .rv.in{opacity:1;transform:none}
 
 body{position:relative}
-main{position:relative;z-index:1}
+main{position:relative}
 #net{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 footer{position:relative;z-index:1}
 
@@ -224,23 +224,24 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 .pbtn:hover{border-color:var(--blue)}
 
 /* ---- red ASCII figures (figures only, no UI) ---- */
+/* Each scene is built for a full-width canvas with its figure on one side, so each one is rendered
+   at double width and only its own half is shown. */
 .figs{display:none}
 @media(min-width:861px){.figs{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:-1rem 0 1rem}}
-.fig{position:relative;height:min(70vh,520px);pointer-events:none;mix-blend-mode:screen;
-  -webkit-mask-image:radial-gradient(closest-side,#000 60%,transparent);
-  mask-image:radial-gradient(closest-side,#000 60%,transparent)}
+.fig{position:relative;aspect-ratio:8/9;pointer-events:none;mix-blend-mode:screen;
+  -webkit-mask-image:radial-gradient(closest-side,#000 62%,transparent);
+  mask-image:radial-gradient(closest-side,#000 62%,transparent)}
 .fig-in{position:absolute;inset:0;isolation:isolate;background:#000;overflow:hidden;clip-path:inset(0 0 14% 0)}
 .fig-in::after{content:"";position:absolute;inset:0;background:#ff2a4d;mix-blend-mode:multiply;pointer-events:none}
-.fig-in>[data-us-project]{position:absolute;inset:0;width:100%;height:100%;min-height:420px;
-  transform-origin:50% 50%;transform:translateX(var(--tx,0)) scale(var(--s,1))}
-/* per-figure framing: the two scenes sit off-centre in their frames and differ in size, so nudge + scale to match.
-   tweak --tx (shift) and --s (zoom) if you want to fine-tune */
-.fig:nth-child(1){--tx:15.5%;--s:1}
-.fig:nth-child(2){--tx:-34%;--s:1.5}
+/* contrast filter crushes the dim background dot grid to black (which the screen blend makes transparent);
+   raise the contrast number to remove more, lower it if the figure starts to thin out */
+.fig-in>[data-us-project]{position:absolute;top:0;left:0;width:200%;height:100%;
+  filter:brightness(.9) contrast(3);transition:transform .8s cubic-bezier(.22,.61,.36,1)}
+.fig:nth-child(2) .fig-in>[data-us-project]{left:-100%}
+.fig-in *{pointer-events:none!important}
 /* hide the attribution badge */
 [data-us-project] a[href*="unicorn"],[data-us-project] [class*="brand"],[data-us-project] [class*="credit"],[data-us-project] [class*="watermark"]{
   display:none!important;visibility:hidden!important;opacity:0!important}
-.fig-in *{pointer-events:none!important}
 @media(prefers-reduced-motion:reduce){
   .figs{display:none!important}
   .card figure img,.gi img,.masonry img,.panel img,#lb img{transition:none;transform:none!important}}
@@ -585,6 +586,53 @@ addEventListener('load',()=>{
     if(t.includes('made with')||h.includes('unicorn.studio'))el.style.setProperty('display','none','important');
   });
   new MutationObserver(hideBadge).observe(document.querySelector('.figs'),{childList:true,subtree:true});
+  // Measure where each figure actually is (bright pixels only, so the background dots are ignored),
+  // then centre it in its half and give both the same height.
+  function autoFit(){
+    const els=[...document.querySelectorAll('.fig-in>[data-us-project]')];
+    if(els.length<2)return;
+    const tmp=document.createElement('canvas'),tc=tmp.getContext('2d',{willReadFrequently:true});
+    const samples=els.map(()=>[]);
+    const measure=el=>{
+      const cv=el.querySelector('canvas');if(!cv||!cv.width||!cv.height)return null;
+      const w=160,h=Math.max(8,Math.round(160*cv.height/cv.width));tmp.width=w;tmp.height=h;
+      try{
+        tc.clearRect(0,0,w,h);tc.drawImage(cv,0,0,w,h);
+        const d=tc.getImageData(0,0,w,h).data,L=new Float32Array(w*h);let mx=0;
+        for(let i=0;i<w*h;i++){const l=Math.max(d[i*4],d[i*4+1],d[i*4+2])*d[i*4+3]/255;L[i]=l;if(l>mx)mx=l}
+        if(mx<60)return null;
+        const xs=[],ys=[];
+        for(let i=0;i<w*h;i++)if(L[i]>mx*.6){xs.push(i%w);ys.push(i/w|0)}
+        if(xs.length<80)return null;
+        xs.sort((a,b)=>a-b);ys.sort((a,b)=>a-b);
+        const q=(a,p)=>a[Math.min(a.length-1,Math.floor(a.length*p))];
+        const x0=q(xs,.03),x1=q(xs,.97),y0=q(ys,.03),y1=q(ys,.97);
+        return{fx:(x0+x1)/2/w,fy:(y0+y1)/2/h,fh:(y1-y0)/h};
+      }catch(e){return null}   // canvas can't be read back: leave the default framing
+    };
+    const avg=a=>({fx:a.reduce((t,v)=>t+v.fx,0)/a.length,fy:a.reduce((t,v)=>t+v.fy,0)/a.length,fh:a.reduce((t,v)=>t+v.fh,0)/a.length});
+    const clampTo=(v,lo,hi)=>lo>hi?(lo+hi)/2:Math.max(lo,Math.min(hi,v));
+    function apply(){
+      const m=samples.map(a=>a.length?avg(a):null);
+      if(m.some(v=>!v||v.fh<.05||v.fh>.95))return;
+      const target=Math.max(...m.map(v=>v.fh));
+      m.forEach((v,i)=>{
+        const s=Math.min(1.8,Math.max(1,target/v.fh));
+        const wl=i?.5:0,wr=i?1:.5;                       // this figure's half of the scene
+        const tx=clampTo((i?.75:.25)-v.fx,wr-v.fx-s*(1-v.fx),wl-v.fx+s*v.fx);   // keep scene edges outside the window
+        const ty=clampTo(.43-v.fy,1-v.fy-s*(1-v.fy),-v.fy+s*v.fy);
+        els[i].style.transformOrigin=`${v.fx*100}% ${v.fy*100}%`;
+        els[i].style.transform=`translate(${tx*100}%,${ty*100}%) scale(${s})`;
+      });
+    }
+    let frame=0;
+    (function tick(){
+      frame++;
+      if(frame%12===0)els.forEach((el,i)=>{if(samples[i].length<8){const r=measure(el);if(r)samples[i].push(r)}});
+      if(samples.every(a=>a.length>=6)||frame>600){apply();return}
+      requestAnimationFrame(tick);
+    })();
+  }
   function boot(){
     // wait until the figure boxes have a real size, otherwise the WebGL canvas gets 0 width/height and throws IndexSizeError
     let tries=0;
@@ -593,6 +641,7 @@ addEventListener('load',()=>{
       if(!ready&&tries++<60)return requestAnimationFrame(go);
       const start=()=>{try{UnicornStudio.init()}catch(e){console.warn('figures failed',e)}};
       start();
+      autoFit();
       // if no canvas showed up, tear down and start again
       const retry=n=>setTimeout(()=>{
         if(document.querySelector('.fig-in canvas')||n>3)return;
