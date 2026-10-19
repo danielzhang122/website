@@ -156,7 +156,8 @@ nav ul{display:none}
 /* ---- loading gate ---- */
 #gate{position:fixed;inset:0;z-index:100;background:#050204;color:var(--red);cursor:pointer;--by:40%;--bh:0px;
 background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparent 72%),radial-gradient(ellipse 40% 50% at 0 100%,#3a0614,transparent 70%),radial-gradient(ellipse 40% 50% at 100% 100%,#3a0614,transparent 70%)}
-#gate canvas{position:absolute;inset:0;width:100%;height:100%;filter:drop-shadow(0 0 2px var(--red)) drop-shadow(0 0 14px var(--red))}
+#gate canvas{position:absolute;inset:0;width:100%;height:100%}
+.g-halo{position:absolute;left:8%;right:8%;top:calc(var(--by) - 12vmin);height:calc(var(--bh) + 24vmin);background:radial-gradient(closest-side,rgba(224,25,63,.34),transparent);pointer-events:none}
 #gate::after{content:"";position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 46%,transparent 42%,rgba(0,0,0,.8)),repeating-linear-gradient(to bottom,rgba(255,255,255,.035) 0 1px,transparent 1px 3px)}
 .g-lab{position:absolute;left:0;right:0;text-align:center;font:800 clamp(12px,2.2vmin,22px)/1 var(--mono);letter-spacing:.6em;text-indent:.6em;white-space:pre;text-shadow:0 0 8px var(--red);z-index:1}
 .g-top{top:calc(var(--by) - 4vmin);transform:translateY(-100%);color:#c6ecff;text-shadow:0 0 8px var(--blue)}
@@ -175,6 +176,7 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 <body>
 
 <div id="gate" role="progressbar" aria-label="Loading" tabindex="0">
+  <div class="g-halo" aria-hidden="true"></div>
   <canvas aria-hidden="true"></canvas>
   <div class="g-lab g-top" aria-hidden="true">daniel zhang</div>
   <div class="g-lab g-bot" aria-hidden="true">000%</div>
@@ -416,6 +418,7 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
   }
   function frame(){
     raf=requestAnimationFrame(frame);
+    if(!document.body.classList.contains('ready'))return;   // idle behind the intro
     ctx.clearRect(0,0,W,H);
     for(const p of pts){
       if(p.x<0||p.x>W)p.vx*=-1;
@@ -468,10 +471,10 @@ const scramble=(p,tick)=>Array.from(LABEL).map((c,i)=>
   c===' '||i<Math.floor(clamp(p)*LABEL.length)?c:LATIN[Math.floor(hash(i*31+tick*7.13)*LATIN.length)]).join('');
 
 let W,H,dpr,cool=[],hot=[],cols=[],shown=0,phase='load',rush=false,alive=true;
-const start=performance.now();let last=start;
+let start=performance.now(),last=start;
 
 function build(){
-  W=innerWidth;H=innerHeight;dpr=Math.min(2,devicePixelRatio||1);
+  W=innerWidth;H=innerHeight;dpr=1;
   cv.width=W*dpr;cv.height=H*dpr;
   // sample the word into grains
   const off=document.createElement('canvas');off.width=W;off.height=H;
@@ -480,12 +483,12 @@ function build(){
   const size=Math.max(24,Math.min(W*.84*100/c.measureText(WORD).width,H*.3));
   c.font='900 '+size+'px '+FONT;c.fillStyle='#fff';c.textAlign='center';c.textBaseline='middle';
   c.fillText(WORD,W/2,H/2);
-  const px=c.getImageData(0,0,W,H).data,step=Math.max(2,Math.round(size/60));
+  const px=c.getImageData(0,0,W,H).data,step=Math.max(2,Math.round(size/44));
   const pts=[];let x0=W,x1=0,y0=H,y1=0;
   for(let y=0;y<H;y+=step)for(let x=0;x<W;x+=step){
     if(px[(y*W+x)*4+3]<110)continue;
     const id=x*7.31+y*1.97;
-    if(hash(id)>.82)continue;               // erode the strokes
+    if(hash(id)>.78)continue;               // erode the strokes
     pts.push({x,y,id});
     x0=Math.min(x0,x);x1=Math.max(x1,x);y0=Math.min(y0,y);y1=Math.max(y1,y);
   }
@@ -498,7 +501,7 @@ function build(){
   gate.style.setProperty('--by',y0+'px');gate.style.setProperty('--bh',(y1-y0)+'px');
   // rain columns, densest over the word
   cols=[];const mid=W/2,spread=Math.max(x1-x0,W*.3)*.62;
-  for(let x=6,k=0;x<W;x+=11,k++){
+  for(let x=6,k=0;x<W;x+=15,k++){
     const dn=(x-mid)/spread,w=.12+.88*Math.exp(-dn*dn);
     cols.push({x:x+.5,head:hash(k+1.7)*H*1.4-H*.2,speed:(50+190*hash(k+2.9))*(.6+w),len:30+H*.55*hash(k+4.1)*(.35+w),w});
   }
@@ -512,9 +515,9 @@ function draw(now,dt){
     c.head+=c.speed*dt/1000*(phase==='open'?1.6:1);
     if(c.head-c.len>H){c.head=-Math.random()*H*.4;c.len=30+H*.55*Math.random()*(.35+c.w)}
     const a=c.w*.6*level;if(a<.01)continue;
-    const g=ctx.createLinearGradient(0,c.head-c.len,0,c.head);
-    g.addColorStop(0,'rgba(255,42,77,0)');g.addColorStop(1,`rgba(255,42,77,${a.toFixed(3)})`);
-    ctx.strokeStyle=g;ctx.beginPath();ctx.moveTo(c.x,c.head-c.len);ctx.lineTo(c.x,c.head);ctx.stroke();
+    const top=c.head-c.len,mid=c.head-c.len*.45;                 // two-tone tail instead of a gradient per column
+    ctx.strokeStyle=`rgba(255,42,77,${(a*.3).toFixed(3)})`;ctx.beginPath();ctx.moveTo(c.x,top);ctx.lineTo(c.x,mid);ctx.stroke();
+    ctx.strokeStyle=`rgba(255,42,77,${a.toFixed(3)})`;ctx.beginPath();ctx.moveTo(c.x,mid);ctx.lineTo(c.x,c.head);ctx.stroke();
     ctx.fillStyle='#d2f0ff';ctx.globalAlpha=Math.min(1,a*1.4);ctx.fillRect(c.x-1.1,c.head-1.1,2.2,2.2);ctx.globalAlpha=1;
   }
   ctx.setLineDash([]);
@@ -561,9 +564,11 @@ function frame(now){
 }
 
 root.style.overflow='hidden';
-build();addEventListener('resize',build);
-if(document.fonts)document.fonts.ready.then(build);
-requestAnimationFrame(frame);
+addEventListener('resize',build);
+const fontReady=document.fonts?document.fonts.load('900 100px "Noto Sans SC"',WORD):Promise.resolve();
+Promise.race([fontReady,new Promise(r=>setTimeout(r,800))]).then(()=>{
+  start=last=performance.now();build();requestAnimationFrame(frame);
+});
 })();
 </script>
 </body>
