@@ -126,6 +126,16 @@ main{position:relative;z-index:1}
 #net{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
 footer{position:relative;z-index:1}
 
+#sign{position:absolute;top:0;left:0;width:100%;height:520px;z-index:2;pointer-events:none;display:none}
+@media(min-width:1280px){#sign{display:block}}
+#sign svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+#sign line{stroke-linecap:round}
+#sign .gw{stroke:#e11d48;stroke-width:7;opacity:.22}
+#sign .cw{stroke:#ff3a6e;stroke-width:2}
+.sn{position:absolute;top:230px;transform-origin:50% 0;writing-mode:vertical-rl;padding:.9rem .5rem;font:900 1.8rem/1.2 'Noto Sans SC',var(--disp);letter-spacing:.22em;white-space:nowrap;
+color:#ffe4e6;border:2px solid var(--red);background:rgba(28,4,8,.82);text-shadow:0 0 6px var(--red),0 0 16px var(--hot);
+box-shadow:0 0 14px rgba(225,29,72,.5),inset 0 0 10px rgba(225,29,72,.3);will-change:transform;animation:flick 7.5s infinite}
+@keyframes flick{0%,18%,22%,25%,53%,57%,100%{opacity:1}20%,24%{opacity:.2}55%{opacity:.45}}
 @media(max-width:650px){
 .cv{height:auto;perspective:none;overflow:visible}
 .rg{width:100%;height:auto;display:flex;flex-direction:column;gap:1rem;transform:none!important}
@@ -137,7 +147,7 @@ nav ul{display:none}
 .card:nth-child(even) figure{order:0}
 .card figure{height:260px}
 }
-@media(prefers-reduced-motion:reduce){.hero>div:first-child>*{opacity:1;animation:none!important}html{scroll-behavior:auto}.rv{opacity:1;transform:none;transition:none}}
+@media(prefers-reduced-motion:reduce){.hero>div:first-child>*{opacity:1;animation:none!important}.sn{animation:none}html{scroll-behavior:auto}.rv{opacity:1;transform:none;transition:none}}
 
 /* ---- loading gate ---- */
 #gate{position:fixed;inset:0;z-index:100;background:#050204;color:var(--red);cursor:pointer;--by:40%;--bh:0px;
@@ -149,7 +159,7 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 .g-bot{top:calc(var(--by) + var(--bh) + 4vmin)}
 .g-hint{position:absolute;right:20px;bottom:18px;z-index:1;font-size:.65rem;letter-spacing:.24em;text-transform:uppercase;color:var(--dim);animation:blink 1.4s steps(2) infinite}
 @keyframes blink{50%{opacity:.25}}
-#gate.open{animation:slit 1.2s cubic-bezier(.7,0,.2,1) forwards}
+#gate.open{animation:slit .9s cubic-bezier(.7,0,.2,1) forwards}
 #gate.open .g-lab,#gate.open .g-hint{opacity:0}
 @keyframes slit{
 0%{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,50% 50%,50% 50%,50% 50%,50% 50%,50% 50%)}
@@ -162,12 +172,13 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 
 <div id="gate" role="progressbar" aria-label="Loading" tabindex="0">
   <canvas aria-hidden="true"></canvas>
-  <div class="g-lab g-top" aria-hidden="true">mechatronics</div>
+  <div class="g-lab g-top" aria-hidden="true">daniel zhang</div>
   <div class="g-lab g-bot" aria-hidden="true">000%</div>
   <div class="g-hint" aria-hidden="true">点击跳过</div>
 </div>
 
 <canvas id="net" aria-hidden="true"></canvas>
+<div id="sign" aria-hidden="true"><svg><line class="gw"/><line class="cw"/><line class="gw"/><line class="cw"/></svg><div class="sn">机电一体化</div></div>
 
 <nav><div class="wrap">
 <a href="#top" class="logo"><b>✕</b> DANIEL ZHANG</a>
@@ -310,6 +321,50 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
   })();
 })();
 
+/* ---------- hanging neon sign ---------- */
+(()=>{
+  const box=document.getElementById('sign'),sn=box.querySelector('.sn'),wires=[...box.querySelectorAll('line')];
+  const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
+  const SY=230,K=5,MAX=.6,cl=(v,m)=>Math.max(-m,Math.min(m,v));
+  let a=still?0:.05,av=0,cx=0,wd=0,h=0,lastX=null,show=false;
+  function draw(){
+    const u=wd*.27,c=Math.cos(a),n=Math.sin(a);
+    wires.forEach((l,i)=>{const d=i<2?-u:u;l.setAttribute('x2',cx+d*c);l.setAttribute('y2',SY+d*n)});
+    sn.style.transform=`translateX(-50%) rotate(${a}rad)`;
+  }
+  function place(){
+    show=getComputedStyle(box).display!=='none';if(!show)return;
+    cx=Math.max(60,(innerWidth-1080)/4);sn.style.left=cx+'px';
+    wd=sn.offsetWidth;h=sn.offsetHeight;
+    wires.forEach((l,i)=>{l.setAttribute('x1',cx+(i<2?-1:1)*wd*.27);l.setAttribute('y1',0)});
+    draw();
+  }
+  place();addEventListener('resize',place);if(document.fonts)document.fonts.ready.then(place);
+  if(still)return;
+  addEventListener('mousemove',e=>{
+    const dx=lastX===null?0:cl(e.pageX-lastX,80);lastX=e.pageX;
+    if(!dx||!show)return;
+    const ex=Math.max(Math.abs(e.pageX-cx)-wd/2,0),ey=Math.max(SY-e.pageY,e.pageY-SY-h,0),f=Math.max(0,1-Math.hypot(ex,ey)/70);
+    if(f)av=cl(av-dx*f*f*.03*Math.max(.15,Math.min(1,(e.pageY-SY)/h)),6);   // brushing it swings it
+  });
+  addEventListener('mousedown',e=>{
+    if(!show)return;
+    const dx=cx-e.pageX,d=Math.hypot(dx,SY+h/2-e.pageY);
+    if(d<180)av=cl(av-Math.sign(dx||1)*(1-d/180)*4,6);                        // clicking near it kicks it
+  });
+  let t0=performance.now();
+  (function tick(now){
+    const dt=Math.min((now-t0)/1000,.05)||.016;t0=now;
+    if(show&&SY+h>scrollY-60&&SY<scrollY+innerHeight+60){
+      av+=(-K*Math.sin(a)-.38*av+K*.04*Math.sin(now/1000*.9))*dt;           // pendulum + gentle sway
+      a+=av*dt;
+      if(Math.abs(a)>MAX){a=Math.sign(a)*MAX;av*=-.35}
+      draw();
+    }
+    requestAnimationFrame(tick);
+  })(t0);
+})();
+
 /* ---------- skills carousel: drag to spin, drifts when idle ---------- */
 (()=>{
   const cv=document.getElementById('cv'),rg=document.getElementById('rg');
@@ -387,7 +442,7 @@ if(seen||matchMedia('(prefers-reduced-motion:reduce)').matches){gate.remove();do
 
 const root=document.documentElement,cv=gate.querySelector('canvas'),ctx=cv.getContext('2d');
 const lt=gate.querySelector('.g-top'),lbot=gate.querySelector('.g-bot');
-const WORD='机电一体化',LABEL='mechatronics',LATIN='abcdefghijklmnopqrstuvwxyz0123456789#$%&@';
+const WORD='张卓远',LABEL='daniel zhang',LATIN='abcdefghijklmnopqrstuvwxyz0123456789#$%&@';
 const FONT='"Noto Sans SC","PingFang SC","Microsoft YaHei","Hiragino Sans GB",sans-serif';
 const KNOTS=[[0,0],[.3,.38],[.4,.41],[.68,.77],[.78,.8],[1,1]];
 const hash=n=>{const s=Math.sin(n*127.1+311.7)*43758.5453;return s-Math.floor(s)};
@@ -401,7 +456,7 @@ const simulated=t=>{
   }
   return 1};
 const scramble=(p,tick)=>Array.from(LABEL).map((c,i)=>
-  i<Math.floor(clamp(p)*LABEL.length)?c:LATIN[Math.floor(hash(i*31+tick*7.13)*LATIN.length)]).join('');
+  c===' '||i<Math.floor(clamp(p)*LABEL.length)?c:LATIN[Math.floor(hash(i*31+tick*7.13)*LATIN.length)]).join('');
 
 let W,H,dpr,cool=[],hot=[],cols=[],shown=0,phase='load',rush=false,alive=true;
 const start=performance.now();let last=start;
@@ -474,7 +529,7 @@ function open(){
   setTimeout(()=>{
     alive=false;root.style.overflow='';gate.remove();
     try{sessionStorage.setItem('gate',1)}catch(e){}
-  },1250);
+  },950);
 }
 gate.addEventListener('click',()=>{if(phase==='load')rush=true;else if(phase==='lock')open()});
 gate.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();gate.click()}});
@@ -483,14 +538,14 @@ function frame(now){
   if(!alive)return;
   const dt=Math.min(64,now-last);last=now;
   if(phase==='load'){
-    const target=rush?1:simulated((now-start)/4200);
+    const target=rush?1:simulated((now-start)/2400);
     shown+=(target-shown)*Math.min(1,(rush?.12:1)*dt/16.7);
     if(target-shown<.002)shown=target;
     const p=Math.round(shown*100);
     lbot.textContent=String(p).padStart(3,'0')+'%';
     lt.textContent=scramble(p/70,Math.floor(now/85));
     gate.setAttribute('aria-valuenow',p);
-    if(shown>=1){phase='lock';lt.textContent=LABEL;lbot.textContent='开启';setTimeout(open,1100)}
+    if(shown>=1){phase='lock';lt.textContent=LABEL;lbot.textContent='开启';setTimeout(open,450)}
   }
   draw(now,dt);
   requestAnimationFrame(frame);
