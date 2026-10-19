@@ -227,16 +227,15 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 /* Each scene is built for a full-width canvas with its figure on one side, so each one is rendered
    at double width and only its own half is shown. */
 .figs{display:none}
-@media(min-width:861px){.figs{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:-1rem 0 1rem}}
-.fig{position:relative;aspect-ratio:8/9;pointer-events:none;mix-blend-mode:screen;
+@media(min-width:861px){.figs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));align-items:center;gap:1rem;margin:-1rem auto 1rem;max-width:900px}}
+.fig{position:relative;aspect-ratio:1/1;min-width:0;pointer-events:none;mix-blend-mode:screen;
   -webkit-mask-image:radial-gradient(closest-side,#000 62%,transparent);
   mask-image:radial-gradient(closest-side,#000 62%,transparent)}
 .fig-in{position:absolute;inset:0;isolation:isolate;background:#000;overflow:hidden;clip-path:inset(0 0 14% 0)}
 .fig-in::after{content:"";position:absolute;inset:0;background:#ff2a4d;mix-blend-mode:multiply;pointer-events:none}
-/* contrast filter crushes the dim background dot grid to black (which the screen blend makes transparent);
-   raise the contrast number to remove more, lower it if the figure starts to thin out */
+/* Keep the original tones; the script below centres each figure and normalizes their visible height. */
 .fig-in>[data-us-project]{position:absolute;top:0;left:0;width:200%;height:100%;
-  filter:brightness(.9) contrast(3);transition:transform .8s cubic-bezier(.22,.61,.36,1)}
+  filter:brightness(.9);transition:transform .8s cubic-bezier(.22,.61,.36,1)}
 .fig:nth-child(2) .fig-in>[data-us-project]{left:-100%}
 .fig-in *{pointer-events:none!important}
 /* hide the attribution badge */
@@ -586,8 +585,7 @@ addEventListener('load',()=>{
     if(t.includes('made with')||h.includes('unicorn.studio'))el.style.setProperty('display','none','important');
   });
   new MutationObserver(hideBadge).observe(document.querySelector('.figs'),{childList:true,subtree:true});
-  // Measure where each figure actually is (bright pixels only, so the background dots are ignored),
-  // then centre it in its half and give both the same height.
+  // Measure each figure's visible bounds, then centre it in its panel and normalize its visible height.
   function autoFit(){
     const els=[...document.querySelectorAll('.fig-in>[data-us-project]')];
     if(els.length<2)return;
