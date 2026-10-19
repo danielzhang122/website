@@ -205,6 +205,37 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 0%{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,50% 50%,50% 50%,50% 50%,50% 50%,50% 50%)}
 40%{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,5% 49.6%,95% 49.6%,95% 50.4%,5% 50.4%,5% 49.6%)}
 100%{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,-2% -2%,102% -2%,102% 102%,-2% 102%,-2% -2%)}}
+
+/* ---- smooth hover zoom on every image / thumbnail ---- */
+.card figure img,.gi img,.masonry img,.panel img,#lb img{
+  transition:transform .5s cubic-bezier(.22,.61,.36,1),border-color .2s,box-shadow .5s;
+  will-change:transform}
+.masonry img{position:relative}
+@media(hover:hover){
+  .card figure:hover img,.gi:hover img,.gi:focus-visible img{transform:scale(1.07)}
+  .masonry img:hover{transform:scale(1.05);z-index:5;box-shadow:0 8px 28px rgba(0,0,0,.7)}
+  .panel img:hover{transform:scale(1.06)}
+  #lb img:hover{transform:scale(1.02)}
+}
+
+/* ---- carousel pause button ---- */
+.pbtn{font:600 .68rem var(--mono);letter-spacing:.08em;color:var(--blue);background:none;
+  border:1px solid var(--line);padding:.2rem .6rem;margin-left:.8rem;cursor:pointer;transition:.2s}
+.pbtn:hover{border-color:var(--blue)}
+
+/* ---- red ASCII figures (figures only, no UI) ---- */
+.figs{display:none}
+@media(min-width:861px){.figs{display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin:-1rem 0 1rem}}
+.fig{position:relative;height:min(70vh,520px);pointer-events:none;mix-blend-mode:screen;
+  -webkit-mask-image:radial-gradient(closest-side,#000 60%,transparent);
+  mask-image:radial-gradient(closest-side,#000 60%,transparent)}
+.fig-in{position:absolute;inset:0;isolation:isolate;background:#000}
+.fig-in::after{content:"";position:absolute;inset:0;background:#ff2a4d;mix-blend-mode:multiply;pointer-events:none}
+.fig-in>[data-us-project]{position:absolute;inset:0;width:100%;height:100%;min-height:420px}
+.fig-in *{pointer-events:none!important}
+@media(prefers-reduced-motion:reduce){
+  .figs{display:none!important}
+  .card figure img,.gi img,.masonry img,.panel img,#lb img{transition:none;transform:none!important}}
 </style>
 <script>function fb(e){e.onerror=null;var s=e.getAttribute("src");e.src=s.indexOf("images/")===0?s.slice(7):"images/"+s}</script>
 </head>
@@ -247,6 +278,11 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 <div class="term" aria-hidden="true"><header>● ● ● &nbsp;daniel@mcmaster:~</header><div id="tm"></div></div>
 </div>
 
+<div class="figs" aria-hidden="true">
+  <div class="fig"><div class="fig-in"><div data-us-project="OMzqyUv6M3kSnv0JeAtC"></div></div></div>
+  <div class="fig"><div class="fig-in"><div data-us-project="whwOGlfJ5Rz2rHaEUgHl"></div></div></div>
+</div>
+
 <section id="skills">
 <div class="sh"><small>01 / SKILLS</small><h2>Technical core</h2><p>Tools I've used to build systems, break prototypes, and occasionally read the documentation.</p></div>
 <div class="cv" id="cv"><div class="rg" id="rg">
@@ -255,7 +291,7 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 <div class="sk" style="--i:2"><div><h3>Software &amp; Computation</h3><span>C / C++</span><span>Python (OpenCV)</span><span>MATLAB / Simulink</span><span>Julia</span><span>Power Automate</span></div></div>
 <div class="sk" style="--i:3"><div><h3>Design &amp; Standards</h3><span>CSA N299.2 / N299.3</span><span>ASD Verification</span><span>GD&amp;T</span><span>FMEA &amp; FAT Plans</span></div></div>
 </div></div>
-<p class="hint">// Drag or hover to inspect modules</p></section>
+<p class="hint">// Drag to spin · hover or click to pause <button id="cvp" class="pbtn" type="button" aria-pressed="false">❚❚ PAUSE</button></p></section>
 
 <section id="projects">
 <div class="sh"><small>02 / PROJECTS</small><h2>Featured work</h2><p>From CAD files that crashed SolidWorks to mechanisms that survived hardware testing.</p></div>
@@ -450,11 +486,11 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
   })(t0);
 })();
 
-/* ---------- skills carousel: drag to spin, drifts when idle ---------- */
+/* ---------- skills carousel: drag to spin, drifts when idle, pauses on hover/click/button ---------- */
 (()=>{
   const cv=document.getElementById('cv'),rg=document.getElementById('rg');
   const still=matchMedia('(prefers-reduced-motion:reduce)').matches;
-  let ang=0,vel=0,lastX=0,moved=0,drag=false,hover=false,on=false,raf=0;
+  let ang=0,vel=0,lastX=0,moved=0,drag=false,hover=false,paused=false,on=false,raf=0;
   const px=e=>e.touches?e.touches[0].pageX:e.pageX;
   const down=e=>{drag=true;moved=0;lastX=px(e);vel=0};
   const move=e=>{if(!drag)return;const d=px(e)-lastX;moved+=Math.abs(d);lastX=px(e);vel=d*.35;ang+=vel};
@@ -463,13 +499,20 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
   addEventListener('mousemove',move);addEventListener('touchmove',move,{passive:true});
   addEventListener('mouseup',up);addEventListener('touchend',up);
   cv.addEventListener('mouseenter',()=>hover=true);cv.addEventListener('mouseleave',()=>hover=false);
-  cv.addEventListener('click',e=>{if(moved>6&&e.target.closest('a'))e.preventDefault()});   // a drag isn't a click
+  const pb=document.getElementById('cvp');
+  const sync=()=>{pb.textContent=paused?'▶ PLAY':'❚❚ PAUSE';pb.setAttribute('aria-pressed',paused)};
+  pb.addEventListener('click',()=>{paused=!paused;sync()});
+  cv.addEventListener('click',e=>{
+    const link=e.target.closest('a');
+    if(moved>6){if(link)e.preventDefault();return}   // a drag isn't a click
+    if(!link){paused=!paused;sync()}                  // plain click toggles pause
+  });
   function spin(){
     if(!on){raf=0;return}
     if(innerWidth>650){
       if(!drag){
         if(Math.abs(vel)>.01){ang+=vel;vel*=.92}      // momentum after a flick
-        else if(!hover&&!still)ang-=.15;               // slow idle drift
+        else if(!hover&&!paused&&!still)ang-=.15;      // slow idle drift
       }
       rg.style.transform=`rotateY(${ang}deg)`;
     }
@@ -519,6 +562,42 @@ document.querySelectorAll('.rv').forEach(el=>io.observe(el));
   // only animate while the hero is on screen
   new IntersectionObserver(([e])=>{cancelAnimationFrame(raf);if(e.isIntersecting)frame()}).observe(cv);
 })();
+
+/* ---------- red ASCII figures: load Unicorn Studio (tries several CDNs) ---------- */
+addEventListener('load',()=>{
+  if(window.UnicornStudio||matchMedia('(prefers-reduced-motion:reduce)').matches||innerWidth<861)return;
+  const SRCS=[
+    'https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.33/dist/unicornStudio.umd.js',
+    'https://cdn.unicorn.studio/v1.4.33/unicornStudio.umd.js',
+    'https://cdn.unicorn.studio/v1.4.29/unicornStudio.umd.js',
+    'https://cdn.jsdelivr.net/gh/hiunicornstudio/unicornstudio.js@v1.4.29/dist/unicornStudio.umd.js'
+  ];
+  function boot(){
+    // wait until the figure boxes have a real size, otherwise the WebGL canvas gets 0 width/height and throws IndexSizeError
+    let tries=0;
+    (function go(){
+      const ready=[...document.querySelectorAll('.fig-in>[data-us-project]')].every(el=>el.clientWidth>0&&el.clientHeight>0);
+      if(!ready&&tries++<60)return requestAnimationFrame(go);
+      const start=()=>{try{UnicornStudio.init()}catch(e){console.warn('figures failed',e)}};
+      start();
+      // if no canvas showed up, tear down and start again
+      const retry=n=>setTimeout(()=>{
+        if(document.querySelector('.fig-in canvas')||n>3)return;
+        try{UnicornStudio.destroy&&UnicornStudio.destroy()}catch(e){}
+        start();retry(n+1);
+      },1800);
+      retry(0);
+    })();
+  }
+  (function load(i){
+    if(i>=SRCS.length){console.warn('Unicorn Studio could not be loaded from any CDN (blocked by network, extension, or preview sandbox?)');return}
+    const s=document.createElement('script');
+    s.src=SRCS[i];
+    s.onload=()=>window.UnicornStudio&&window.UnicornStudio.init?boot():load(i+1);
+    s.onerror=()=>{s.remove();load(i+1)};
+    document.head.appendChild(s);
+  })(0);
+});
 
 /* ---------- loading gate ---------- */
 (()=>{
