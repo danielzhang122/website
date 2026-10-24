@@ -368,17 +368,43 @@ a.pill-blue:hover { background: rgba(138, 216, 255, .16); }
 }
 
 .terminal {
+  position: relative;
+  z-index: 10;
   border: 1px solid var(--line);
   background: rgba(5, 5, 7, .92);
   box-shadow: 0 0 35px rgba(224, 25, 63, .25);
   font-size: .8rem;
+  transition: translate .35s var(--ease-out), box-shadow .2s;
+}
+
+/* Dragged via the title bar (js/terminal.js). */
+.terminal.is-dragging {
+  box-shadow: 0 0 50px rgba(224, 25, 63, .45), 0 18px 40px rgba(0, 0, 0, .6);
+  transition: box-shadow .2s;
 }
 
 .terminal header {
+  display: flex;
+  justify-content: space-between;
   padding: .5rem .8rem;
   border-bottom: 1px solid var(--line);
   color: var(--dim);
   font-size: .7rem;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.terminal.is-dragging header { cursor: grabbing; }
+
+.terminal-hint {
+  opacity: .6;
+  transition: opacity .2s, color .2s;
+}
+
+.terminal header:hover .terminal-hint {
+  color: var(--blue);
+  opacity: 1;
 }
 
 .terminal-body {
