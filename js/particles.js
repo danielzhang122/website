@@ -64,8 +64,9 @@
 
       const dx = p.x - mouse.x;
       const dy = p.y - mouse.y;
-      const d = Math.hypot(dx, dy);
-      if (d > 0 && d < mouse.radius) {
+      const distSq = dx * dx + dy * dy;
+      if (distSq > 0 && distSq < MOUSE_RADIUS_SQ) {
+        const d = Math.sqrt(distSq);
         const push = ((mouse.radius - d) / mouse.radius) * 3;
         p.x += (dx / d) * push;
         p.y += (dy / d) * push;
@@ -76,36 +77,70 @@
     }
   }
 
+  // Links are grouped by color and (quantized) opacity so each group is one
+  // stroke() call instead of one per link. 16 opacity steps is visually seamless.
+  const LINK_MAX_ALPHA = 0.55;
+  const ALPHA_STEPS = 16;
+  const LINK_COLORS = ['255, 58, 92', '138, 216, 255', '210, 238, 255']; // red, blue, near cursor
+  const LINK_STYLES = LINK_COLORS.map((rgb) =>
+    Array.from({ length: ALPHA_STEPS + 1 }, (_, i) => `rgba(${rgb}, ${((i / ALPHA_STEPS) * LINK_MAX_ALPHA).toFixed(3)})`));
+  const linkBuckets = LINK_COLORS.map(() => Array.from({ length: ALPHA_STEPS + 1 }, () => []));
+  const LINK_DISTANCE_SQ = LINK_DISTANCE * LINK_DISTANCE;
+  const MOUSE_RADIUS_SQ = mouse.radius * mouse.radius;
+
+  function drawPoints(blue, style) {
+    ctx.fillStyle = style;
+    ctx.beginPath();
+    for (const p of points) {
+      if (p.blue !== blue) continue;
+      ctx.moveTo(p.x + p.size, p.y);
+      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+    }
+    ctx.fill();
+  }
+
   function draw() {
     ctx.clearRect(0, 0, width, height);
+    drawPoints(false, 'rgba(224, 25, 63, .85)');
+    drawPoints(true, 'rgba(138, 216, 255, .9)');
 
     for (const p of points) {
-      ctx.fillStyle = p.blue ? 'rgba(138, 216, 255, .9)' : 'rgba(224, 25, 63, .85)';
-      ctx.beginPath();
-      ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-      ctx.fill();
+      const mx = p.x - mouse.x;
+      const my = p.y - mouse.y;
+      p.nearMouse = mx * mx + my * my < MOUSE_RADIUS_SQ;
+    }
+
+    for (const color of linkBuckets) for (const bucket of color) bucket.length = 0;
+
+    for (let i = 0; i < points.length; i++) {
+      const a = points[i];
+      for (let j = i + 1; j < points.length; j++) {
+        const b = points[j];
+        const dx = a.x - b.x;
+        const dy = a.y - b.y;
+        const distSq = dx * dx + dy * dy;
+        if (distSq > LINK_DISTANCE_SQ) continue;
+
+        const step = Math.round((1 - Math.sqrt(distSq) / LINK_DISTANCE) * ALPHA_STEPS);
+        if (step === 0) continue;
+        const color = a.nearMouse ? 2 : a.blue && b.blue ? 1 : 0;
+        linkBuckets[color][step].push(a.x, a.y, b.x, b.y);
+      }
     }
 
     ctx.lineWidth = 1;
-    for (let i = 0; i < points.length; i++) {
-      for (let j = i + 1; j < points.length; j++) {
-        const a = points[i];
-        const b = points[j];
-        const d = Math.hypot(a.x - b.x, a.y - b.y);
-        if (d > LINK_DISTANCE) continue;
-
-        const alpha = (1 - d / LINK_DISTANCE) * 0.55;
-        const nearMouse = Math.hypot(a.x - mouse.x, a.y - mouse.y) < mouse.radius;
-        if (nearMouse) ctx.strokeStyle = `rgba(210, 238, 255, ${alpha})`;
-        else if (a.blue && b.blue) ctx.strokeStyle = `rgba(138, 216, 255, ${alpha})`;
-        else ctx.strokeStyle = `rgba(255, 58, 92, ${alpha})`;
-
+    linkBuckets.forEach((color, c) => {
+      color.forEach((lines, step) => {
+        if (!lines.length) return;
+        ctx.strokeStyle = LINK_STYLES[c][step];
         ctx.beginPath();
-        ctx.moveTo(a.x, a.y);
-        ctx.lineTo(b.x, b.y);
+        for (let k = 0; k < lines.length; k += 4) {
+          ctx.moveTo(lines[k], lines[k + 1]);
+          ctx.lineTo(lines[k + 2], lines[k + 3]);
+        }
         ctx.stroke();
-      }
-    }
+      });
+    });
   }
 
   function loop(now) {
@@ -133,11 +168,11 @@
     },
   };
 
+  // The canvas is fixed to the viewport, so client coordinates map directly.
   addEventListener('mousemove', (e) => {
-    const rect = canvas.getBoundingClientRect();
-    mouse.x = e.clientX - rect.left;
-    mouse.y = e.clientY - rect.top;
-  });
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  }, { passive: true });
   document.addEventListener('mouseleave', () => {
     mouse.x = mouse.y = -1e4;
   });

@@ -115,6 +115,7 @@
   let width = 0;
   let height = 0;
   let grains = [];
+  let wordBounds = { left: 0, right: 0, top: 0, bottom: 0 };
   let rainColumns = [];
   let progress = 0;           // 0..1, what's currently displayed
   let phase = 'load';
@@ -146,11 +147,18 @@
   finalLine.hidden = true;
   log.append(finalLine);
 
+  // Only touch the DOM when something flips, so the log doesn't cost a layout per frame.
   function updateLog() {
     for (const { at, line, statusEl } of logLines) {
-      line.hidden = progress < at;
-      statusEl.hidden = progress < Math.min(1, at + STATUS_DELAY);
+      const lineHidden = progress < at;
+      const statusHidden = progress < Math.min(1, at + STATUS_DELAY);
+      if (line.hidden !== lineHidden) line.hidden = lineHidden;
+      if (statusEl.hidden !== statusHidden) statusEl.hidden = statusHidden;
     }
+  }
+
+  function setText(el, text) {
+    if (el.textContent !== text) el.textContent = text;
   }
 
   /* ---------- scene setup ---------- */
@@ -216,6 +224,7 @@
       appearedAt: -1,
     }));
 
+    wordBounds = bounds;
     gate.style.setProperty('--word-top', `${bounds.top}px`);
     gate.style.setProperty('--word-height', `${bounds.bottom - bounds.top}px`);
 
@@ -239,22 +248,32 @@
   /* ---------- physics ---------- */
 
   // Grains are pushed away from the cursor and spring back home.
+  // Grains at rest with the cursor out of reach are skipped entirely.
   function updateGrains(dt) {
     const seconds = dt / 1000;
     const releasing = phase === 'release';
     const drag = Math.pow(releasing ? RELEASE_DRAG : DRAG, dt / 16.7);
+    const repelSq = REPEL_RADIUS * REPEL_RADIUS;
+    const pointerNearWord = !releasing &&
+      pointer.x > wordBounds.left - REPEL_RADIUS && pointer.x < wordBounds.right + REPEL_RADIUS &&
+      pointer.y > wordBounds.top - REPEL_RADIUS && pointer.y < wordBounds.bottom + REPEL_RADIUS;
 
     for (const g of grains) {
       if (g.appearedAt < 0) continue;
+      if (g.resting && !pointerNearWord && !releasing) continue;
+      g.resting = false;
 
       if (!releasing) {
-        const px = g.homeX + g.dx - pointer.x;
-        const py = g.homeY + g.dy - pointer.y;
-        const d = Math.hypot(px, py);
-        if (d > 0 && d < REPEL_RADIUS) {
-          const push = REPEL_FORCE * (1 - d / REPEL_RADIUS);
-          g.vx += (px / d) * push * seconds;
-          g.vy += (py / d) * push * seconds;
+        if (pointerNearWord) {
+          const px = g.homeX + g.dx - pointer.x;
+          const py = g.homeY + g.dy - pointer.y;
+          const distSq = px * px + py * py;
+          if (distSq > 0 && distSq < repelSq) {
+            const d = Math.sqrt(distSq);
+            const push = REPEL_FORCE * (1 - d / REPEL_RADIUS);
+            g.vx += (px / d) * push * seconds;
+            g.vy += (py / d) * push * seconds;
+          }
         }
         g.vx -= g.dx * SPRING * seconds;
         g.vy -= g.dy * SPRING * seconds;
@@ -264,10 +283,25 @@
       g.vy *= drag;
       g.dx += g.vx * seconds;
       g.dy += g.vy * seconds;
+
+      // Snap to rest once the motion is sub-pixel.
+      if (!releasing && Math.abs(g.dx) + Math.abs(g.dy) < 0.05 && Math.abs(g.vx) + Math.abs(g.vy) < 0.5) {
+        g.dx = g.dy = g.vx = g.vy = 0;
+        g.resting = true;
+      }
     }
   }
 
   /* ---------- drawing ---------- */
+
+  // Everything is drawn in batches grouped by color and opacity, so a frame is a
+  // few dozen canvas calls instead of thousands. 20 opacity steps is visually seamless.
+  const ALPHA_STEPS = 20;
+  const alphaStep = (alpha) => Math.round(clamp01(alpha) * ALPHA_STEPS);
+  const makeBuckets = (n) => Array.from({ length: n }, () => []);
+  const tailBuckets = makeBuckets(ALPHA_STEPS + 1);
+  const headBuckets = makeBuckets(ALPHA_STEPS + 1);
+  const grainBuckets = makeBuckets(2 * (ALPHA_STEPS + 1)); // red steps, then blue steps
 
   function drawRain(now, dt) {
     let intensity = 1;
@@ -275,8 +309,10 @@
     else if (phase === 'release') intensity = 1 - clamp01((now - releaseStart) / (RELEASE_DURATION * 0.5));
     const speedUp = phase === 'release' ? 1.6 : 1;
 
-    ctx.lineWidth = 1.3;
-    ctx.setLineDash([1.4, 2.8]);
+    // Group segments by opacity step so each step is one stroke() call.
+    for (const bucket of tailBuckets) bucket.length = 0;
+    for (const bucket of headBuckets) bucket.length = 0;
+
     for (const col of rainColumns) {
       col.head += (col.speed * dt * speedUp) / 1000;
       if (col.head - col.length > height) {
@@ -287,54 +323,76 @@
       const alpha = col.weight * 0.6 * intensity;
       if (alpha < 0.01) continue;
 
-      // Two-tone tail: cheaper than a gradient per column.
-      const top = col.head - col.length;
+      // Two-tone tail: a faint top half and a brighter bottom half.
       const mid = col.head - col.length * 0.45;
-      ctx.strokeStyle = `rgba(255, 42, 77, ${(alpha * 0.3).toFixed(3)})`;
-      ctx.beginPath();
-      ctx.moveTo(col.x, top);
-      ctx.lineTo(col.x, mid);
-      ctx.stroke();
-
-      ctx.strokeStyle = `rgba(255, 42, 77, ${alpha.toFixed(3)})`;
-      ctx.beginPath();
-      ctx.moveTo(col.x, mid);
-      ctx.lineTo(col.x, col.head);
-      ctx.stroke();
-
-      ctx.fillStyle = '#d2f0ff';
-      ctx.globalAlpha = Math.min(1, alpha * 1.4);
-      ctx.fillRect(col.x - 1.1, col.head - 1.1, 2.2, 2.2);
-      ctx.globalAlpha = 1;
+      tailBuckets[alphaStep(alpha * 0.3)].push(col.x, col.head - col.length, mid);
+      tailBuckets[alphaStep(alpha)].push(col.x, mid, col.head);
+      headBuckets[alphaStep(Math.min(1, alpha * 1.4))].push(col.x, col.head);
     }
+
+    ctx.lineWidth = 1.3;
+    ctx.setLineDash([1.4, 2.8]);
+    ctx.strokeStyle = '#ff2a4d';
+    tailBuckets.forEach((segments, step) => {
+      if (!segments.length) return;
+      ctx.globalAlpha = step / ALPHA_STEPS;
+      ctx.beginPath();
+      for (let k = 0; k < segments.length; k += 3) {
+        ctx.moveTo(segments[k], segments[k + 1]);
+        ctx.lineTo(segments[k], segments[k + 2]);
+      }
+      ctx.stroke();
+    });
     ctx.setLineDash([]);
+
+    ctx.fillStyle = '#d2f0ff';
+    headBuckets.forEach((heads, step) => {
+      if (!heads.length) return;
+      ctx.globalAlpha = step / ALPHA_STEPS;
+      ctx.beginPath();
+      for (let k = 0; k < heads.length; k += 2) ctx.rect(heads[k] - 1.1, heads[k + 1] - 1.1, 2.2, 2.2);
+      ctx.fill();
+    });
+    ctx.globalAlpha = 1;
   }
 
   function drawGrains(now) {
     const fadeOut = phase === 'release' ? 1 - clamp01((now - releaseStart) / (RELEASE_DURATION * 0.7)) : 1;
+    for (const bucket of grainBuckets) bucket.length = 0;
 
-    for (const [blue, color] of [[false, '#e0193f'], [true, '#bfe6ff']]) {
-      ctx.fillStyle = color;
-      for (const g of grains) {
-        if (g.blue !== blue || g.handedOff) continue;
-        if (g.appearedAt < 0) {
-          if (g.revealAt > progress) continue;
-          g.appearedAt = now;
-        }
-        const t = Math.min(1, (now - g.appearedAt) / GRAIN_FADE_IN);
-        const fall = 1 - easeOutCubic(t);
-
-        let alpha = g.alpha * (0.3 + 0.7 * t) * fadeOut;
-        if (phase === 'lock') alpha *= 0.84 + 0.16 * Math.sin(now * 0.006 + g.revealAt * 60); // shimmer
-        if (alpha < 0.01) continue;
-        ctx.globalAlpha = alpha;
-
-        // Grains fall into place as vertical streaks that shrink to dots.
-        const x = g.homeX + g.dx;
-        const y = g.homeY + g.dy - g.fallHeight * fall;
-        ctx.fillRect(x, y, g.size * 0.8, g.size * (1 + fall * g.fallHeight * 0.04));
+    for (const g of grains) {
+      if (g.handedOff) continue;
+      if (g.appearedAt < 0) {
+        if (g.revealAt > progress) continue;
+        g.appearedAt = now;
       }
+      const t = Math.min(1, (now - g.appearedAt) / GRAIN_FADE_IN);
+      const fall = 1 - easeOutCubic(t);
+
+      let alpha = g.alpha * (0.3 + 0.7 * t) * fadeOut;
+      if (phase === 'lock') alpha *= 0.84 + 0.16 * Math.sin(now * 0.006 + g.revealAt * 60); // shimmer
+      const step = alphaStep(alpha);
+      if (step === 0) continue;
+
+      // Grains fall into place as vertical streaks that shrink to dots.
+      const bucket = grainBuckets[(g.blue ? ALPHA_STEPS + 1 : 0) + step];
+      bucket.push(
+        g.homeX + g.dx,
+        g.homeY + g.dy - g.fallHeight * fall,
+        g.size * 0.8,
+        g.size * (1 + fall * g.fallHeight * 0.04),
+      );
     }
+
+    grainBuckets.forEach((rects, i) => {
+      if (!rects.length) return;
+      const blue = i > ALPHA_STEPS;
+      ctx.fillStyle = blue ? '#bfe6ff' : '#e0193f';
+      ctx.globalAlpha = (blue ? i - ALPHA_STEPS - 1 : i) / ALPHA_STEPS;
+      ctx.beginPath();
+      for (let k = 0; k < rects.length; k += 4) ctx.rect(rects[k], rects[k + 1], rects[k + 2], rects[k + 3]);
+      ctx.fill();
+    });
     ctx.globalAlpha = 1;
   }
 
@@ -397,8 +455,9 @@
     progress += (target - progress) * smoothing;
     if (target - progress < 0.002) progress = target;
 
-    nameLabel.textContent = scrambledLabel(progress / 0.7, Math.floor(now / 85));
-    gate.setAttribute('aria-valuenow', Math.round(progress * 100));
+    setText(nameLabel, scrambledLabel(progress / 0.7, Math.floor(now / 85)));
+    const percent = String(Math.round(progress * 100));
+    if (gate.getAttribute('aria-valuenow') !== percent) gate.setAttribute('aria-valuenow', percent);
     updateLog();
 
     if (progress >= 1) {

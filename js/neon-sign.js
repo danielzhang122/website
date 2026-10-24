@@ -5,7 +5,7 @@
 
   const container = document.getElementById('neon-sign');
   const sign = container.querySelector('.neon-sign-text');
-  const wires = [...container.querySelectorAll('line')]; // [glow, core, glow, core]: left pair, right pair
+  const wires = [...container.querySelectorAll('.wire')]; // [glow, core, glow, core]: left pair, right pair
   const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   const SIGN_TOP = 230;           // px from page top; matches .neon-sign-text in CSS
@@ -32,10 +32,16 @@
     const offset = width * WIRE_SPREAD;
     const cos = Math.cos(angle);
     const sin = Math.sin(angle);
-    wires.forEach((line, i) => {
+    wires.forEach((wire, i) => {
+      // Each wire runs from its fixed anchor at the top of the page
+      // to its attachment point on the (rotated) sign.
       const d = i < 2 ? -offset : offset;
-      line.setAttribute('x2', centerX + d * cos);
-      line.setAttribute('y2', SIGN_TOP + d * sin);
+      const anchorX = centerX + d;
+      const dx = centerX + d * cos - anchorX;
+      const dy = SIGN_TOP + d * sin;
+      const length = Math.hypot(dx, dy);
+      const tilt = Math.atan2(-dx, dy);
+      wire.style.transform = `translateX(${anchorX}px) rotate(${tilt}rad) scaleY(${length})`;
     });
     sign.style.transform = `translateX(-50%) rotate(${angle}rad)`;
   }
@@ -49,11 +55,6 @@
     sign.style.left = `${centerX}px`;
     width = sign.offsetWidth;
     height = sign.offsetHeight;
-
-    wires.forEach((line, i) => {
-      line.setAttribute('x1', centerX + (i < 2 ? -1 : 1) * width * WIRE_SPREAD);
-      line.setAttribute('y1', 0);
-    });
     draw();
   }
 

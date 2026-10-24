@@ -7,7 +7,7 @@
 
   addEventListener('scroll', () => {
     const scrollable = doc.scrollHeight - doc.clientHeight;
-    bar.style.width = `${(doc.scrollTop / scrollable) * 100}%`;
+    bar.style.transform = `scaleX(${scrollable > 0 ? doc.scrollTop / scrollable : 0})`;
   }, { passive: true });
 
   const observer = new IntersectionObserver((entries) => {
@@ -19,4 +19,14 @@
   }, { threshold: 0.1 });
 
   document.querySelectorAll('.reveal').forEach((el) => observer.observe(el));
+
+  // Autoplaying videos only decode while they're on screen.
+  const videoObserver = new IntersectionObserver((entries) => {
+    for (const { target, isIntersecting } of entries) {
+      if (isIntersecting) target.play().catch(() => {}); // autoplay can be refused
+      else target.pause();
+    }
+  }, { rootMargin: '200px' });
+
+  document.querySelectorAll('video[autoplay]').forEach((video) => videoObserver.observe(video));
 })();

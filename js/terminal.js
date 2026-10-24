@@ -18,8 +18,19 @@
   let wordIndex = 0;
   let length = 0;
   let deleting = false;
+  let onScreen = true;
+
+  // Each keystroke changes text, which costs a layout, so only type while it can be seen.
+  new IntersectionObserver(([entry]) => {
+    onScreen = entry.isIntersecting;
+  }).observe(output.closest('.terminal'));
 
   function tick() {
+    if (!onScreen || !document.body.classList.contains('is-ready')) {
+      setTimeout(tick, 250);
+      return;
+    }
+
     const word = WORDS[wordIndex];
     length += deleting ? -1 : 1;
     output.textContent = word.slice(0, length);

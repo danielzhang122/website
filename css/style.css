@@ -100,9 +100,12 @@ main {
   top: 0;
   left: 0;
   z-index: 60;
-  width: 0;
+  width: 100%;
   height: 3px;
   background: linear-gradient(90deg, var(--red), var(--blue));
+  /* Scaled rather than resized, so scrolling never triggers layout. */
+  transform: scaleX(0);
+  transform-origin: left;
 }
 
 #particles {
@@ -130,25 +133,27 @@ main {
   #neon-sign { display: block; }
 }
 
-#neon-sign svg {
+/* Wires are 1px-tall bars that js/neon-sign.js stretches and rotates with
+   transform only, so the swinging never triggers layout. */
+.wire {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  overflow: visible;
+  top: 0;
+  left: 0;
+  height: 1px;
+  transform-origin: 50% 0;
 }
 
-#neon-sign line { stroke-linecap: round; }
-
-#neon-sign .wire-glow {
-  stroke: #8ad8ff;
-  stroke-width: 7;
+.wire-glow {
+  width: 7px;
+  margin-left: -3.5px;
+  background: #8ad8ff;
   opacity: .22;
 }
 
-#neon-sign .wire-core {
-  stroke: #c6ecff;
-  stroke-width: 2;
+.wire-core {
+  width: 2px;
+  margin-left: -1px;
+  background: #c6ecff;
 }
 
 .neon-sign-text {
@@ -185,8 +190,9 @@ nav {
   top: 0;
   z-index: 50;
   border-bottom: 1px solid var(--line);
-  background: rgba(8, 7, 10, .9);
-  backdrop-filter: blur(8px);
+  /* Near-opaque instead of backdrop-filter: blurring the animated canvas
+     underneath would be recomputed every frame. */
+  background: rgba(8, 7, 10, .95);
 }
 
 nav .wrap {
@@ -278,7 +284,6 @@ nav li a:hover {
   border: 1px solid rgba(224, 25, 63, .35);
   border-radius: 999px;
   background: rgba(224, 25, 63, .1);
-  backdrop-filter: blur(4px);
   color: var(--hot);
   font-size: .7rem;
   letter-spacing: .1em;
@@ -875,8 +880,9 @@ footer p { margin-top: .8rem; }
 .art-grid > :is(img, video),
 .panel > img,
 #lightbox :is(img, video) {
+  /* No will-change here: it would keep ~30 images on their own GPU layers
+     permanently. Browsers promote them on their own while they animate. */
   transition: transform .5s var(--ease-out), border-color .2s, box-shadow .5s;
-  will-change: transform;
 }
 
 @media (hover: hover) {
@@ -911,6 +917,9 @@ footer p { margin-top: .8rem; }
   z-index: 100;
   color: var(--red);
   cursor: pointer;
+  /* Its size comes from the viewport, so text changes inside never need to
+     re-lay-out the page underneath. */
+  contain: strict;
 }
 
 /* The backdrop and the vignette/scanlines live on pseudo-elements so they can
