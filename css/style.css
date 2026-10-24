@@ -879,6 +879,7 @@ footer p { margin-top: .8rem; }
 .bench-item > :is(img, video),
 .art-grid > :is(img, video),
 .panel > img,
+.badge-link img,
 #lightbox :is(img, video) {
   /* No will-change here: it would keep ~30 images on their own GPU layers
      permanently. Browsers promote them on their own while they animate. */
@@ -899,6 +900,8 @@ footer p { margin-top: .8rem; }
   }
 
   .panel > img:hover { transform: scale(1.06); }
+  .badge-link:hover img,
+  .badge-link:focus-visible img { transform: scale(1.08); }
   #lightbox :is(img, video):hover { transform: scale(1.02); }
 }
 
@@ -1103,6 +1106,7 @@ footer p { margin-top: .8rem; }
   .bench-item > :is(img, video),
   .art-grid > :is(img, video),
   .panel > img,
+  .badge-link img,
   #lightbox :is(img, video) {
     transform: none !important;
     transition: none;
