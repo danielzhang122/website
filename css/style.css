@@ -984,20 +984,22 @@ footer p { margin-top: .8rem; }
   transform: translateY(-100%);
 }
 
-/* Boot log under the word; lines are added by js/intro.js as loading progresses. */
+/* Live G-code feed under the word, written by js/intro.js as the name is plotted. */
 .gate-log {
   position: absolute;
-  top: calc(var(--word-top) + var(--word-height) + 4vmin);
+  top: calc(var(--word-top) + var(--word-height) + 3vmin);
   left: 50%;
   z-index: 1;
-  width: 36ch;
+  width: 38ch;
   color: var(--dim);
-  font: 600 clamp(11px, 1.6vmin, 15px)/1.75 var(--mono);
+  font: 600 clamp(10px, 1.45vmin, 14px)/1.7 var(--mono);
   white-space: pre;
   transform: translateX(-50%);
 }
 
-.gate-log .status { color: var(--blue); }
+.gate-log .status { color: var(--mute); }
+.gate-log .status b { color: var(--hot); font-weight: 800; }
+.gate-log .now { color: var(--blue); }
 
 .gate-log .final {
   color: var(--hot);
