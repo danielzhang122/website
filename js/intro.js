@@ -1,7 +1,8 @@
 // Intro screen: 张卓远 is plotted stroke by stroke like a CNC toolpath, with a
-// live G-code feed, while grains settle into each stroke right behind the tool.
-// Grains shy away from the cursor. On exit the name bursts apart and some of its
-// grains become the site's background particle network. Shown once per session.
+// live G-code feed, while ASCII characters settle into each stroke right behind
+// the tool. The characters (grains) shy away from the cursor. On exit the name
+// bursts apart and some of its grains become the site's background particle
+// network. Shown once per session.
 //
 // Everything runs off one virtual clock (vt), so speeding up is just scaling time.
 // Timeline: plot → lock (brief hold) → release (exit) → finish.
@@ -47,6 +48,9 @@
 
   const LABEL = 'daniel zhang';
   const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789#$%&@';
+  const RAMP = '.:-=+*#%@';       // light to dense, picked by how much of a cell the strokes cover
+  const SPARK_CHARS = "*+.'`";
+  const MIN_COVERAGE = 0.12;      // cells with less stroke than this stay empty
 
   const START_DELAY = 120;        // ms before the first move
   const CUT_TIME = 1100;          // ms spent cutting all strokes
@@ -80,15 +84,23 @@
   const lerp = (a, b, t) => a + (b - a) * t;
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
   const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
+  const randomChar = (seed) => SCRAMBLE_CHARS[Math.floor(hash(seed) * SCRAMBLE_CHARS.length)];
 
   // Reveals LABEL left to right as progress grows; unrevealed letters flicker.
   function scrambledLabel(progress, tick) {
     const revealed = Math.floor(clamp01(progress) * LABEL.length);
     return Array.from(LABEL, (char, i) => {
       if (char === ' ' || i < revealed) return char;
-      return SCRAMBLE_CHARS[Math.floor(hash(i * 31 + tick * 7.13) * SCRAMBLE_CHARS.length)];
+      return randomChar(i * 31 + tick * 7.13);
     }).join('');
   }
+
+  // Sprite atlas layout: every character pre-rendered once in each of these colors.
+  const COLOR = { red: 0, blue: 1, rain: 2, head: 3, sparkHot: 4, spark: 5 };
+  const COLOR_VALUES = ['#ff3355', '#e4f5ff', '#ff2a4d', '#d2f0ff', '#ffd6dd', '#ff3a5c'];
+  const ATLAS_CHARS = [...new Set(RAMP + SCRAMBLE_CHARS + SPARK_CHARS)];
+  const charIndex = new Map(ATLAS_CHARS.map((char, i) => [char, i]));
+  const sprite = (char, color) => color * ATLAS_CHARS.length + charIndex.get(char);
 
   /* ---------- state ---------- */
 
@@ -110,6 +122,11 @@
   let events = [];
   let schedule = {};
   let cutSpeed = 1;           // px per ms
+  let dpr = 1;
+  let cellW = 0;              // px per character cell
+  let cellH = 0;
+  let atlas = null;           // pre-rendered characters, see buildAtlas()
+  let atlasCell = { w: 0, h: 0 };
   let bed = null;             // pre-rendered dot grid
   let sparks = [];
 
@@ -127,13 +144,15 @@
   function build() {
     width = innerWidth;
     height = innerHeight;
-    const dpr = Math.min(1.5, devicePixelRatio || 1);
+    dpr = Math.min(1.5, devicePixelRatio || 1);
     canvas.width = Math.round(width * dpr);
     canvas.height = Math.round(height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
     glyphSize = Math.min((width * 0.88) / 2.94, height * 0.46);
     unit = glyphSize / 1024;
+    cellW = Math.max(6, Math.round(glyphSize / 48));
+    cellH = Math.round(cellW * 1.6); // monospace aspect
     const advance = glyphSize * 0.97;
     const left = (width - (advance * 2 + glyphSize)) / 2;
     const top = height * 0.44 - glyphSize / 2;
@@ -168,6 +187,7 @@
     sampleGrains();
     buildRain();
     buildBed(dpr);
+    buildAtlas();
 
     // The visible ink sits roughly between y = 860 and y = -40 on the glyph grid.
     gate.style.setProperty('--word-top', `${top + 40 * unit}px`);
@@ -220,8 +240,9 @@
     events.push({ t: lockStart, text: '> 开启', final: true });
   }
 
-  // Rasterize the stroke outlines and sample them into grains. Each grain knows
-  // its stroke and how far along it sits, so it lands right behind the tool.
+  // Rasterize the stroke outlines and lay a character grid over them. Every cell
+  // the strokes cover becomes a grain, its character denser the more is covered.
+  // Each grain knows its stroke and how far along it sits, so it lands right behind the tool.
   function sampleGrains() {
     const offscreen = document.createElement('canvas');
     offscreen.width = Math.ceil(width);
@@ -237,15 +258,32 @@
     c.setTransform(1, 0, 0, 1, 0, 0);
 
     const pixels = c.getImageData(0, 0, offscreen.width, offscreen.height).data;
-    const spacing = Math.max(2, Math.round(glyphSize / 80));
+    const inside = (x, y) => pixels[(y * offscreen.width + x) * 4 + 3] >= 110;
 
     grains = [];
-    for (let y = 0; y < offscreen.height; y += spacing) {
-      for (let x = 0; x < offscreen.width; x += spacing) {
-        if (pixels[(y * offscreen.width + x) * 4 + 3] < 110) continue; // outside the strokes
-        const id = x * 7.31 + y * 1.97;
-        if (hash(id) > 0.8) continue;                               // erode the strokes a bit
+    const startX = Math.max(0, Math.floor(wordBounds.left));
+    const startY = Math.max(0, Math.floor(wordBounds.top));
+    for (let top = startY; top < wordBounds.bottom && top + cellH <= offscreen.height; top += cellH) {
+      for (let left = startX; left < wordBounds.right && left + cellW <= offscreen.width; left += cellW) {
+        // Share of the cell the strokes cover, sampled every other pixel.
+        let hits = 0;
+        let samples = 0;
+        for (let y = top; y < top + cellH; y += 2) {
+          for (let x = left; x < left + cellW; x += 2) {
+            samples++;
+            if (inside(x, y)) hits++;
+          }
+        }
+        const coverage = hits / samples;
+        if (coverage < MIN_COVERAGE) continue;
 
+        const x = left + cellW / 2;
+        const y = top + cellH / 2;
+        const id = x * 7.31 + y * 1.97;
+        if (hash(id) > 0.93) continue; // erode the strokes a bit
+
+        // Edge cells can have their center just outside every stroke;
+        // those go to whichever centerline is nearest.
         let owner = null;
         for (const st of strokes) {
           if (x < st.ox - 4 || x > st.ox + glyphSize + 4) continue;
@@ -255,30 +293,36 @@
             break;
           }
         }
-        if (!owner) continue;
 
         // How far along the stroke this grain is: the nearest centerline point's share.
         let nearest = 0;
         let nearestDist = Infinity;
-        owner.pts.forEach((p, i) => {
-          const d = (p.x - x) ** 2 + (p.y - y) ** 2;
-          if (d < nearestDist) {
-            nearestDist = d;
-            nearest = i;
-          }
-        });
+        let nearestStroke = owner;
+        for (const st of owner ? [owner] : strokes) {
+          st.pts.forEach((p, i) => {
+            const d = (p.x - x) ** 2 + (p.y - y) ** 2;
+            if (d < nearestDist) {
+              nearestDist = d;
+              nearest = i;
+              nearestStroke = st;
+            }
+          });
+        }
+        owner = nearestStroke;
         const along = owner.cum[nearest] / owner.len;
 
+        const level = clamp01(coverage + (hash(id + 7) - 0.5) * 0.2);
         grains.push({
-          homeX: x + (hash(id + 13) - 0.5) * spacing * 0.7,
+          homeX: x,
           homeY: y,
           // Displacement from home (cursor pushes, exit burst) and its velocity.
           dx: 0,
           dy: 0,
           vx: 0,
           vy: 0,
-          size: spacing * (0.7 + 0.6 * hash(id + 11)),
-          alpha: 0.5 + 0.5 * hash(id + 3),
+          char: RAMP[Math.round(level * (RAMP.length - 1))],
+          seed: id,
+          alpha: 0.85 + 0.15 * hash(id + 3),
           blue: hash(id + 21) < 0.4,
           fallHeight: 22 + 90 * hash(id + 5),
           landAt: lerp(owner.cutStart, owner.cutEnd, along) + FILL_DELAY + hash(id + 9) * FILL_SPREAD,
@@ -288,16 +332,16 @@
     }
   }
 
-  // Rain columns, densest over the word.
+  // Rain columns of falling characters, densest over the word.
   function buildRain() {
     rainColumns = [];
     const mid = width / 2;
     const spread = Math.max(wordBounds.right - wordBounds.left, width * 0.3) * 0.62;
-    for (let x = 6, k = 0; x < width; x += 15, k++) {
+    for (let x = cellW, k = 0; x < width; x += cellW * 1.6, k++) {
       const distance = (x - mid) / spread;
       const weight = 0.12 + 0.88 * Math.exp(-distance * distance);
       rainColumns.push({
-        x: x + 0.5,
+        x,
         head: hash(k + 1.7) * height * 1.4 - height * 0.2,
         speed: (50 + 190 * hash(k + 2.9)) * (0.6 + weight),
         length: 30 + height * 0.55 * hash(k + 4.1) * (0.35 + weight),
@@ -318,6 +362,25 @@
     for (let y = gap / 2; y < height; y += gap) {
       for (let x = gap / 2; x < width; x += gap) b.fillRect(x - 0.6, y - 0.6, 1.2, 1.2);
     }
+  }
+
+  // Every character in every color, rendered once; frames copy cells out of it
+  // with drawImage, which is far cheaper than thousands of fillText calls.
+  function buildAtlas() {
+    const w = Math.ceil(cellW * dpr);
+    const h = Math.ceil(cellH * dpr);
+    atlas = document.createElement('canvas');
+    atlas.width = w * ATLAS_CHARS.length;
+    atlas.height = h * COLOR_VALUES.length;
+    const a = atlas.getContext('2d');
+    a.font = `800 ${Math.round((cellW / 0.6) * dpr)}px "JetBrains Mono", monospace`;
+    a.textAlign = 'center';
+    a.textBaseline = 'middle';
+    COLOR_VALUES.forEach((color, row) => {
+      a.fillStyle = color;
+      ATLAS_CHARS.forEach((char, col) => a.fillText(char, col * w + w / 2, row * h + h / 2));
+    });
+    atlasCell = { w, h };
   }
 
   /* ---------- motion ---------- */
@@ -410,6 +473,7 @@
           vy: Math.sin(angle) * speed - 40,
           age: 0,
           hot: Math.random() < 0.6,
+          char: SPARK_CHARS[Math.floor(Math.random() * SPARK_CHARS.length)],
         });
       }
     }
@@ -424,59 +488,61 @@
 
   /* ---------- drawing ---------- */
 
-  // Grains and rain are drawn in batches grouped by color and opacity, so a frame
-  // is a few dozen canvas calls instead of thousands. 20 opacity steps is seamless.
+  // Characters are drawn in batches grouped by opacity, so a frame sets globalAlpha
+  // a few dozen times instead of thousands. 20 opacity steps is seamless.
   const ALPHA_STEPS = 20;
   const alphaStep = (alpha) => Math.round(clamp01(alpha) * ALPHA_STEPS);
-  const makeBuckets = (n) => Array.from({ length: n }, () => []);
-  const tailBuckets = makeBuckets(ALPHA_STEPS + 1);
-  const headBuckets = makeBuckets(ALPHA_STEPS + 1);
-  const grainBuckets = makeBuckets(2 * (ALPHA_STEPS + 1)); // red steps, then blue steps
+  const spriteBuckets = Array.from({ length: ALPHA_STEPS + 1 }, () => []);
 
+  function clearBuckets() {
+    for (const bucket of spriteBuckets) bucket.length = 0;
+  }
+
+  // Draws the bucketed [x, y, sprite] triples, centered on (x, y), scaled from the cell size.
+  function drawBuckets(scale = 1) {
+    const { w, h } = atlasCell;
+    const dw = cellW * scale;
+    const dh = cellH * scale;
+    const perRow = ATLAS_CHARS.length;
+    spriteBuckets.forEach((items, step) => {
+      if (!items.length) return;
+      ctx.globalAlpha = step / ALPHA_STEPS;
+      for (let k = 0; k < items.length; k += 3) {
+        const s = items[k + 2];
+        ctx.drawImage(
+          atlas, (s % perRow) * w, Math.floor(s / perRow) * h, w, h,
+          items[k] - dw / 2, items[k + 1] - dh / 2, dw, dh,
+        );
+      }
+    });
+    ctx.globalAlpha = 1;
+  }
+
+  // Each column's characters sit on the cell grid and its head steps down it,
+  // trailing a tail that fades out. Characters change slowly and out of sync.
   function drawRain(dt, intensity) {
-    for (const bucket of tailBuckets) bucket.length = 0;
-    for (const bucket of headBuckets) bucket.length = 0;
-
-    for (const col of rainColumns) {
+    clearBuckets();
+    rainColumns.forEach((col, k) => {
       col.head += (col.speed * dt) / 1000;
       if (col.head - col.length > height) {
         col.head = -Math.random() * height * 0.4;
         col.length = 30 + height * 0.55 * Math.random() * (0.35 + col.weight);
       }
-      const alpha = col.weight * 0.5 * intensity;
-      if (alpha < 0.01) continue;
+      const alpha = col.weight * 0.32 * intensity;
+      if (alpha < 0.01) return;
 
-      // Two-tone tail: a faint top half and a brighter bottom half.
-      const mid = col.head - col.length * 0.45;
-      tailBuckets[alphaStep(alpha * 0.3)].push(col.x, col.head - col.length, mid);
-      tailBuckets[alphaStep(alpha)].push(col.x, mid, col.head);
-      headBuckets[alphaStep(Math.min(1, alpha * 1.4))].push(col.x, col.head);
-    }
-
-    ctx.lineWidth = 1.3;
-    ctx.setLineDash([1.4, 2.8]);
-    ctx.strokeStyle = '#ff2a4d';
-    tailBuckets.forEach((segments, step) => {
-      if (!segments.length) return;
-      ctx.globalAlpha = step / ALPHA_STEPS;
-      ctx.beginPath();
-      for (let k = 0; k < segments.length; k += 3) {
-        ctx.moveTo(segments[k], segments[k + 1]);
-        ctx.lineTo(segments[k], segments[k + 2]);
+      const headRow = Math.floor(col.head / cellH);
+      const rows = Math.max(1, Math.round(col.length / cellH));
+      for (let r = 0; r < rows; r++) {
+        const row = headRow - r;
+        const y = (row + 0.5) * cellH;
+        if (y < -cellH || y > height + cellH) continue;
+        const char = randomChar(k * 13.7 + row * 1.31 + Math.floor(vt / 400 + hash(k + row * 0.7)) * 0.53);
+        if (r === 0) spriteBuckets[alphaStep(alpha * 1.4)].push(col.x, y, sprite(char, COLOR.head));
+        else spriteBuckets[alphaStep(alpha * (1 - r / rows))].push(col.x, y, sprite(char, COLOR.rain));
       }
-      ctx.stroke();
     });
-    ctx.setLineDash([]);
-
-    ctx.fillStyle = '#d2f0ff';
-    headBuckets.forEach((heads, step) => {
-      if (!heads.length) return;
-      ctx.globalAlpha = step / ALPHA_STEPS;
-      ctx.beginPath();
-      for (let k = 0; k < heads.length; k += 2) ctx.rect(heads[k] - 1.1, heads[k + 1] - 1.1, 2.2, 2.2);
-      ctx.fill();
-    });
-    ctx.globalAlpha = 1;
+    drawBuckets(0.8);
   }
 
   function tracePolyline(st, length) {
@@ -583,18 +649,21 @@
   }
 
   function drawSparks() {
+    clearBuckets();
     for (const p of sparks) {
-      ctx.globalAlpha = 1 - p.age / 280;
-      ctx.fillStyle = p.hot ? '#ffd6dd' : '#ff3a5c';
-      ctx.fillRect(p.x - 0.8, p.y - 0.8, 1.6, 1.6);
+      spriteBuckets[alphaStep(1 - p.age / 280)].push(p.x, p.y, sprite(p.char, p.hot ? COLOR.sparkHot : COLOR.spark));
     }
-    ctx.globalAlpha = 1;
+    drawBuckets(0.7);
   }
 
   function drawGrains() {
     const fadeOut = released ? 1 - clamp01((vt - schedule.releaseStart) / (RELEASE_DURATION * 0.7)) : 1;
     const locked = vt >= schedule.lockStart && !released;
-    for (const bucket of grainBuckets) bucket.length = 0;
+    // Share of landed grains glitching to a random character at any moment.
+    const glitchOdds = released ? 0.5 : locked ? 0.03 : 0.005;
+    const glitchTick = Math.floor(vt / 110) * 3.7;
+    const scrambleTick = Math.floor(vt / 50);
+    clearBuckets();
 
     for (const g of grains) {
       if (g.handedOff || vt < g.landAt) continue;
@@ -606,25 +675,16 @@
       const step = alphaStep(alpha);
       if (step === 0) continue;
 
-      // Grains fall into place as vertical streaks that shrink to dots.
-      grainBuckets[(g.blue ? ALPHA_STEPS + 1 : 0) + step].push(
+      // Falling grains flicker through random characters and settle on their own on landing.
+      const glitch = t < 1 || hash(g.seed + glitchTick) < glitchOdds;
+      const char = glitch ? randomChar(g.seed + scrambleTick) : g.char;
+      spriteBuckets[step].push(
         g.homeX + g.dx,
         g.homeY + g.dy - g.fallHeight * fall,
-        g.size * 0.8,
-        g.size * (1 + fall * g.fallHeight * 0.04),
+        sprite(char, g.blue ? COLOR.blue : COLOR.red),
       );
     }
-
-    grainBuckets.forEach((rects, i) => {
-      if (!rects.length) return;
-      const blue = i > ALPHA_STEPS;
-      ctx.fillStyle = blue ? '#bfe6ff' : '#e0193f';
-      ctx.globalAlpha = (blue ? i - ALPHA_STEPS - 1 : i) / ALPHA_STEPS;
-      ctx.beginPath();
-      for (let k = 0; k < rects.length; k += 4) ctx.rect(rects[k], rects[k + 1], rects[k + 2], rects[k + 3]);
-      ctx.fill();
-    });
-    ctx.globalAlpha = 1;
+    drawBuckets();
   }
 
   /* ---------- text overlays (the DOM only changes when the text does) ---------- */
@@ -787,6 +847,10 @@
   });
 
   build();
+  // The atlas is drawn in JetBrains Mono; redraw it once the webfont has arrived.
+  document.fonts?.load('800 16px "JetBrains Mono"').then(() => {
+    if (running) buildAtlas();
+  }, () => {});
   lastFrame = performance.now();
   requestAnimationFrame(frame);
 })();
