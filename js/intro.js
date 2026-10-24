@@ -1,10 +1,11 @@
-// Intro screen: 张卓远 assembles out of falling grains over red digital rain
-// while a boot log ticks through. Grains shy away from the cursor. On exit the
-// name bursts apart and some of its grains become the site's background
-// particle network. Shown once per session.
+// Intro screen: 张卓远 is plotted stroke by stroke like a CNC toolpath, with a
+// live G-code feed, while grains settle into each stroke right behind the tool.
+// Grains shy away from the cursor. On exit the name bursts apart and some of its
+// grains become the site's background particle network. Shown once per session.
 //
-// Phases: 'load' (boot log runs) → 'lock' (brief hold) → 'release' (exit).
-// Click speeds up the load (or exits once locked); Esc / S skips straight to the site.
+// Everything runs off one virtual clock (vt), so speeding up is just scaling time.
+// Timeline: plot → lock (brief hold) → release (exit) → finish.
+// Click speeds up the plot (or exits once locked); Esc / S skips straight to the site.
 (() => {
   'use strict';
 
@@ -34,7 +35,8 @@
     // storage blocked (private mode etc.): just show the intro
   }
 
-  if (seenThisSession || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+  const GLYPHS = window.INTRO_GLYPHS;
+  if (seenThisSession || !GLYPHS || matchMedia('(prefers-reduced-motion: reduce)').matches) {
     gate.remove();
     markReady();
     loadChatbot();
@@ -43,16 +45,23 @@
 
   /* ---------- config ---------- */
 
-  const WORD = '张卓远';
   const LABEL = 'daniel zhang';
   const SCRAMBLE_CHARS = 'abcdefghijklmnopqrstuvwxyz0123456789#$%&@';
-  const FONT = '"Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif';
 
-  const LOAD_DURATION = 1600;     // ms for the boot sequence to finish
-  const LOCK_HOLD = 350;          // ms the finished name holds before exiting
+  const START_DELAY = 120;        // ms before the first move
+  const CUT_TIME = 1100;          // ms spent cutting all strokes
+  const RAPID_FACTOR = 4.5;       // rapids (G00) move this much faster than cuts
+  const MIN_RAPID = 18;           // ms, shortest rapid move
+  const FILL_DELAY = 90;          // ms between the tool passing and grains landing
+  const FILL_SPREAD = 130;        // ms of random jitter on top of that
+  const GRAIN_FADE_IN = 380;      // ms for a grain to fall into place
+  const COOL_DOWN = 480;          // ms for a fresh cut to cool from hot red to toolpath blue
+  const HOME_TIME = 240;          // ms for the tool to return home after the last stroke
+  const LOCK_HOLD = 380;          // ms the finished name holds before exiting
   const RELEASE_DURATION = 1000;  // ms for the exit
-  const GRAIN_FADE_IN = 450;      // ms for a grain to fall into place
-  const FONT_TIMEOUT = 600;       // ms to wait for the CJK web font before falling back
+  const RUSH_SPEED = 3;           // time multiplier after a click
+  const FEED_RATE = 2400;         // shown in the G-code feed, mm/min
+  const FEED_LINES = 6;           // G-code lines visible at once
 
   const REPEL_RADIUS = 90;        // px around the cursor that pushes grains
   const REPEL_FORCE = 2600;       // px/s² at the cursor itself
@@ -60,41 +69,17 @@
   const DRAG = 0.86;              // velocity kept per 60 fps frame
   const RELEASE_DRAG = 0.95;      // lighter drag so the exit burst carries
 
-  // Progress curve as [time, progress] knots: surges and stalls, so it reads as real work.
-  const LOAD_CURVE = [[0, 0], [0.3, 0.38], [0.4, 0.41], [0.68, 0.77], [0.78, 0.8], [1, 1]];
-
-  // [progress at which the line appears, label, status]
-  const BOOT_LOG = [
-    [0.0, 'POST', 'OK'],
-    [0.16, 'servo bus', '12/12 actuators'],
-    [0.34, 'IK solver', 'converged (eventually)'],
-    [0.52, 'ASD calcs', 'verified (probably)'],
-    [0.7, 'coffee', '3 cups, nominal'],
-    [0.86, 'sleep', 'not found'],
-  ];
-  const LOG_LABEL_WIDTH = 13;     // label + dot leader, in characters
-  const STATUS_DELAY = 0.07;      // progress after a line appears before its status prints
-
   /* ---------- helpers ---------- */
 
   // Deterministic pseudo-random in [0, 1) so grains look the same on every resize.
   const hash = (n) => {
-    const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
-    return s - Math.floor(s);
+    const v = Math.sin(n * 127.1 + 311.7) * 43758.5453;
+    return v - Math.floor(v);
   };
   const clamp01 = (x) => Math.max(0, Math.min(1, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
   const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
-
-  function simulatedProgress(t) {
-    if (t <= 0) return 0;
-    if (t >= 1) return 1;
-    for (let i = 0; i < LOAD_CURVE.length - 1; i++) {
-      const [t0, p0] = LOAD_CURVE[i];
-      const [t1, p1] = LOAD_CURVE[i + 1];
-      if (t <= t1) return p0 + (p1 - p0) * easeOutCubic((t - t0) / (t1 - t0));
-    }
-    return 1;
-  }
+  const easeInOut = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 
   // Reveals LABEL left to right as progress grows; unrevealed letters flicker.
   function scrambledLabel(progress, tick) {
@@ -110,128 +95,204 @@
   const canvas = gate.querySelector('canvas');
   const ctx = canvas.getContext('2d');
   const nameLabel = gate.querySelector('.gate-name');
-  const log = gate.querySelector('.gate-log');
+  const feed = gate.querySelector('.gate-log');
 
   let width = 0;
   let height = 0;
-  let grains = [];
+  let glyphSize = 0;          // px per glyph box
+  let unit = 0;               // px per glyph unit (data is on a 1024 grid)
+  let origin = { x: 0, y: 0 };    // plotter (0, 0): baseline of the first glyph
+  let home = { x: 0, y: 0 };      // where the tool parks
   let wordBounds = { left: 0, right: 0, top: 0, bottom: 0 };
+  let strokes = [];
+  let grains = [];
   let rainColumns = [];
-  let progress = 0;           // 0..1, what's currently displayed
-  let phase = 'load';
-  let rushing = false;        // user clicked to speed up
+  let events = [];
+  let schedule = {};
+  let cutSpeed = 1;           // px per ms
+  let bed = null;             // pre-rendered dot grid
+  let sparks = [];
+
+  let vt = 0;                 // virtual time, ms since the plot started
+  let lastFrame = 0;
+  let rushing = false;
+  let released = false;
   let running = true;
-  let startTime = performance.now();
-  let lastFrame = startTime;
-  let releaseStart = 0;
+  let shownEvents = -1;
+  let shownStatus = '';
   const pointer = { x: -1e4, y: -1e4 };
 
-  /* ---------- boot log ---------- */
-
-  // Build every line up front, hidden; updateLog() reveals them as progress grows.
-  const logLines = BOOT_LOG.map(([at, label, status]) => {
-    const line = document.createElement('div');
-    const statusEl = document.createElement('span');
-    statusEl.className = 'status';
-    statusEl.textContent = status;
-    statusEl.hidden = true;
-    line.append(`${label} `.padEnd(LOG_LABEL_WIDTH, '.') + ' ', statusEl);
-    line.hidden = true;
-    log.append(line);
-    return { at, line, statusEl };
-  });
-
-  const finalLine = document.createElement('div');
-  finalLine.className = 'final';
-  finalLine.textContent = '> 开启';
-  finalLine.hidden = true;
-  log.append(finalLine);
-
-  // Only touch the DOM when something flips, so the log doesn't cost a layout per frame.
-  function updateLog() {
-    for (const { at, line, statusEl } of logLines) {
-      const lineHidden = progress < at;
-      const statusHidden = progress < Math.min(1, at + STATUS_DELAY);
-      if (line.hidden !== lineHidden) line.hidden = lineHidden;
-      if (statusEl.hidden !== statusHidden) statusEl.hidden = statusHidden;
-    }
-  }
-
-  function setText(el, text) {
-    if (el.textContent !== text) el.textContent = text;
-  }
-
   /* ---------- scene setup ---------- */
-
-  // Render the word off-screen, then sample its pixels into grains.
-  function sampleWord() {
-    const offscreen = document.createElement('canvas');
-    offscreen.width = width;
-    offscreen.height = height;
-    const c = offscreen.getContext('2d', { willReadFrequently: true });
-
-    c.font = `900 100px ${FONT}`;
-    const fontSize = Math.max(24, Math.min((width * 0.84 * 100) / c.measureText(WORD).width, height * 0.3));
-    c.font = `900 ${fontSize}px ${FONT}`;
-    c.fillStyle = '#fff';
-    c.textAlign = 'center';
-    c.textBaseline = 'middle';
-    c.fillText(WORD, width / 2, height / 2);
-
-    const pixels = c.getImageData(0, 0, width, height).data;
-    const spacing = Math.max(2, Math.round(fontSize / 44));
-    const samples = [];
-    const bounds = { left: width, right: 0, top: height, bottom: 0 };
-
-    for (let y = 0; y < height; y += spacing) {
-      for (let x = 0; x < width; x += spacing) {
-        if (pixels[(y * width + x) * 4 + 3] < 110) continue; // outside the glyphs
-        const id = x * 7.31 + y * 1.97;
-        if (hash(id) > 0.78) continue;                      // erode the strokes a bit
-        samples.push({ x, y, id });
-        bounds.left = Math.min(bounds.left, x);
-        bounds.right = Math.max(bounds.right, x);
-        bounds.top = Math.min(bounds.top, y);
-        bounds.bottom = Math.max(bounds.bottom, y);
-      }
-    }
-    return { samples, spacing, bounds };
-  }
 
   function build() {
     width = innerWidth;
     height = innerHeight;
-    canvas.width = width;
-    canvas.height = height;
+    const dpr = Math.min(1.5, devicePixelRatio || 1);
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-    const { samples, spacing, bounds } = sampleWord();
-    const wordWidth = Math.max(1, bounds.right - bounds.left);
+    glyphSize = Math.min((width * 0.88) / 2.94, height * 0.46);
+    unit = glyphSize / 1024;
+    const advance = glyphSize * 0.97;
+    const left = (width - (advance * 2 + glyphSize)) / 2;
+    const top = height * 0.44 - glyphSize / 2;
+    origin = { x: left, y: top + 900 * unit };
+    home = { x: left - glyphSize * 0.14, y: top + glyphSize * 0.08 };
+    wordBounds = { left, right: left + advance * 2 + glyphSize, top, bottom: top + glyphSize };
 
-    grains = samples.map(({ x, y, id }) => ({
-      homeX: x + (hash(id + 13) - 0.5) * spacing * 0.7,
-      homeY: y,
-      // Displacement from home (cursor pushes, exit burst) and its velocity.
-      dx: 0,
-      dy: 0,
-      vx: 0,
-      vy: 0,
-      size: spacing * (0.55 + 0.6 * hash(id + 11)),
-      alpha: 0.5 + 0.5 * hash(id + 3),
-      blue: hash(id + 21) < 0.4,
-      fallHeight: 30 + 170 * hash(id + 5),
-      // When this grain appears, as a progress value: mostly left to right, with jitter.
-      revealAt: Math.min(1, (0.55 * (x - bounds.left)) / wordWidth + 0.45 * hash(id + 9)),
-      appearedAt: -1,
-    }));
+    strokes = [];
+    GLYPHS.forEach((glyph, ci) => {
+      const ox = left + ci * advance;
+      glyph.strokes.forEach((outline, si) => {
+        const pts = glyph.medians[si].map(([x, y]) => ({ x: ox + x * unit, y: top + (900 - y) * unit }));
+        const cum = [0];
+        for (let i = 1; i < pts.length; i++) {
+          cum.push(cum[i - 1] + Math.hypot(pts[i].x - pts[i - 1].x, pts[i].y - pts[i - 1].y));
+        }
+        strokes.push({
+          char: glyph.char,
+          index: si + 1,
+          count: glyph.strokes.length,
+          path: new Path2D(outline),
+          ox,
+          top,
+          pts,
+          cum,
+          len: cum[cum.length - 1],
+        });
+      });
+    });
 
-    wordBounds = bounds;
-    gate.style.setProperty('--word-top', `${bounds.top}px`);
-    gate.style.setProperty('--word-height', `${bounds.bottom - bounds.top}px`);
+    planSchedule();
+    sampleGrains();
+    buildRain();
+    buildBed(dpr);
 
-    // Rain columns, densest over the word.
+    // The visible ink sits roughly between y = 860 and y = -40 on the glyph grid.
+    gate.style.setProperty('--word-top', `${top + 40 * unit}px`);
+    gate.style.setProperty('--word-height', `${900 * unit}px`);
+    shownEvents = -1;
+    shownStatus = '';
+  }
+
+  // Times for every move: a rapid to each stroke's start, then a cut along its centerline.
+  function planSchedule() {
+    const total = strokes.reduce((sum, st) => sum + st.len, 0);
+    cutSpeed = total / CUT_TIME;
+    const rapidSpeed = cutSpeed * RAPID_FACTOR;
+    const coords = (p) => {
+      const x = ((p.x - origin.x) / unit / 10).toFixed(1).padStart(5);
+      const y = ((origin.y - p.y) / unit / 10).toFixed(1).padStart(5);
+      return `X${x} Y${y}`;
+    };
+    let lineNumber = 10;
+    const block = (text) => `N${String(lineNumber++).padStart(3, '0')} ${text}`;
+
+    events = [{ t: 0, text: 'G21 G90 ; mm, absolute' }];
+    let t = START_DELAY;
+    let pos = { ...home };
+    for (const st of strokes) {
+      st.rapidFrom = { ...pos };
+      st.rapidStart = t;
+      events.push({ t, text: block(`G00 ${coords(st.pts[0])}`) });
+      t += Math.max(MIN_RAPID, Math.hypot(st.pts[0].x - pos.x, st.pts[0].y - pos.y) / rapidSpeed);
+
+      st.cutStart = t;
+      events.push({ t, text: block(`G01 ${coords(st.pts[st.pts.length - 1])} F${FEED_RATE}`) });
+      t += st.len / cutSpeed;
+      st.cutEnd = t;
+      pos = st.pts[st.pts.length - 1];
+    }
+
+    const plotEnd = t;
+    const lockStart = plotEnd + FILL_DELAY + FILL_SPREAD + GRAIN_FADE_IN * 0.7;
+    const releaseStart = lockStart + LOCK_HOLD;
+    schedule = {
+      plotEnd,
+      homeFrom: { ...pos },
+      lockStart,
+      releaseStart,
+      end: releaseStart + RELEASE_DURATION,
+    };
+    events.push({ t: plotEnd, text: block('G28 ; home') });
+    events.push({ t: lockStart - 80, text: 'M30 ; program end' });
+    events.push({ t: lockStart, text: '> 开启', final: true });
+  }
+
+  // Rasterize the stroke outlines and sample them into grains. Each grain knows
+  // its stroke and how far along it sits, so it lands right behind the tool.
+  function sampleGrains() {
+    const offscreen = document.createElement('canvas');
+    offscreen.width = Math.ceil(width);
+    offscreen.height = Math.ceil(height);
+    const c = offscreen.getContext('2d', { willReadFrequently: true });
+    const strokeTransform = (st) => c.setTransform(unit, 0, 0, -unit, st.ox, st.top + 900 * unit);
+
+    c.fillStyle = '#fff';
+    for (const st of strokes) {
+      strokeTransform(st);
+      c.fill(st.path);
+    }
+    c.setTransform(1, 0, 0, 1, 0, 0);
+
+    const pixels = c.getImageData(0, 0, offscreen.width, offscreen.height).data;
+    const spacing = Math.max(2, Math.round(glyphSize / 80));
+
+    grains = [];
+    for (let y = 0; y < offscreen.height; y += spacing) {
+      for (let x = 0; x < offscreen.width; x += spacing) {
+        if (pixels[(y * offscreen.width + x) * 4 + 3] < 110) continue; // outside the strokes
+        const id = x * 7.31 + y * 1.97;
+        if (hash(id) > 0.8) continue;                               // erode the strokes a bit
+
+        let owner = null;
+        for (const st of strokes) {
+          if (x < st.ox - 4 || x > st.ox + glyphSize + 4) continue;
+          strokeTransform(st);
+          if (c.isPointInPath(st.path, x, y)) {
+            owner = st;
+            break;
+          }
+        }
+        if (!owner) continue;
+
+        // How far along the stroke this grain is: the nearest centerline point's share.
+        let nearest = 0;
+        let nearestDist = Infinity;
+        owner.pts.forEach((p, i) => {
+          const d = (p.x - x) ** 2 + (p.y - y) ** 2;
+          if (d < nearestDist) {
+            nearestDist = d;
+            nearest = i;
+          }
+        });
+        const along = owner.cum[nearest] / owner.len;
+
+        grains.push({
+          homeX: x + (hash(id + 13) - 0.5) * spacing * 0.7,
+          homeY: y,
+          // Displacement from home (cursor pushes, exit burst) and its velocity.
+          dx: 0,
+          dy: 0,
+          vx: 0,
+          vy: 0,
+          size: spacing * (0.7 + 0.6 * hash(id + 11)),
+          alpha: 0.5 + 0.5 * hash(id + 3),
+          blue: hash(id + 21) < 0.4,
+          fallHeight: 22 + 90 * hash(id + 5),
+          landAt: lerp(owner.cutStart, owner.cutEnd, along) + FILL_DELAY + hash(id + 9) * FILL_SPREAD,
+          shimmer: hash(id + 17) * 60,
+        });
+      }
+    }
+  }
+
+  // Rain columns, densest over the word.
+  function buildRain() {
     rainColumns = [];
     const mid = width / 2;
-    const spread = Math.max(wordWidth, width * 0.3) * 0.62;
+    const spread = Math.max(wordBounds.right - wordBounds.left, width * 0.3) * 0.62;
     for (let x = 6, k = 0; x < width; x += 15, k++) {
       const distance = (x - mid) / spread;
       const weight = 0.12 + 0.88 * Math.exp(-distance * distance);
@@ -245,13 +306,57 @@
     }
   }
 
-  /* ---------- physics ---------- */
+  // Faint dot grid, like a plotter bed. Rendered once, copied each frame.
+  function buildBed(dpr) {
+    bed = document.createElement('canvas');
+    bed.width = canvas.width;
+    bed.height = canvas.height;
+    const b = bed.getContext('2d');
+    b.scale(dpr, dpr);
+    b.fillStyle = 'rgba(138, 216, 255, .09)';
+    const gap = Math.max(14, glyphSize / 16);
+    for (let y = gap / 2; y < height; y += gap) {
+      for (let x = gap / 2; x < width; x += gap) b.fillRect(x - 0.6, y - 0.6, 1.2, 1.2);
+    }
+  }
+
+  /* ---------- motion ---------- */
+
+  function pointAlong(st, distance) {
+    if (distance <= 0) return st.pts[0];
+    for (let i = 1; i < st.pts.length; i++) {
+      if (st.cum[i] >= distance) {
+        const t = (distance - st.cum[i - 1]) / (st.cum[i] - st.cum[i - 1] || 1);
+        return { x: lerp(st.pts[i - 1].x, st.pts[i].x, t), y: lerp(st.pts[i - 1].y, st.pts[i].y, t) };
+      }
+    }
+    return st.pts[st.pts.length - 1];
+  }
+
+  // Where the tool is at time t, and whether it's cutting.
+  function toolAt(t) {
+    if (t < strokes[0].rapidStart) return { ...home, cutting: false };
+    for (const st of strokes) {
+      if (t < st.cutStart) {
+        const k = easeInOut(clamp01((t - st.rapidStart) / (st.cutStart - st.rapidStart)));
+        return {
+          x: lerp(st.rapidFrom.x, st.pts[0].x, k),
+          y: lerp(st.rapidFrom.y, st.pts[0].y, k),
+          cutting: false,
+          stroke: st,
+        };
+      }
+      if (t <= st.cutEnd) return { ...pointAlong(st, (t - st.cutStart) * cutSpeed), cutting: true, stroke: st };
+    }
+    const k = easeInOut(clamp01((t - schedule.plotEnd) / HOME_TIME));
+    return { x: lerp(schedule.homeFrom.x, home.x, k), y: lerp(schedule.homeFrom.y, home.y, k), cutting: false };
+  }
 
   // Grains are pushed away from the cursor and spring back home.
   // Grains at rest with the cursor out of reach are skipped entirely.
   function updateGrains(dt) {
     const seconds = dt / 1000;
-    const releasing = phase === 'release';
+    const releasing = released;
     const drag = Math.pow(releasing ? RELEASE_DRAG : DRAG, dt / 16.7);
     const repelSq = REPEL_RADIUS * REPEL_RADIUS;
     const pointerNearWord = !releasing &&
@@ -259,7 +364,7 @@
       pointer.y > wordBounds.top - REPEL_RADIUS && pointer.y < wordBounds.bottom + REPEL_RADIUS;
 
     for (const g of grains) {
-      if (g.appearedAt < 0) continue;
+      if (vt < g.landAt) continue;
       if (g.resting && !pointerNearWord && !releasing) continue;
       g.resting = false;
 
@@ -292,10 +397,35 @@
     }
   }
 
+  function updateSparks(tool, dt) {
+    const seconds = dt / 1000;
+    if (tool.cutting && sparks.length < 140) {
+      for (let i = 0; i < 3; i++) {
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 60 + Math.random() * 220;
+        sparks.push({
+          x: tool.x,
+          y: tool.y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed - 40,
+          age: 0,
+          hot: Math.random() < 0.6,
+        });
+      }
+    }
+    for (const p of sparks) {
+      p.age += dt;
+      p.vy += 420 * seconds; // gravity
+      p.x += p.vx * seconds;
+      p.y += p.vy * seconds;
+    }
+    sparks = sparks.filter((p) => p.age < 280);
+  }
+
   /* ---------- drawing ---------- */
 
-  // Everything is drawn in batches grouped by color and opacity, so a frame is a
-  // few dozen canvas calls instead of thousands. 20 opacity steps is visually seamless.
+  // Grains and rain are drawn in batches grouped by color and opacity, so a frame
+  // is a few dozen canvas calls instead of thousands. 20 opacity steps is seamless.
   const ALPHA_STEPS = 20;
   const alphaStep = (alpha) => Math.round(clamp01(alpha) * ALPHA_STEPS);
   const makeBuckets = (n) => Array.from({ length: n }, () => []);
@@ -303,24 +433,17 @@
   const headBuckets = makeBuckets(ALPHA_STEPS + 1);
   const grainBuckets = makeBuckets(2 * (ALPHA_STEPS + 1)); // red steps, then blue steps
 
-  function drawRain(now, dt) {
-    let intensity = 1;
-    if (phase === 'load') intensity = 0.45 + 0.55 * progress;
-    else if (phase === 'release') intensity = 1 - clamp01((now - releaseStart) / (RELEASE_DURATION * 0.5));
-    const speedUp = phase === 'release' ? 1.6 : 1;
-
-    // Group segments by opacity step so each step is one stroke() call.
+  function drawRain(dt, intensity) {
     for (const bucket of tailBuckets) bucket.length = 0;
     for (const bucket of headBuckets) bucket.length = 0;
 
     for (const col of rainColumns) {
-      col.head += (col.speed * dt * speedUp) / 1000;
+      col.head += (col.speed * dt) / 1000;
       if (col.head - col.length > height) {
         col.head = -Math.random() * height * 0.4;
         col.length = 30 + height * 0.55 * Math.random() * (0.35 + col.weight);
       }
-
-      const alpha = col.weight * 0.6 * intensity;
+      const alpha = col.weight * 0.5 * intensity;
       if (alpha < 0.01) continue;
 
       // Two-tone tail: a faint top half and a brighter bottom half.
@@ -356,27 +479,135 @@
     ctx.globalAlpha = 1;
   }
 
-  function drawGrains(now) {
-    const fadeOut = phase === 'release' ? 1 - clamp01((now - releaseStart) / (RELEASE_DURATION * 0.7)) : 1;
+  function tracePolyline(st, length) {
+    ctx.beginPath();
+    ctx.moveTo(st.pts[0].x, st.pts[0].y);
+    for (let i = 1; i < st.pts.length; i++) {
+      if (st.cum[i] >= length) {
+        const p = pointAlong(st, length);
+        ctx.lineTo(p.x, p.y);
+        return;
+      }
+      ctx.lineTo(st.pts[i].x, st.pts[i].y);
+    }
+  }
+
+  // Cuts glow hot red while fresh, then cool to a thin blue toolpath that fades at the lock.
+  function drawToolpath() {
+    const fade = vt < schedule.lockStart ? 1 : 1 - clamp01((vt - schedule.lockStart) / (LOCK_HOLD * 0.8));
+    if (fade <= 0) return;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+
+    for (const st of strokes) {
+      if (vt < st.rapidStart) break;
+
+      // Rapid move: a dashed line from where the tool was to the stroke start.
+      const sinceCut = vt - st.cutStart;
+      if (sinceCut < 220) {
+        ctx.globalAlpha = 0.55 * (sinceCut < 0 ? 1 : 1 - sinceCut / 220) * fade;
+        ctx.strokeStyle = '#8ad8ff';
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 5]);
+        ctx.beginPath();
+        ctx.moveTo(st.rapidFrom.x, st.rapidFrom.y);
+        ctx.lineTo(st.pts[0].x, st.pts[0].y);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+      if (vt < st.cutStart) break;
+
+      const length = vt < st.cutEnd ? (vt - st.cutStart) * cutSpeed : st.len;
+      const heat = vt < st.cutEnd ? 1 : 1 - clamp01((vt - st.cutEnd) / COOL_DOWN);
+
+      ctx.globalAlpha = 0.42 * fade;
+      ctx.strokeStyle = '#8ad8ff';
+      ctx.lineWidth = 1;
+      tracePolyline(st, length);
+      ctx.stroke();
+
+      if (heat > 0) {
+        ctx.globalAlpha = 0.3 * heat * fade;
+        ctx.strokeStyle = '#ff3a5c';
+        ctx.lineWidth = Math.max(4, glyphSize * 0.03);
+        ctx.stroke();
+        ctx.globalAlpha = heat * fade;
+        ctx.strokeStyle = '#ffe1e7';
+        ctx.lineWidth = Math.max(1.3, glyphSize * 0.006);
+        ctx.stroke();
+      }
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  // Crosshair reticle with a glow (red while cutting) and a live coordinate readout.
+  function drawTool(tool) {
+    const fade = vt < schedule.lockStart ? 1 : 1 - clamp01((vt - schedule.lockStart) / (LOCK_HOLD * 0.7));
+    if (fade <= 0) return;
+    const r = Math.max(5, glyphSize * 0.022);
+    const { x, y } = tool;
+
+    ctx.globalAlpha = (tool.cutting ? 0.35 : 0.15) * fade;
+    ctx.fillStyle = tool.cutting ? '#ff3a5c' : '#8ad8ff';
+    ctx.beginPath();
+    ctx.arc(x, y, r * 2.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalAlpha = 0.95 * fade;
+    ctx.strokeStyle = '#8ad8ff';
+    ctx.lineWidth = 1.2;
+    ctx.beginPath();
+    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.moveTo(x - r * 2.3, y);
+    ctx.lineTo(x - r * 1.3, y);
+    ctx.moveTo(x + r * 1.3, y);
+    ctx.lineTo(x + r * 2.3, y);
+    ctx.moveTo(x, y - r * 2.3);
+    ctx.lineTo(x, y - r * 1.3);
+    ctx.moveTo(x, y + r * 1.3);
+    ctx.lineTo(x, y + r * 2.3);
+    ctx.stroke();
+
+    ctx.fillStyle = tool.cutting ? '#ffffff' : '#8ad8ff';
+    ctx.beginPath();
+    ctx.arc(x, y, tool.cutting ? 2 : 1.4, 0, Math.PI * 2);
+    ctx.fill();
+
+    ctx.globalAlpha = 0.85 * fade;
+    ctx.fillStyle = '#8ad8ff';
+    ctx.font = `600 ${Math.max(9, Math.round(glyphSize * 0.034))}px "JetBrains Mono", monospace`;
+    const mmX = ((x - origin.x) / unit / 10).toFixed(1);
+    const mmY = ((origin.y - y) / unit / 10).toFixed(1);
+    ctx.fillText(`X${mmX} Y${mmY}`, x + r * 2.8, y - r * 1.4);
+    ctx.globalAlpha = 1;
+  }
+
+  function drawSparks() {
+    for (const p of sparks) {
+      ctx.globalAlpha = 1 - p.age / 280;
+      ctx.fillStyle = p.hot ? '#ffd6dd' : '#ff3a5c';
+      ctx.fillRect(p.x - 0.8, p.y - 0.8, 1.6, 1.6);
+    }
+    ctx.globalAlpha = 1;
+  }
+
+  function drawGrains() {
+    const fadeOut = released ? 1 - clamp01((vt - schedule.releaseStart) / (RELEASE_DURATION * 0.7)) : 1;
+    const locked = vt >= schedule.lockStart && !released;
     for (const bucket of grainBuckets) bucket.length = 0;
 
     for (const g of grains) {
-      if (g.handedOff) continue;
-      if (g.appearedAt < 0) {
-        if (g.revealAt > progress) continue;
-        g.appearedAt = now;
-      }
-      const t = Math.min(1, (now - g.appearedAt) / GRAIN_FADE_IN);
+      if (g.handedOff || vt < g.landAt) continue;
+      const t = Math.min(1, (vt - g.landAt) / GRAIN_FADE_IN);
       const fall = 1 - easeOutCubic(t);
 
       let alpha = g.alpha * (0.3 + 0.7 * t) * fadeOut;
-      if (phase === 'lock') alpha *= 0.84 + 0.16 * Math.sin(now * 0.006 + g.revealAt * 60); // shimmer
+      if (locked) alpha *= 0.84 + 0.16 * Math.sin(vt * 0.006 + g.shimmer);
       const step = alphaStep(alpha);
       if (step === 0) continue;
 
       // Grains fall into place as vertical streaks that shrink to dots.
-      const bucket = grainBuckets[(g.blue ? ALPHA_STEPS + 1 : 0) + step];
-      bucket.push(
+      grainBuckets[(g.blue ? ALPHA_STEPS + 1 : 0) + step].push(
         g.homeX + g.dx,
         g.homeY + g.dy - g.fallHeight * fall,
         g.size * 0.8,
@@ -394,6 +625,43 @@
       ctx.fill();
     });
     ctx.globalAlpha = 1;
+  }
+
+  /* ---------- text overlays (the DOM only changes when the text does) ---------- */
+
+  function updateOverlays(tool) {
+    const done = strokes.filter((st) => vt >= st.cutEnd).length;
+    const finished = done === strokes.length;
+
+    const label = finished ? LABEL : scrambledLabel(done / strokes.length / 0.8, Math.floor(vt / 85));
+    if (nameLabel.textContent !== label) nameLabel.textContent = label;
+
+    const percent = String(Math.round((done / strokes.length) * 100));
+    if (gate.getAttribute('aria-valuenow') !== percent) gate.setAttribute('aria-valuenow', percent);
+
+    let passed = 0;
+    while (passed < events.length && events[passed].t <= vt) passed++;
+    const status = finished
+      ? `${strokes.length}/${strokes.length} strokes`
+      : tool.stroke ? `${tool.stroke.char} · stroke ${tool.stroke.index}/${tool.stroke.count}` : 'homing';
+    if (passed === shownEvents && status === shownStatus) return;
+    shownEvents = passed;
+    shownStatus = status;
+
+    const head = document.createElement('div');
+    head.className = 'status';
+    const word = document.createElement('b');
+    word.textContent = finished ? 'PLOT OK ' : 'PLOTTING ';
+    head.append(word, status);
+
+    const lines = events.slice(Math.max(0, passed - FEED_LINES), passed).map((ev, i, list) => {
+      const line = document.createElement('div');
+      line.textContent = ev.text;
+      if (ev.final) line.className = 'final';
+      else if (i === list.length - 1) line.className = 'now';
+      return line;
+    });
+    feed.replaceChildren(head, ...lines);
   }
 
   /* ---------- lifecycle ---------- */
@@ -415,25 +683,24 @@
   // particle network, which glides them out to become its points; the rest
   // fade on this canvas while the gate's backdrop fades away.
   function release() {
-    if (phase === 'release') return;
-    phase = 'release';
-    releaseStart = performance.now();
+    released = true;
+    sparks = [];
 
     const cx = width / 2;
-    const cy = height / 2;
+    const cy = (wordBounds.top + wordBounds.bottom) / 2;
     for (const g of grains) {
       const ox = g.homeX + g.dx - cx;
       const oy = g.homeY + g.dy - cy;
       const d = Math.hypot(ox, oy) || 1;
       const speed = 250 + 900 * Math.random();
       const wobble = (Math.random() - 0.5) * 0.8;
-      g.vx += ((ox / d) + wobble) * speed;
-      g.vy += ((oy / d) - wobble) * speed;
+      g.vx += (ox / d + wobble) * speed;
+      g.vy += (oy / d - wobble) * speed;
     }
 
     const network = window.particleNetwork;
     if (network) {
-      const visible = grains.filter((g) => g.appearedAt >= 0);
+      const visible = grains.filter((g) => vt >= g.landAt);
       const picked = [];
       const want = Math.min(network.count, visible.length);
       for (let i = 0; i < want; i++) {
@@ -446,39 +713,38 @@
 
     gate.classList.add('is-releasing');
     markReady(); // start the page underneath while the gate fades
-    setTimeout(finish, RELEASE_DURATION);
-  }
-
-  function updateLoad(now, dt) {
-    const target = rushing ? 1 : simulatedProgress((now - startTime) / LOAD_DURATION);
-    const smoothing = Math.min(1, ((rushing ? 0.15 : 1) * dt) / 16.7);
-    progress += (target - progress) * smoothing;
-    if (target - progress < 0.002) progress = target;
-
-    setText(nameLabel, scrambledLabel(progress / 0.7, Math.floor(now / 85)));
-    const percent = String(Math.round(progress * 100));
-    if (gate.getAttribute('aria-valuenow') !== percent) gate.setAttribute('aria-valuenow', percent);
-    updateLog();
-
-    if (progress >= 1) {
-      phase = 'lock';
-      nameLabel.textContent = LABEL;
-      finalLine.hidden = false;
-      setTimeout(release, LOCK_HOLD);
-    }
   }
 
   function frame(now) {
     if (!running) return;
-    const dt = Math.min(64, now - lastFrame);
+    const real = Math.min(64, now - lastFrame);
     lastFrame = now;
+    const dt = rushing && vt < schedule.lockStart ? real * RUSH_SPEED : real;
+    vt += dt;
 
-    if (phase === 'load') updateLoad(now, dt);
+    if (!released && vt >= schedule.releaseStart) release();
+    if (vt >= schedule.end) {
+      finish();
+      return;
+    }
+
+    const tool = toolAt(vt);
     updateGrains(dt);
+    updateSparks(tool, dt);
 
     ctx.clearRect(0, 0, width, height);
-    drawRain(now, dt);
-    drawGrains(now);
+    const backdrop = released ? 1 - clamp01((vt - schedule.releaseStart) / (RELEASE_DURATION * 0.5)) : 1;
+    ctx.globalAlpha = backdrop;
+    ctx.drawImage(bed, 0, 0, width, height);
+    ctx.globalAlpha = 1;
+    drawRain(dt, released ? backdrop : 0.45 + 0.55 * clamp01(vt / schedule.plotEnd));
+    drawToolpath();
+    drawGrains();
+    drawSparks();
+    if (!released) {
+      drawTool(tool);
+      updateOverlays(tool);
+    }
 
     requestAnimationFrame(frame);
   }
@@ -502,8 +768,8 @@
   });
 
   gate.addEventListener('click', () => {
-    if (phase === 'load') rushing = true;
-    else if (phase === 'lock') release();
+    if (vt < schedule.lockStart) rushing = true;
+    else if (!released) vt = schedule.releaseStart;
   });
 
   gate.addEventListener('keydown', (e) => {
@@ -517,15 +783,10 @@
 
   root.style.overflow = 'hidden';
   addEventListener('resize', () => {
-    if (phase !== 'release') build();
+    if (!released) build();
   });
 
-  // Wait briefly for the CJK font so the word is sampled in the right typeface.
-  const fontReady = document.fonts ? document.fonts.load(`900 100px "Noto Sans SC"`, WORD) : Promise.resolve();
-  const timeout = new Promise((resolve) => setTimeout(resolve, FONT_TIMEOUT));
-  Promise.race([fontReady, timeout]).then(() => {
-    startTime = lastFrame = performance.now();
-    build();
-    requestAnimationFrame(frame);
-  });
+  build();
+  lastFrame = performance.now();
+  requestAnimationFrame(frame);
 })();
