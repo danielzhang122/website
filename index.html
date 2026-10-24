@@ -102,7 +102,7 @@ section{padding:4.5rem 0 1rem;border-top:1px solid var(--line)}
 .card:hover{border-color:var(--red)}
 .card:nth-child(even) figure{order:2}
 .card figure{position:relative;height:320px;background:#050405;cursor:zoom-in;overflow:hidden}
-.card figure img{width:100%;height:100%;object-fit:contain;padding:.5rem}
+.card figure :is(img,video){width:100%;height:100%;object-fit:contain;padding:.5rem}
 .card figcaption{position:absolute;top:10px;right:10px;font-size:.64rem;font-weight:800;color:var(--blue);background:var(--bg);border:1px solid var(--line);padding:.15rem .5rem}
 .card div.b{padding:1.6rem;display:flex;flex-direction:column;justify-content:space-between;gap:1.2rem}
 .card h3{font-size:1.2rem;margin-bottom:.6rem}
@@ -110,10 +110,10 @@ section{padding:4.5rem 0 1rem;border-top:1px solid var(--line)}
 .tags a{float:right;color:var(--blue);font-size:.72rem;font-weight:600;text-decoration:none}
 
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1rem}
-.grid img,.masonry img{width:100%;display:block;border:1px solid var(--line);cursor:zoom-in;transition:border-color .2s}
-.grid img{height:220px;object-fit:cover}
-.grid img:hover,.masonry img:hover{border-color:var(--red)}
-.masonry{columns:3 220px;column-gap:1rem}.masonry img{margin-bottom:1rem;break-inside:avoid}
+.grid :is(img,video),.masonry :is(img,video){width:100%;display:block;border:1px solid var(--line);cursor:zoom-in;transition:border-color .2s}
+.grid :is(img,video){height:220px;object-fit:cover}
+.grid :is(img,video):hover,.masonry :is(img,video):hover{border-color:var(--red)}
+.masonry{columns:3 220px;column-gap:1rem}.masonry :is(img,video){margin-bottom:1rem;break-inside:avoid}
 
 /* hover captions on the hardware grid */
 .gi{position:relative;overflow:hidden;cursor:zoom-in}
@@ -132,7 +132,7 @@ section{padding:4.5rem 0 1rem;border-top:1px solid var(--line)}
 
 .panel{display:grid;grid-template-columns:150px 1fr 260px;gap:1.8rem;align-items:center;background:var(--card);border:1px solid var(--line);padding:1.6rem;margin-bottom:1.2rem}
 .panel.r{grid-template-columns:1fr 240px}
-.panel img{width:100%;border:1px solid var(--line);cursor:zoom-in}
+.panel :is(img,video){width:100%;border:1px solid var(--line);cursor:zoom-in}
 .panel .meta{font-size:.72rem;color:var(--red);font-weight:600;text-transform:uppercase;margin:.4rem 0 .8rem}
 .panel p{color:var(--mute);font-size:.85rem;margin-bottom:1rem}
 
@@ -141,7 +141,7 @@ footer a{color:var(--hot);font-size:1rem;font-weight:600;text-decoration:none}
 
 #lb{position:fixed;inset:0;z-index:90;background:rgba(5,4,6,.96);display:none;flex-direction:column;align-items:center;justify-content:center;gap:1rem;padding:1.5rem;cursor:zoom-out}
 #lb.on{display:flex}
-#lb img{max-width:92vw;max-height:80vh;border:1px solid var(--red)}
+#lb :is(img,video){max-width:92vw;max-height:80vh;border:1px solid var(--red)}
 #lb p{font-size:.85rem;color:var(--mute);max-width:800px;text-align:center}
 #lb p strong{color:var(--hot);text-transform:uppercase}
 #ln{font-size:.7rem;color:var(--dim);letter-spacing:.1em}
@@ -205,15 +205,15 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 100%{clip-path:polygon(evenodd,0 0,100% 0,100% 100%,0 100%,0 0,-2% -2%,102% -2%,102% 102%,-2% 102%,-2% -2%)}}
 
 /* ---- smooth hover zoom on every image / thumbnail ---- */
-.card figure img,.gi img,.masonry img,.panel img,#lb img{
+.card figure :is(img,video),.gi :is(img,video),.masonry :is(img,video),.panel :is(img,video),#lb :is(img,video){
   transition:transform .5s cubic-bezier(.22,.61,.36,1),border-color .2s,box-shadow .5s;
   will-change:transform}
-.masonry img{position:relative}
+.masonry :is(img,video){position:relative}
 @media(hover:hover){
-  .card figure:hover img,.gi:hover img,.gi:focus-visible img{transform:scale(1.07)}
-  .masonry img:hover{transform:scale(1.05);z-index:5;box-shadow:0 8px 28px rgba(0,0,0,.7)}
-  .panel img:hover{transform:scale(1.06)}
-  #lb img:hover{transform:scale(1.02)}
+  .card figure:hover :is(img,video),.gi:hover :is(img,video),.gi:focus-visible :is(img,video){transform:scale(1.07)}
+  .masonry :is(img,video):hover{transform:scale(1.05);z-index:5;box-shadow:0 8px 28px rgba(0,0,0,.7)}
+  .panel :is(img,video):hover{transform:scale(1.06)}
+  #lb :is(img,video):hover{transform:scale(1.02)}
 }
 
 /* ---- carousel pause button ---- */
@@ -222,7 +222,7 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 .pbtn:hover{border-color:var(--blue)}
 
 @media(prefers-reduced-motion:reduce){
-  .card figure img,.gi img,.masonry img,.panel img,#lb img{transition:none;transform:none!important}}
+  .card figure :is(img,video),.gi :is(img,video),.masonry :is(img,video),.panel :is(img,video),#lb :is(img,video){transition:none;transform:none!important}}
 </style>
 <script>function fb(e){e.onerror=null;var s=e.getAttribute("src");e.src=s.indexOf("images/")===0?s.slice(7):"images/"+s}</script>
 </head>
@@ -278,11 +278,11 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 <section id="projects">
 <div class="sh"><small>02 / PROJECTS</small><h2>Featured work</h2><p>From CAD files that crashed SolidWorks to mechanisms that survived hardware testing.</p></div>
 <div class="projects">
-<article class="card rv"><figure><img src="yurr.gif" alt="Autonomous Quadruped Robot &amp; Locomotion Sim" data-cap="Autonomous Quadruped Robot &amp; Locomotion Sim // 12-DOF legged robotics platform &amp; locomotion sim" onerror="fb(this)"><figcaption>ROBOT-SIM</figcaption></figure>
+<article class="card rv"><figure><video src="images/yurr-loop.mp4" aria-label="Autonomous Quadruped Robot &amp; Locomotion Sim" data-cap="Autonomous Quadruped Robot &amp; Locomotion Sim // 12-DOF legged robotics platform &amp; locomotion sim" autoplay muted loop playsinline></video><figcaption>ROBOT-SIM</figcaption></figure>
 <div class="b"><div><h3>Autonomous Quadruped Robot &amp; Locomotion Sim</h3><p>12-DOF legged robotics platform built around an inverse kinematics solver and dynamic stability modeling. Simulated leg trajectories, center-of-mass stabilization, and ground reaction forces in real time. Works flawlessly in simulation, where gravity is a tidy constant and friction never betrays you.</p></div>
 <div class="tags"><span>Inverse Kinematics</span><span>MuJoCo</span><span>ESP32</span><span>C++</span></div></div></article>
 
-<article class="card rv"><figure><img src="movement.gif" alt="Double Wishbone Suspension Geometry" data-cap="Double Wishbone Suspension Geometry // Dynamic camber stabilization for 500 mL payload" onerror="fb(this)"><figcaption>CAD-PROTO</figcaption></figure>
+<article class="card rv"><figure><video src="images/movement-loop.mp4" aria-label="Double Wishbone Suspension Geometry" data-cap="Double Wishbone Suspension Geometry // Dynamic camber stabilization for 500 mL payload" autoplay muted loop playsinline></video><figcaption>CAD-PROTO</figcaption></figure>
 <div class="b"><div><h3>Double Wishbone Suspension Geometry</h3><p>Proof-of-Concept double wishbone assembly engineered in SolidWorks to control dynamic camber and stabilize a 500 mL sloshing payload over a 33 m track run. Peak mechanical over-engineering for a straight-line sprint, but the kinematic camber curves are undeniable.</p></div>
 <div class="tags"><span>SolidWorks</span><span>Kinematics</span><span>Vehicle Dynamics</span><span>Chem-E-Car</span></div></div></article>
 
@@ -290,7 +290,7 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 <div class="b"><div><h3>WheelSafe Storage — Accessible Mobility Aid</h3><p>Engineered an ergonomic, weatherproof wheelchair storage module for a client with Spina Bifida. Achieved a 3.25:1 load-to-weight ratio with a 0.4 kg carbon-fiber-reinforced structure. Top 3 out of 200+ engineering teams at the McMaster Design Showcase.</p></div>
 <div class="tags"><span>Autodesk Inventor</span><span>Client Prototyping</span><span>Carbon Fiber</span><span>Top 3 Award</span></div></div></article>
 
-<article class="card rv"><figure><img src="test.gif" alt="Vision-Guided 2-DOF Robotic Arm" data-cap="Vision-Guided 2-DOF Robotic Arm // Real-time OpenCV hand tracking over UDP to ESP32" onerror="fb(this)"><figcaption>CV-EMBEDDED</figcaption></figure>
+<article class="card rv"><figure><video src="images/test-loop.mp4" aria-label="Vision-Guided 2-DOF Robotic Arm" data-cap="Vision-Guided 2-DOF Robotic Arm // Real-time OpenCV hand tracking over UDP to ESP32" autoplay muted loop playsinline></video><figcaption>CV-EMBEDDED</figcaption></figure>
 <div class="b"><div><h3>Vision-Guided 2-DOF Robotic Arm</h3><p>Built in 6 hours. Runs a real-time OpenCV hand-tracking pipeline transmitting coordinate deltas over UDP to an ESP32, which converts position streams into tuned stepper pulses without jitter.</p></div>
 <div class="tags"><span>OpenCV</span><span>ESP32</span><span>C++ / UDP</span></div></div></article>
 
@@ -336,20 +336,20 @@ background-image:radial-gradient(ellipse 110% 60% at 50% 115%,#5c0820,transparen
 
 <footer><div class="wrap"><a href="mailto:zhand40@mcmaster.ca">zhand40@mcmaster.ca</a><p style="margin-top:.8rem">© 2026 Daniel Zhang</p></div></footer>
 
-<div id="lb" role="dialog" aria-modal="true" aria-label="Image viewer"><button id="lp" type="button" aria-label="Previous image">‹</button><img alt=""><p></p><span id="ln"></span><button id="lnx" type="button" aria-label="Next image">›</button></div>
+<div id="lb" role="dialog" aria-modal="true" aria-label="Image viewer"><button id="lp" type="button" aria-label="Previous image">‹</button><img alt=""><video muted loop playsinline hidden></video><p></p><span id="ln"></span><button id="lnx" type="button" aria-label="Next image">›</button></div>
 
 <script>
 /* ---------- content: [src, title, description] ---------- */
 const BENCH=[
-['images/chemecar-transmission.gif','Chem-E-Car Transmission','Worked on the Chem-E-Car transmission system, because apparently even a shoebox-sized car needs gear selection'],
+['images/chemecar-transmission-loop.mp4','Chem-E-Car Transmission','Worked on the Chem-E-Car transmission system, because apparently even a shoebox-sized car needs gear selection'],
 ['quadriped.png','Quadruped CAD','Quadruped 12-DOF Full Assembly CAD'],
 ['quadriped leg.png','Kinematic Linkage','Dynamic Leg Kinematic Linkage'],
 ['cool2.jpg','Accidental Antenna','Accidental RF antenna: when poor probe grounding becomes generative art'],
-['taser.gif','HV Discharge','HV pulse discharge test: Officially a high-voltage pulse discharge experiment, unofficially a very enthusiastic "spark" generator'],
+['images/taser-loop.mp4','HV Discharge','HV pulse discharge test: Officially a high-voltage pulse discharge experiment, unofficially a very enthusiastic "spark" generator'],
 ['images/computer-bootleg.jpg','Dell Bootleg','"Acquired" from high school. Upgraded the CPU/RAM with spare parts and e-waste finds and kept a 24/7 Minecraft server alive for 2 months'],
 ['images/newcomputer.jpg','First POST','The rarest sight in engineering: everything working on the first try']];
 const ART=[
-['blender.gif','Hang In There','A visual reminder to save your work before attempting a render.'],
+['images/blender-loop.mp4','Hang In There','A visual reminder to save your work before attempting a render.'],
 ['sketch 2.jpg','Toned Back Study','Charcoal on paper. I still find black dust from this on my desk.'],
 ['painting.jpg','Floral Heads','Painting faces requires perfect symmetry. Painting flowers over them does not. Efficiency.'],
 ['sketch.jpg','Live Figure Drawing','Stared intensely at the back of a naked man for an hour just to avoid drawing his hands.'],
@@ -363,21 +363,29 @@ const ART=[
 ['b91768fc-c60e-405e-af9a-1a3e961c3cf4.jpg','Lake Reflection','A digital landscape that won a local contest. Naturally, they printed it on a municipal utility box.'],
 ['09d807cf-c8e4-4a66-a3bf-dbae582978ba.jpg','Utility Box Install','Here it is in the wild, circa 2022. I can now claim public infrastructure installations.']];
 const esc=s=>s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-const pic=([s,t,d])=>`<img src="${esc(s)}" alt="${esc(t)}" data-cap="${esc(t+' // '+d)}" loading="lazy" onerror="fb(this)">`;
+const pic=([s,t,d])=>s.endsWith('.mp4')
+  ?`<video src="${esc(s)}" aria-label="${esc(t)}" data-cap="${esc(t+' // '+d)}" autoplay muted loop playsinline preload="metadata"></video>`
+  :`<img src="${esc(s)}" alt="${esc(t)}" data-cap="${esc(t+' // '+d)}" loading="lazy" onerror="fb(this)">`;
 document.getElementById('bench-grid').innerHTML=BENCH.map(b=>`<figure class="gi" tabindex="0">${pic(b)}<figcaption>// ${esc(b[2])}</figcaption></figure>`).join('');
 document.getElementById('art-grid').innerHTML=ART.map(pic).join('');
 
 /* ---------- lightbox: arrows / ← → keys cycle through the group the image belongs to ---------- */
-const lb=document.getElementById('lb'),lbImg=lb.querySelector('img'),lbCap=lb.querySelector('p'),lbN=document.getElementById('ln');
+const lb=document.getElementById('lb'),lbImg=lb.querySelector('img'),lbVid=lb.querySelector('video'),lbCap=lb.querySelector('p'),lbN=document.getElementById('ln');
 const lbPrev=document.getElementById('lp'),lbNext=document.getElementById('lnx');
 let group=[],gi=0;
-const groupOf=img=>{const c=img.closest('.projects,#bench-grid,#art-grid');return c?[...c.querySelectorAll('img')]:[img]};
+const groupOf=img=>{const c=img.closest('.projects,#bench-grid,#art-grid');return c?[...c.querySelectorAll('img,video')]:[img]};
 function showAt(i){
   gi=(i+group.length)%group.length;
   const img=group[gi];
-  lbImg.onerror=()=>fb(lbImg);   // lazy thumbnails may not have resolved their path yet
-  lbImg.src=img.currentSrc||img.getAttribute('src');lbImg.alt=img.alt;
-  const [t,...d]=(img.dataset.cap||img.alt).split(' // ');
+  const vid=img.tagName==='VIDEO',label=vid?img.getAttribute('aria-label'):img.alt;
+  lbImg.hidden=vid;lbVid.hidden=!vid;
+  if(vid){lbImg.removeAttribute('src');lbVid.src=img.currentSrc||img.getAttribute('src');lbVid.setAttribute('aria-label',label);lbVid.play().catch(()=>{})}
+  else{
+    lbVid.pause();lbVid.removeAttribute('src');
+    lbImg.onerror=()=>fb(lbImg);   // lazy thumbnails may not have resolved their path yet
+    lbImg.src=img.currentSrc||img.getAttribute('src');lbImg.alt=label;
+  }
+  const [t,...d]=(img.dataset.cap||label).split(' // ');
   lbCap.textContent='';
   const s=document.createElement('strong');s.textContent=t;
   lbCap.append(s,d.length?' // '+d.join(' // '):'');
@@ -388,14 +396,14 @@ function openLb(img){group=groupOf(img);showAt(group.indexOf(img));lb.classList.
 document.addEventListener('click',e=>{
   const nav=e.target.closest('#lp,#lnx');
   if(nav){showAt(gi+(nav.id==='lp'?-1:1));return}
-  const host=e.target.closest('.gi,.card figure,.masonry img,.panel > img');
-  const img=host&&(host.tagName==='IMG'?host:host.querySelector('img'));
+  const host=e.target.closest('.gi,.card figure,.masonry img,.masonry video,.panel > img');
+  const img=host&&(/^(IMG|VIDEO)$/.test(host.tagName)?host:host.querySelector('img,video'));
   if(img)openLb(img);
-  else if(lb.classList.contains('on'))lb.classList.remove('on');
+  else if(lb.classList.contains('on')){lb.classList.remove('on');lbVid.pause()}
 });
 addEventListener('keydown',e=>{
   const open=lb.classList.contains('on');
-  if(e.key==='Escape')lb.classList.remove('on');
+  if(e.key==='Escape'){lb.classList.remove('on');lbVid.pause()}
   if(open&&e.key==='ArrowRight')showAt(gi+1);
   if(open&&e.key==='ArrowLeft')showAt(gi-1);
   if(e.key==='Enter'&&document.activeElement&&document.activeElement.classList.contains('gi'))document.activeElement.click();
