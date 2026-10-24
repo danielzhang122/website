@@ -40,8 +40,25 @@
     }));
   }
 
-  function step() {
+  const easeOutCubic = (t) => 1 - Math.pow(1 - t, 3);
+
+  function step(now) {
     for (const p of points) {
+      if (p.glide) {
+        // Flying in from where the intro left it; joins the normal drift on arrival.
+        const { fromX, fromY, toX, toY, start, duration } = p.glide;
+        const t = (now - start) / duration;
+        if (t < 1) {
+          const e = easeOutCubic(Math.max(0, t));
+          p.x = fromX + (toX - fromX) * e;
+          p.y = fromY + (toY - fromY) * e;
+          continue;
+        }
+        p.x = toX;
+        p.y = toY;
+        delete p.glide;
+      }
+
       if (p.x < 0 || p.x > width) p.vx *= -1;
       if (p.y < 0 || p.y > height) p.vy *= -1;
 
@@ -91,12 +108,30 @@
     }
   }
 
-  function loop() {
+  function loop(now) {
     requestAnimationFrame(loop);
     if (!document.body.classList.contains('is-ready')) return; // stay idle behind the intro
-    step();
+    step(now);
     draw();
   }
+
+  // The intro hands its grains over as starting points, so its name
+  // visibly breaks apart into this network (see release() in js/intro.js).
+  window.particleNetwork = {
+    get count() {
+      return points.length;
+    },
+    adopt(starts, duration) {
+      const start = performance.now();
+      starts.slice(0, points.length).forEach((s, i) => {
+        const p = points[i];
+        p.blue = s.blue;
+        p.glide = { fromX: s.x, fromY: s.y, toX: p.x, toY: p.y, start, duration };
+        p.x = s.x;
+        p.y = s.y;
+      });
+    },
+  };
 
   addEventListener('mousemove', (e) => {
     const rect = canvas.getBoundingClientRect();
@@ -109,5 +144,5 @@
   addEventListener('resize', init);
 
   init();
-  loop();
+  requestAnimationFrame(loop);
 })();

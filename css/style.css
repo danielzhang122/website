@@ -909,24 +909,33 @@ footer p { margin-top: .8rem; }
   position: fixed;
   inset: 0;
   z-index: 100;
+  color: var(--red);
+  cursor: pointer;
+}
+
+/* The backdrop and the vignette/scanlines live on pseudo-elements so they can
+   fade out on their own while the canvas keeps animating the exit. */
+#gate::before,
+#gate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity .55s ease-out;
+}
+
+#gate::before {
   background-color: #050204;
   background-image:
     radial-gradient(ellipse 110% 60% at 50% 115%, #5c0820, transparent 72%),
     radial-gradient(ellipse 40% 50% at 0 100%, #3a0614, transparent 70%),
     radial-gradient(ellipse 40% 50% at 100% 100%, #3a0614, transparent 70%);
-  color: var(--red);
-  cursor: pointer;
 }
 
-/* Vignette and scanlines on top of everything. */
 #gate::after {
-  content: "";
-  position: absolute;
-  inset: 0;
   background:
     radial-gradient(ellipse at 50% 46%, transparent 42%, rgba(0, 0, 0, .8)),
     repeating-linear-gradient(to bottom, rgba(255, 255, 255, .035) 0 1px, transparent 1px 3px);
-  pointer-events: none;
 }
 
 #gate canvas {
@@ -966,8 +975,24 @@ footer p { margin-top: .8rem; }
   transform: translateY(-100%);
 }
 
-.gate-percent {
+/* Boot log under the word; lines are added by js/intro.js as loading progresses. */
+.gate-log {
+  position: absolute;
   top: calc(var(--word-top) + var(--word-height) + 4vmin);
+  left: 50%;
+  z-index: 1;
+  width: 36ch;
+  color: var(--dim);
+  font: 600 clamp(11px, 1.6vmin, 15px)/1.75 var(--mono);
+  white-space: pre;
+  transform: translateX(-50%);
+}
+
+.gate-log .status { color: var(--blue); }
+
+.gate-log .final {
+  color: var(--hot);
+  text-shadow: 0 0 8px var(--red);
 }
 
 .gate-hint {
@@ -982,27 +1007,25 @@ footer p { margin-top: .8rem; }
   animation: blink 1.4s steps(2) infinite;
 }
 
-/* Exit: the screen splits open from a horizontal slit in the middle. */
-#gate.is-opening { animation: slit-open .9s cubic-bezier(.7, 0, .2, 1) forwards; }
+/* Exit: everything but the canvas fades; the grains scatter into the
+   background particle network (see release() in js/intro.js). */
+#gate.is-releasing { pointer-events: none; }
+#gate.is-releasing .gate-hint { animation: none; }
 
-#gate.is-opening .gate-label,
-#gate.is-opening .gate-hint {
+#gate.is-releasing::before,
+#gate.is-releasing::after,
+#gate.is-releasing .gate-halo,
+#gate.is-releasing .gate-label,
+#gate.is-releasing .gate-log,
+#gate.is-releasing .gate-hint {
   opacity: 0;
 }
 
-@keyframes slit-open {
-  0% {
-    clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0,
-      50% 50%, 50% 50%, 50% 50%, 50% 50%, 50% 50%);
-  }
-  40% {
-    clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0,
-      5% 49.6%, 95% 49.6%, 95% 50.4%, 5% 50.4%, 5% 49.6%);
-  }
-  100% {
-    clip-path: polygon(evenodd, 0 0, 100% 0, 100% 100%, 0 100%, 0 0,
-      -2% -2%, 102% -2%, 102% 102%, -2% 102%, -2% -2%);
-  }
+.gate-halo,
+.gate-label,
+.gate-log,
+.gate-hint {
+  transition: opacity .35s ease-out;
 }
 
 
