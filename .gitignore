@@ -1,0 +1,15 @@
+# OS / OneDrive
+Thumbs.db
+desktop.ini
+.DS_Store
+~$*
+
+# Editors
+.vscode/
+.idea/
+*.swp
+
+# Tooling, in case any gets added later
+node_modules/
+*.log
+.env
