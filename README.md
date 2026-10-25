@@ -2,6 +2,6 @@
 
 vibe coded website. dont look too closely lol
 
-## Credits
+## credits
 
-all the cool visuals were found on https://21st.dev/. Intro stroke data taken from (https://github.com/skishore/makemeahanzi).
+all the cool visuals were found on https://21st.dev/. intro stroke data taken from (https://github.com/skishore/makemeahanzi).
