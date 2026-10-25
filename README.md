@@ -1,5 +1,9 @@
-# daniel
+# portfolio
 
-vibe coded website lol. dont look too closely
+vibe coded website. dont look too closely lol
 
-all the cool visuals were found on 21st.dev
+i love pushing garbage
+
+## credits
+
+all the cool visuals were found on https://21st.dev/. intro stroke data taken from (https://github.com/skishore/makemeahanzi).

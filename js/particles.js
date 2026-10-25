@@ -20,15 +20,24 @@
   let height = 0;
   let points = [];
 
-  function init() {
+  let dpr = 1;
+
+  // Match the bitmap to the canvas's box. Runs on its own when the box changes without
+  // a window resize, e.g. the page scrollbar appearing as the intro ends.
+  function fitCanvas() {
     const rect = canvas.getBoundingClientRect();
-    const dpr = Math.min(2, devicePixelRatio || 1);
+    // Capped like the intro canvas: on 4K / Retina screens the full-resolution
+    // redraw every frame costs more than the extra sharpness is worth.
+    dpr = Math.min(1.5, devicePixelRatio || 1);
     width = rect.width;
     height = rect.height;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
+    canvas.width = Math.round(width * dpr);
+    canvas.height = Math.round(height * dpr);
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
 
+  function init() {
+    fitCanvas();
     const count = Math.min(MAX_POINTS, Math.floor((width * height) / AREA_PER_POINT));
     points = Array.from({ length: count }, () => ({
       x: Math.random() * width,
@@ -128,7 +137,10 @@
       }
     }
 
-    ctx.lineWidth = 1;
+    // Exactly one device pixel. Lines up to 1px wide take the GPU's fast hairline path;
+    // at 150% display scaling a 1 CSS px line is 1.5 device px, which is several times
+    // slower to draw and made the whole page (and the intro's exit) drop to ~20 fps.
+    ctx.lineWidth = 1 / dpr;
     linkBuckets.forEach((color, c) => {
       color.forEach((lines, step) => {
         if (!lines.length) return;
@@ -177,6 +189,7 @@
     mouse.x = mouse.y = -1e4;
   });
   addEventListener('resize', init);
+  new ResizeObserver(fitCanvas).observe(canvas);
 
   init();
   requestAnimationFrame(loop);

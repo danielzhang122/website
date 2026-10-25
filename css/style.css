@@ -879,6 +879,7 @@ footer p { margin-top: .8rem; }
 .bench-item > :is(img, video),
 .art-grid > :is(img, video),
 .panel > img,
+.badge-link img,
 #lightbox :is(img, video) {
   /* No will-change here: it would keep ~30 images on their own GPU layers
      permanently. Browsers promote them on their own while they animate. */
@@ -899,6 +900,8 @@ footer p { margin-top: .8rem; }
   }
 
   .panel > img:hover { transform: scale(1.06); }
+  .badge-link:hover img,
+  .badge-link:focus-visible img { transform: scale(1.08); }
   #lightbox :is(img, video):hover { transform: scale(1.02); }
 }
 
@@ -931,6 +934,8 @@ footer p { margin-top: .8rem; }
   inset: 0;
   pointer-events: none;
   transition: opacity .55s ease-out;
+  /* On their own layers from the start, so the exit fade doesn't re-raster them. */
+  will-change: opacity;
 }
 
 #gate::before {
@@ -939,6 +944,10 @@ footer p { margin-top: .8rem; }
     radial-gradient(ellipse 110% 60% at 50% 115%, #5c0820, transparent 72%),
     radial-gradient(ellipse 40% 50% at 0 100%, #3a0614, transparent 70%),
     radial-gradient(ellipse 40% 50% at 100% 100%, #3a0614, transparent 70%);
+  /* Not quite opaque (invisibly so): a fully opaque backdrop lets the browser skip
+     drawing the page underneath, which then all gets drawn on the first frames of
+     the exit and stalls the burst. This way it's drawn while the intro plays. */
+  opacity: .995;
 }
 
 #gate::after {
@@ -962,6 +971,7 @@ footer p { margin-top: .8rem; }
   height: calc(var(--word-height) + 24vmin);
   background: radial-gradient(closest-side, rgba(224, 25, 63, .34), transparent);
   pointer-events: none;
+  will-change: opacity;
 }
 
 .gate-label {
@@ -1103,6 +1113,7 @@ footer p { margin-top: .8rem; }
   .bench-item > :is(img, video),
   .art-grid > :is(img, video),
   .panel > img,
+  .badge-link img,
   #lightbox :is(img, video) {
     transform: none !important;
     transition: none;
