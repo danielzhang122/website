@@ -944,6 +944,10 @@ footer p { margin-top: .8rem; }
     radial-gradient(ellipse 110% 60% at 50% 115%, #5c0820, transparent 72%),
     radial-gradient(ellipse 40% 50% at 0 100%, #3a0614, transparent 70%),
     radial-gradient(ellipse 40% 50% at 100% 100%, #3a0614, transparent 70%);
+  /* Not quite opaque (invisibly so): a fully opaque backdrop lets the browser skip
+     drawing the page underneath, which then all gets drawn on the first frames of
+     the exit and stalls the burst. This way it's drawn while the intro plays. */
+  opacity: .995;
 }
 
 #gate::after {
