@@ -484,7 +484,7 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 370px;
+  height: 400px;
   overflow: hidden;
   perspective: 1100px;
   cursor: grab;
@@ -497,7 +497,7 @@ section {
 .carousel-ring {
   position: relative;
   width: 260px;
-  height: 240px;
+  height: 270px;
   transform-style: preserve-3d;
 }
 
