@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="no-js">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>DANIEL ZHANG // MECHATRONICS</title>
+  <title>Daniel Zhang — Mechatronics Engineering</title>
   <meta name="description" content="Daniel Zhang — Mechatronics Engineering co-op at McMaster. Robotics, CAD, nuclear tooling.">
-  <meta name="theme-color" content="#08070a">
+  <meta name="theme-color" content="#0b0b0b">
   <link rel="canonical" href="https://danielzhang122.github.io/website">
   <link rel="icon" type="image/png" href="images/favicon.png">
   <link rel="apple-touch-icon" href="images/favicon.png">
@@ -23,456 +23,333 @@
   }
   </script>
 
+  <!-- Swapped before first paint, so the plain-README fallback never flashes. -->
+  <script>document.documentElement.classList.replace('no-js', 'js');</script>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=JetBrains+Mono:wght@400;600;800&family=Noto+Sans+SC:wght@900&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
   <link rel="stylesheet" href="css/style.css">
 
   <script src="js/intro-glyphs.js" defer></script>
   <script src="js/intro.js" defer></script>
-  <script src="js/scroll.js" defer></script>
-  <script src="js/terminal.js" defer></script>
-  <script src="js/neon-sign.js" defer></script>
-  <script src="js/skills-carousel.js" defer></script>
-  <script src="js/particles.js" defer></script>
   <script src="js/lightbox.js" defer></script>
+  <script src="js/terminal.js" defer></script>
+  <!-- Animated ASCII art from ASCII Magic (MIT): defines the <ascii-art> element. -->
+  <script type="module" src="https://www.ascii-magic.com/ascii/ascii.js"></script>
 </head>
 <body>
 
   <!-- Intro screen. js/intro.js animates it and removes it when done. -->
-  <div id="gate" role="progressbar" aria-label="Loading" tabindex="0">
-    <div class="gate-halo" aria-hidden="true"></div>
-    <canvas aria-hidden="true"></canvas>
-    <div class="gate-label gate-name" aria-hidden="true">daniel zhang</div>
-    <div class="gate-log" aria-hidden="true"></div>
-    <div class="gate-hint" aria-hidden="true">ESC / S TO SKIP · CLICK TO SPEED UP</div>
+  <div id="gate" aria-hidden="true">
+    <canvas></canvas>
+    <div class="gate-hint">esc to skip</div>
   </div>
 
-  <div id="scroll-progress"></div>
-  <canvas id="particles" aria-hidden="true"></canvas>
-  <div id="neon-sign" aria-hidden="true">
-    <span class="wire wire-glow"></span><span class="wire wire-core"></span>
-    <span class="wire wire-glow"></span><span class="wire wire-core"></span>
-    <div class="neon-sign-text">机电一体化</div>
-  </div>
+  <!-- The console. js/terminal.js prints sections from #content into #screen. -->
+  <main id="console">
+    <div id="screen" aria-live="polite"></div>
+    <form id="prompt" autocomplete="off">
+      <label for="cmd" class="ps">&gt;</label>
+      <span class="input-wrap">
+        <input id="cmd" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" aria-label="Command">
+        <span class="cursor" aria-hidden="true"></span>
+      </span>
+    </form>
+  </main>
 
-  <nav>
-    <div class="wrap">
-      <a href="#top" class="logo"><b>✕</b> DANIEL ZHANG</a>
-      <ul>
-        <li><a href="#skills">Skills</a></li>
-        <li><a href="#projects">Projects</a></li>
-        <li><a href="#bench">Hardware</a></li>
-        <li><a href="#experience">Timeline</a></li>
-        <li><a href="#certs">Certs</a></li>
-        <li><a href="#resume">Resume</a></li>
-        <li><a href="#art">Art</a></li>
-      </ul>
-    </div>
+  <nav id="shortcuts" aria-label="Commands">
+    <button type="button" data-run="help">help</button>
+    <button type="button" data-run="projects">projects</button>
+    <button type="button" data-run="hardware">hardware</button>
+    <button type="button" data-run="experience">experience</button>
+    <button type="button" data-run="skills">skills</button>
+    <button type="button" data-run="certs">certs</button>
+    <button type="button" data-run="art">art</button>
+    <button type="button" data-run="resume">resume</button>
+    <button type="button" data-run="contact">contact</button>
   </nav>
 
-  <main class="wrap" id="top">
+  <!--
+    Everything the terminal can print. Each [data-cmd] section is the output of
+    that command. Without JavaScript this whole block shows as a plain README.
 
-    <div class="hero">
-      <div class="hero-intro">
-        <div class="pills">
-          <span class="pill">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></svg>
-            AVAILABLE · SPRING 2027 CO-OP
-          </span>
-          <a class="pill pill-blue" href="#certs">CSWA · CERTIFIED SOLIDWORKS ASSOCIATE</a>
-        </div>
-        <h1>Daniel <span>Zhang</span></h1>
-        <p class="lead">Mechatronics Engineering student at McMaster. I build robots, design mechanical parts, and work on nuclear tooling, ranked in ascending order of paperwork.</p>
-        <div class="btns">
-          <a class="btn btn-primary" href="#projects">View projects</a>
-          <a class="btn" href="https://www.linkedin.com/in/zhangdz/" target="_blank" rel="noopener">LinkedIn</a>
-          <a class="btn" href="https://github.com/danielzhang122" target="_blank" rel="noopener">GitHub</a>
-          <a class="btn" href="mailto:zhand40@mcmaster.ca">Contact</a>
-        </div>
-      </div>
+    Lightbox convention: any <img>/<video> with data-lightbox opens in the viewer.
+    Its alt / aria-label is the title, data-caption the description, and the
+    arrows cycle through the other media inside the same [data-gallery].
+  -->
+  <div id="content">
 
-      <div class="terminal" aria-hidden="true">
-        <header>
-          <span>● ● ● &nbsp;daniel@mcmaster:~</span>
-          <span class="terminal-hint">drag me</span>
-        </header>
-        <div class="terminal-body">
-          <em>$</em> whoami<br>
-          <b>daniel</b> // mechatronics, mcmaster<br>
-          <em>$</em> cat status.txt<br>
-          co-op: <b>spring 2027, open</b><br>
-          cert: <b>CSWA verified</b><br>
-          sleep: <b>deprecated</b><br>
-          <em>$</em> now_building -- <b id="terminal-typed"></b><span class="cursor">█</span>
-        </div>
+    <header data-cmd="banner" class="banner">
+      <ascii-art piece="liquid-chrome" look="dense" contrast="100" size="13" aria-hidden="true"></ascii-art>
+      <div>
+        <h1>Daniel Zhang</h1>
+        <p class="dim">Mechatronics Engineering, McMaster University</p>
+        <p class="dim js-only">Type a command, or pick one from the bar below. Try <code>help</code>.</p>
       </div>
-    </div>
+    </header>
 
-    <section id="skills">
-      <div class="section-head">
-        <small>01 / SKILLS</small>
-        <h2>Technical core</h2>
-        <p>Tools I've used to build systems, break prototypes, and occasionally read the documentation.</p>
-      </div>
-
-      <div class="carousel" id="skills-carousel">
-        <div class="carousel-ring" id="skills-ring">
-          <div class="skill-face" style="--i: 0">
-            <h3>Hardware &amp; Embedded</h3>
-            <span>STM32</span><span>ESP32</span><span>Raspberry Pi</span><span>Embedded Systems</span><span>PCA9685 / Drivers</span><span>NI Multisim</span><span>Soldering</span><span>3D Printing</span>
-          </div>
-          <div class="skill-face" style="--i: 1">
-            <h3>CAD &amp; Simulation</h3>
-            <span><a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener">CSWA ↗</a></span><span>SolidWorks</span><span>Inventor</span><span>Fusion 360</span><span>FEA</span><span>MuJoCo</span><span>FlexPDE</span>
-          </div>
-          <div class="skill-face" style="--i: 2">
-            <h3>Software &amp; Computation</h3>
-            <span><a href="https://github.com/danielzhang122/junk-drawer" target="_blank" rel="noopener">Junk drawer ↗</a></span><span>Python (OpenCV)</span><span>C / C++</span><span>MATLAB / Simulink</span><span>Julia</span><span>SMath</span><span>Maple</span><span>Power Automate</span><span>Microsoft 365</span>
-          </div>
-          <div class="skill-face" style="--i: 3">
-            <h3>Industry &amp; Standards</h3>
-            <span>Project Engineering</span><span>CSA N299.2 / N299.3</span><span>FMEA &amp; FAT Plans</span><span>GD&amp;T</span><span>ASD Verification</span><span>Technical Writing</span><span>WHMIS / LOTO</span>
-          </div>
-        </div>
-      </div>
-      <p class="carousel-hint">
-        // Drag to spin · click to pause
-        <button id="skills-pause" class="pause-btn" type="button" aria-pressed="false">❚❚ PAUSE</button>
-      </p>
+    <section data-cmd="whoami">
+      <p>I build robots, design mechanical parts, and work on nuclear tooling, ranked in ascending order of paperwork.</p>
+      <p class="dim">B.Eng. Mechatronics Engineering Co-op (Level III), McMaster University</p>
+      <p>Available for a Spring 2027 co-op.</p>
     </section>
 
-    <!--
-      Lightbox convention: any <img>/<video> with data-lightbox opens in the viewer.
-      Its alt / aria-label is the title, data-caption the description, and the
-      arrows cycle through the other media inside the same [data-gallery].
-    -->
+    <section data-cmd="projects" data-gallery>
+      <h2>Projects</h2>
 
-    <section id="projects">
-      <div class="section-head">
-        <small>02 / PROJECTS</small>
-        <h2>Featured work</h2>
-        <p>From CAD files that crashed SolidWorks to mechanisms that survived hardware testing.</p>
-      </div>
+      <article>
+        <h3>Quadruped Robot &amp; Locomotion Sim</h3>
+        <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place, and drives the real servos through a PCA9685 board on a Raspberry Pi.</p>
+        <p class="tags">Python, MuJoCo, Fusion 360, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener">Repo</a></p>
+        <figure class="thumb">
+          <video src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" data-lightbox
+                 aria-label="Quadruped Robot &amp; Locomotion Sim"
+                 data-caption="Trot gait running in MuJoCo"></video>
+        </figure>
+      </article>
 
-      <div class="projects" data-gallery>
-        <article class="card reveal">
-          <figure>
-            <video src="images/quadruped-sim.mp4" autoplay muted loop playsinline data-lightbox
-                   aria-label="Quadruped Robot &amp; Locomotion Sim"
-                   data-caption="12-DOF legged robotics platform &amp; locomotion sim"></video>
-            <figcaption>ROBOT-SIM</figcaption>
-          </figure>
-          <div class="card-body">
-            <div>
-              <h3>Quadruped Robot &amp; Locomotion Sim</h3>
-              <p>12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn on the spot, and drives the real servos through a PCA9685 board. Works flawlessly in simulation, where gravity is a tidy constant and friction never betrays you.</p>
-            </div>
-            <div class="tags"><a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener">REPO ↗</a><span>Python</span><span>MuJoCo</span><span>Fusion 360</span><span>Raspberry Pi</span></div>
-          </div>
-        </article>
+      <article>
+        <h3>Double Wishbone Suspension</h3>
+        <p>A proof-of-concept double wishbone assembly designed in SolidWorks for McMaster Chem-E-Car. It controls dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run.</p>
+        <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
+        <figure class="thumb">
+          <video src="images/suspension.mp4" muted loop playsinline preload="metadata" data-lightbox
+                 aria-label="Double Wishbone Suspension"
+                 data-caption="Camber control through the suspension travel"></video>
+        </figure>
+      </article>
 
-        <article class="card reveal">
-          <figure>
-            <video src="images/suspension.mp4" autoplay muted loop playsinline data-lightbox
-                   aria-label="Double Wishbone Suspension Geometry"
-                   data-caption="Dynamic camber stabilization for 500 mL payload"></video>
-            <figcaption>CAD-PROTO</figcaption>
-          </figure>
-          <div class="card-body">
-            <div>
-              <h3>Double Wishbone Suspension Geometry</h3>
-              <p>Proof-of-Concept double wishbone assembly engineered in SolidWorks to control dynamic camber and stabilize a 500 mL sloshing payload over a 33 m track run. Peak mechanical over-engineering for a straight-line sprint, but the kinematic camber curves are undeniable.</p>
-            </div>
-            <div class="tags"><span>SolidWorks</span><span>Kinematics</span><span>Vehicle Dynamics</span><span>Chem-E-Car</span></div>
-          </div>
-        </article>
+      <article>
+        <h3>WheelSafe Storage</h3>
+        <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the McMaster Design Showcase.</p>
+        <p class="tags">Autodesk Inventor, client prototyping, carbon fiber</p>
+        <figure class="thumb">
+          <img src="images/wheelsafe.jpg" loading="lazy" data-lightbox
+               alt="WheelSafe Storage"
+               data-caption="Carbon-fiber wheelchair storage module, Top 3 at the McMaster Design Showcase">
+        </figure>
+      </article>
 
-        <article class="card reveal">
-          <figure>
-            <img src="images/wheelsafe.jpg" data-lightbox
-                 alt="WheelSafe Storage — Accessible Mobility Aid"
-                 data-caption="Accessible carbon-fiber mobility aid, Top 3 Award">
-            <figcaption>TOP 3 / SHOWCASE</figcaption>
-          </figure>
-          <div class="card-body">
-            <div>
-              <h3>WheelSafe Storage — Accessible Mobility Aid</h3>
-              <p>Engineered an ergonomic, weatherproof wheelchair storage module for a client with Spina Bifida. Achieved a 3.25:1 load-to-weight ratio with a 0.4 kg carbon-fiber-reinforced structure. Top 3 out of 200+ teams at the McMaster Design Showcase.</p>
-            </div>
-            <div class="tags"><span>Autodesk Inventor</span><span>Client Prototyping</span><span>Carbon Fiber</span><span>Top 3 Award</span></div>
-          </div>
-        </article>
+      <article>
+        <h3>Vision-Guided 2-DOF Robotic Arm</h3>
+        <p>Built in 12 hours. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
+        <p class="tags">OpenCV, ESP32, C++, UDP</p>
+        <figure class="thumb">
+          <video src="images/robotic-arm.mp4" muted loop playsinline preload="metadata" data-lightbox
+                 aria-label="Vision-Guided 2-DOF Robotic Arm"
+                 data-caption="Real-time OpenCV hand tracking over UDP to an ESP32"></video>
+        </figure>
+      </article>
 
-        <article class="card reveal">
-          <figure>
-            <video src="images/robotic-arm.mp4" autoplay muted loop playsinline data-lightbox
-                   aria-label="Vision-Guided 2-DOF Robotic Arm"
-                   data-caption="Real-time OpenCV hand tracking over UDP to ESP32"></video>
-            <figcaption>CV-EMBEDDED</figcaption>
-          </figure>
-          <div class="card-body">
-            <div>
-              <h3>Vision-Guided 2-DOF Robotic Arm</h3>
-              <p>Built in 12 hours, which is roughly how long SolidWorks takes to open. Runs a real-time OpenCV hand-tracking pipeline that streams coordinate deltas over UDP to an ESP32, which turns them into tuned stepper pulses without jitter.</p>
-            </div>
-            <div class="tags"><span>OpenCV</span><span>ESP32</span><span>C++ / UDP</span></div>
-          </div>
-        </article>
+      <article>
+        <h3>Globe Ghost — iOS GPS Simulator</h3>
+        <p>Sets an iPhone's actual GPS location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester.</p>
+        <p class="tags">Python, pymobiledevice3, OpenStreetMap <a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener">Repo</a></p>
+        <figure class="thumb">
+          <img src="images/spoofer.jpg" loading="lazy" data-lightbox
+               alt="Globe Ghost — iOS GPS Simulator"
+               data-caption="A scripted walk through Manhattan on the live map, logged step by step">
+        </figure>
+      </article>
 
-        <article class="card reveal">
-          <figure>
-            <img src="images/wage-tracker.png" data-lightbox
-                 alt="Real-Time Compensation Visualizer"
-                 data-caption="Real-time Python dashboard calculating earnings">
-            <figcaption>APP-DEV</figcaption>
-          </figure>
-          <div class="card-body">
-            <div>
-              <h3>Real-Time Compensation Visualizer</h3>
-              <p>A live Python dashboard that calculates and displays earnings down to the microsecond. Built to quantify the exact monetary cost of a 45-minute meeting that definitely could have been an email.</p>
-            </div>
-            <div class="tags"><a href="https://github.com/danielzhang122/wage-tracker" target="_blank" rel="noopener">REPO ↗</a><span>Python</span><span>GUI Dev</span><span>Process Tool</span></div>
-          </div>
-        </article>
-
-        <article class="card reveal">
-          <figure>
-            <img src="images/spoofer.jpg" loading="lazy" data-lightbox
-                 alt="Globe Ghost — iOS GPS Simulator"
-                 data-caption="Mid-scenario: a scripted walk through Manhattan on the live map, logged step by step">
-            <figcaption>GLOBE-GHOST</figcaption>
-          </figure>
-          <div class="card-body">
-            <div>
-              <h3>Globe Ghost — iOS GPS Simulator</h3>
-              <p>Moves an iPhone's real GPS, not just the IP address like a VPN, to test location-aware apps: live map, scripted routes, and a geofence tester. Also great for convincing my mom I'm at the library and not the bar. Allegedly.</p>
-            </div>
-            <div class="tags"><a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener">REPO ↗</a><span>Python</span><span>pymobiledevice3</span><span>OpenStreetMap</span><span>Test Automation</span></div>
-          </div>
-        </article>
-      </div>
+      <article>
+        <h3>Real-Time Compensation Visualizer</h3>
+        <p>A live Python dashboard that shows earnings adding up in real time, down to the microsecond. Built to put an exact dollar figure on a 45-minute meeting.</p>
+        <p class="tags">Python, GUI <a href="https://github.com/danielzhang122/wage-tracker" target="_blank" rel="noopener">Repo</a></p>
+        <figure class="thumb">
+          <img src="images/wage-tracker.png" loading="lazy" data-lightbox
+               alt="Real-Time Compensation Visualizer"
+               data-caption="Live earnings dashboard in Python">
+        </figure>
+      </article>
     </section>
 
-    <section id="bench">
-      <div class="section-head">
-        <small>03 / HARDWARE</small>
-        <h2>Bench &amp; CAD</h2>
-        <p>Prototyping, bench testing, and empirically messing around. Click to enlarge.</p>
-      </div>
+    <section data-cmd="hardware">
+      <h2>Hardware &amp; CAD</h2>
+      <p class="dim">Click any image to enlarge.</p>
 
-      <div class="bench-grid" data-gallery>
-        <figure class="bench-item" tabindex="0">
-          <video src="images/chemecar-transmission.mp4" autoplay muted loop playsinline preload="metadata" data-lightbox
+      <div class="thumbs" data-gallery>
+        <figure>
+          <video src="images/chemecar-transmission.mp4" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Chem-E-Car Transmission"
-                 data-caption="Worked on the Chem-E-Car transmission system, because apparently even a shoebox-sized car needs gear selection"></video>
-          <figcaption>// Worked on the Chem-E-Car transmission system, because apparently even a shoebox-sized car needs gear selection</figcaption>
+                 data-caption="Transmission work for Chem-E-Car. Even a shoebox-sized car needs gear selection."></video>
+          <figcaption>Chem-E-Car transmission</figcaption>
         </figure>
-        <figure class="bench-item" tabindex="0">
+        <figure>
           <img src="images/quadruped-cad-v2.png" class="fit-whole" loading="lazy" data-lightbox
-               alt="Quadruped CAD with Raspberry Pi and PCA9685 servo board"
-               data-caption="Full 12-DOF quadruped assembly, now with the Raspberry Pi and servo driver on board. Twelve degrees of freedom, twelve servos, twelve fresh opportunities for a mate error.">
-          <figcaption>// Full 12-DOF quadruped assembly, now with the Raspberry Pi and servo driver on board. Twelve degrees of freedom, twelve servos, twelve fresh opportunities for a mate error.</figcaption>
+               alt="Quadruped CAD Assembly"
+               data-caption="Full 12-DOF quadruped assembly with the Raspberry Pi and PCA9685 servo driver mounted">
+          <figcaption>Quadruped assembly</figcaption>
         </figure>
-        <figure class="bench-item" tabindex="0">
+        <figure>
           <img src="images/quadruped-leg.png" loading="lazy" data-lightbox
-               alt="Kinematic Linkage"
-               data-caption="Kinematic linkage for one leg. There are four legs, so every problem here comes in a pack of four.">
-          <figcaption>// Kinematic linkage for one leg. There are four legs, so every problem here comes in a pack of four.</figcaption>
+               alt="Leg Linkage"
+               data-caption="Kinematic linkage for one quadruped leg">
+          <figcaption>Leg linkage</figcaption>
         </figure>
-        <figure class="bench-item" tabindex="0">
+        <figure>
+          <video src="images/hv-discharge.mp4" muted loop playsinline preload="metadata" data-lightbox
+                 aria-label="HV Discharge Test"
+                 data-caption="High-voltage pulse discharge test"></video>
+          <figcaption>HV discharge test</figcaption>
+        </figure>
+        <figure>
           <img src="images/accidental-antenna.jpg" loading="lazy" data-lightbox
                alt="Accidental Antenna"
-               data-caption="Accidental RF antenna: when poor probe grounding becomes generative art">
-          <figcaption>// Accidental RF antenna: when poor probe grounding becomes generative art</figcaption>
+               data-caption="Poor probe grounding turned the setup into an RF antenna. The result looked like generative art.">
+          <figcaption>Accidental RF antenna</figcaption>
         </figure>
-        <figure class="bench-item" tabindex="0">
-          <video src="images/hv-discharge.mp4" autoplay muted loop playsinline preload="metadata" data-lightbox
-                 aria-label="HV Discharge"
-                 data-caption="HV pulse discharge test: Officially a high-voltage pulse discharge experiment, unofficially a very enthusiastic &quot;spark&quot; generator"></video>
-          <figcaption>// HV pulse discharge test: Officially a high-voltage pulse discharge experiment, unofficially a very enthusiastic "spark" generator</figcaption>
+        <figure>
+          <img src="images/spoofer-apple-park.jpg" loading="lazy" data-lightbox
+               alt="Globe Ghost Field Test"
+               data-caption="Find My placing me at Apple Park. I have never been to California.">
+          <figcaption>Globe Ghost field test</figcaption>
         </figure>
-        <figure class="bench-item" tabindex="0">
+        <figure>
           <img src="images/computer-bootleg.jpg" loading="lazy" data-lightbox
-               alt="Dell Bootleg"
-               data-caption="&quot;Acquired&quot; from high school. Upgraded the CPU/RAM with spare parts and e-waste finds and kept a 24/7 Minecraft server alive for 2 months">
-          <figcaption>// "Acquired" from high school. Upgraded the CPU/RAM with spare parts and e-waste finds and kept a 24/7 Minecraft server alive for 2 months</figcaption>
+               alt="Rebuilt Dell"
+               data-caption="An old Dell from my high school, upgraded with spare and e-waste parts. It ran a 24/7 Minecraft server for two months.">
+          <figcaption>Rebuilt Dell server</figcaption>
         </figure>
-        <figure class="bench-item" tabindex="0">
+        <figure>
           <img src="images/newcomputer.jpg" loading="lazy" data-lightbox
                alt="First POST"
-               data-caption="The rarest sight in engineering: everything working on the first try">
-          <figcaption>// The rarest sight in engineering: everything working on the first try</figcaption>
-        </figure>
-        <figure class="bench-item" tabindex="0">
-          <img src="images/spoofer-apple-park.jpg" loading="lazy" data-lightbox
-               alt="Spoofer Field Test"
-               data-caption="Exhibit A: Find My placing me at Apple Park. For the record, I have never been to Cupertino. Or California. Spoofer working as intended.">
-          <figcaption>// Exhibit A: Find My placing me at Apple Park. For the record, I have never been to Cupertino. Or California. Spoofer working as intended.</figcaption>
+               data-caption="New build, first boot. Everything worked on the first try.">
+          <figcaption>New build, first boot</figcaption>
         </figure>
       </div>
     </section>
 
-    <section id="experience">
-      <div class="section-head">
-        <small>04 / TIMELINE</small>
-        <h2>Experience</h2>
-        <p>Organizations that handed me real, high-consequence hardware and have not yet asked for it back.</p>
-      </div>
+    <section data-cmd="experience">
+      <h2>Experience</h2>
 
-      <div class="timeline">
-        <article class="reveal">
-          <time>OCT 2026 · CERTIFICATION</time>
-          <h3>Certified SOLIDWORKS Associate (CSWA)</h3>
-          <div class="org">Dassault Systèmes</div>
-          <p>Passed the timed exam on parts, assemblies, and drawing views without resorting to sketch fixing or crying. <a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener">VERIFY ↗</a></p>
-        </article>
-        <article class="reveal">
-          <time>SEP 2026 — PRESENT · STUDENT DESIGN TEAM</time>
-          <h3>Mechanical Sub-team Member (Wheel Assembly)</h3>
-          <div class="org">McMaster Chem-E-Car</div>
-          <p>Designing custom wheel assemblies and suspension geometry for a 33-meter run. Total mechanical overkill to keep 500 mL of water from sloshing around, but it works.</p>
-        </article>
-        <article class="reveal">
-          <time>JAN 2026 — PRESENT · NUCLEAR INDUSTRY</time>
-          <h3>Nuclear Engineering Intern</h3>
-          <div class="org">Eclipse Automation</div>
-          <p>My Accenture career lasted one orientation before the company was bought back by its former CEO. Since then: 8+ months learning nuclear is 10% tooling design, 90% paperwork. Performed ASD calcs and weldment FEAs, wrote FMEAs, and tested N299.2-rated tooling for Pickering and international CANDU sites.</p>
-        </article>
-        <article class="reveal">
-          <time>2024 · AWARD &amp; SHOWCASE</time>
-          <h3>Top 3 Finalist — ENGINEER 1P13 Showcase</h3>
-          <div class="org">McMaster University</div>
-          <p>Placed top 3 out of 200+ teams with a carbon-fiber wheelchair storage unit. Engineered a 3.25:1 strength-to-weight ratio and survived being cross-examined by skeptical P.Eng judges.</p>
-        </article>
-        <article class="reveal">
-          <time>2023 — PRESENT · ACADEMIA</time>
-          <h3>B.Eng., Mechatronics Engineering CO-OP (Level III)</h3>
-          <div class="org">McMaster University</div>
-          <p>Equal parts statics/dynamics, embedded systems, circuit theory, and theoretical math that feels made up until you suddenly need it on co-op.</p>
-        </article>
+      <div class="row">
+        <span class="key">Jan 2026 – present</span>
+        <div>
+          <p><b>Nuclear Engineering Intern</b>, Eclipse Automation</p>
+          <p class="dim">Tooling design and verification for CANDU sites, including Pickering and international stations. Performed ASD calculations and weldment FEA, wrote FMEAs, and tested CSA N299.2-rated tooling.</p>
+        </div>
+      </div>
+      <div class="row">
+        <span class="key">Sep 2026 – present</span>
+        <div>
+          <p><b>Mechanical Sub-team Member, Wheel Assembly</b>, McMaster Chem-E-Car</p>
+          <p class="dim">Designing custom wheel assemblies and suspension geometry to keep a 500 mL payload stable over a 33 m run.</p>
+        </div>
+      </div>
+      <div class="row">
+        <span class="key">2024</span>
+        <div>
+          <p><b>Top 3 Finalist, ENGINEER 1P13 Showcase</b>, McMaster University</p>
+          <p class="dim">Placed top 3 of 200+ teams with a carbon-fiber wheelchair storage unit, presented to a panel of P.Eng judges.</p>
+        </div>
+      </div>
+      <div class="row">
+        <span class="key">2023 – present</span>
+        <div>
+          <p><b>B.Eng., Mechatronics Engineering Co-op (Level III)</b>, McMaster University</p>
+          <p class="dim">Coursework in statics and dynamics, embedded systems, circuit theory and applied math.</p>
+        </div>
       </div>
     </section>
 
-    <section id="certs">
-      <div class="section-head">
-        <small>05 / CERTIFICATIONS</small>
-        <h2>Credentials</h2>
-        <p>With receipts. Click a badge to verify it.</p>
-      </div>
+    <section data-cmd="skills">
+      <h2>Skills</h2>
 
-      <div class="panel reveal">
-        <a class="badge-link" href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener">
-          <img src="images/cswa-badge.png" alt="SOLIDWORKS Design Associate badge" width="150" height="150" loading="lazy">
-        </a>
-        <div>
-          <h3>SOLIDWORKS Design Associate (CSWA)</h3>
-          <div class="meta">Dassault Systèmes · Oct 5, 2026 · ID C-TVPDAF78ML</div>
-          <p>Sat through a 3-hour CAD exam modeling parts and complex assemblies just to prove I can align a mate without standard assembly errors.</p>
-          <div class="tags"><span>SolidWorks</span><span>Fully Defined</span><span>Assemblies</span><span>Drawings</span></div>
-        </div>
-        <img src="images/cswa-certificate.png" loading="lazy" data-lightbox
-             alt="CSWA Certificate"
-             data-caption="Issued by Dassault Systèmes, Oct 5 2026">
+      <div class="row">
+        <span class="key">Hardware</span>
+        <p>STM32, ESP32, Raspberry Pi, PCA9685 / motor drivers, NI Multisim, soldering, 3D printing</p>
       </div>
-
-      <div class="panel reveal">
-        <a class="badge-link" href="https://academy.claude.com/verify/66dcad03033df581fcda7c09f68d719d" target="_blank" rel="noopener">
-          <img src="images/claude-code-101-badge.png" alt="Claude Code 101 course completion badge" width="150" height="150" loading="lazy">
-        </a>
-        <div>
-          <h3>Claude Code 101</h3>
-          <div class="meta">Anthropic · Claude Academy · Oct 24, 2026</div>
-          <p>Course on working with Claude Code, Anthropic's agentic coding tool: planning, reviewing, and steering AI-written changes instead of blindly accepting them. Mostly proof I can supervise something that types faster than I can read.</p>
-          <div class="tags"><span>Claude Code</span><span>AI-Assisted Dev</span><span>Agentic Workflows</span><span>Code Review</span></div>
-        </div>
-        <img src="images/claude-code-101-certificate.jpg" loading="lazy" data-lightbox
-             alt="Claude Code 101 Badge"
-             data-caption="Issued by Claude Academy, Oct 24 2026">
+      <div class="row">
+        <span class="key">CAD &amp; simulation</span>
+        <p>SolidWorks (CSWA), Autodesk Inventor, Fusion 360, FEA, MuJoCo, FlexPDE</p>
+      </div>
+      <div class="row">
+        <span class="key">Software</span>
+        <p>Python (OpenCV), C / C++, MATLAB / Simulink, Julia, SMath, Maple, Power Automate <a href="https://github.com/danielzhang122/junk-drawer" target="_blank" rel="noopener">Misc scripts</a></p>
+      </div>
+      <div class="row">
+        <span class="key">Industry</span>
+        <p>CSA N299.2 / N299.3, FMEA &amp; FAT plans, GD&amp;T, ASD verification, project engineering, technical writing, WHMIS / LOTO</p>
       </div>
     </section>
 
-    <section id="resume">
-      <div class="section-head">
-        <small>06 / RESUME</small>
-        <h2>Resume</h2>
-        <p>One page. Every bullet point had to fight for its spot.</p>
-      </div>
+    <section data-cmd="certs">
+      <h2>Certifications</h2>
 
-      <div class="panel panel-resume reveal">
-        <div>
-          <h3>Daniel Zhang — Resume</h3>
-          <div class="meta">PDF · 1 page · Updated Oct 2026</div>
-          <p>The condensed version: nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and vision projects. Fits on one page, unlike my SolidWorks feature trees.</p>
-          <div class="btns">
-            <a class="btn btn-primary" href="Daniel_Zhang_Resume.pdf" download>Download PDF</a>
-            <a class="btn" href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener">Open in new tab</a>
-          </div>
-        </div>
-        <img src="images/resume-preview.png" loading="lazy" data-lightbox
-             alt="Resume"
-             data-caption="Daniel Zhang, Mechatronics Engineering">
+      <div class="row">
+        <span class="key">Oct 2026</span>
+        <p><b>Certified SOLIDWORKS Associate (CSWA)</b>, Dassault Systèmes <span class="dim">ID C-TVPDAF78ML</span> <a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener">Verify</a></p>
+      </div>
+      <div class="row">
+        <span class="key">Oct 2026</span>
+        <p><b>Claude Code 101</b>, Anthropic Academy <a href="https://academy.claude.com/verify/66dcad03033df581fcda7c09f68d719d" target="_blank" rel="noopener">Verify</a></p>
       </div>
     </section>
 
-    <section id="art">
-      <div class="section-head">
-        <small>07 / ART</small>
-        <h2>Art portfolio</h2>
-        <p>Proof I have hobbies. Click to enlarge.</p>
-      </div>
+    <section data-cmd="resume">
+      <h2>Resume</h2>
+      <p>One page covering nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and computer vision projects.</p>
+      <p class="dim">PDF, one page, updated Oct 2026. <a href="Daniel_Zhang_Resume.pdf" download>Download</a> or <a href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
+    </section>
 
-      <div class="art-grid" data-gallery>
-        <video src="images/blender.mp4" autoplay muted loop playsinline preload="metadata" data-lightbox
+    <section data-cmd="art">
+      <h2>Art</h2>
+      <p class="dim">Painting, drawing, printmaking and carving. Click any piece to enlarge.</p>
+
+      <div class="thumbs" data-gallery>
+        <video src="images/blender.mp4" muted loop playsinline preload="metadata" data-lightbox
                aria-label="Hang In There"
-               data-caption="A visual reminder to save your work before attempting a render."></video>
+               data-caption="Blender animation. A reminder to save before you render."></video>
         <img src="images/sketch-2.jpg" loading="lazy" data-lightbox
              alt="Toned Back Study"
              data-caption="Charcoal on paper. I still find black dust from this on my desk.">
         <img src="images/painting.jpg" loading="lazy" data-lightbox
              alt="Floral Heads"
-             data-caption="Painting faces requires perfect symmetry. Painting flowers over them does not. Efficiency.">
+             data-caption="Painting faces requires perfect symmetry. Painting flowers over them does not.">
         <img src="images/sketch.jpg" loading="lazy" data-lightbox
              alt="Live Figure Drawing"
-             data-caption="Stared intensely at the back of a naked man for an hour just to avoid drawing his hands.">
+             data-caption="An hour-long live figure pose.">
         <img src="images/self-portrait-3.jpg" loading="lazy" data-lightbox
              alt="Half Dead Portrait"
-             data-caption="Acrylic self-portrait. How it feels to fix broken CAD constraints at 2 AM.">
+             data-caption="Acrylic self-portrait.">
         <img src="images/digital-teeth.jpeg" loading="lazy" data-lightbox
              alt="Dental Study"
-             data-caption="A reminder to floss. Or else I will draw your teeth.">
+             data-caption="Digital study of teeth.">
         <img src="images/skull.jpg" loading="lazy" data-lightbox
              alt="Flayed Skull"
-             data-caption="Anatomical study of facial musculature. Mostly an excuse to use up my red paint.">
+             data-caption="Anatomical study of facial musculature.">
         <img src="images/skull2.jpg" loading="lazy" data-lightbox
              alt="Block Print Skull"
-             data-caption="Linocut print. The hardest part was not gouging my thumb with the carving tool.">
+             data-caption="Linocut print.">
         <img src="images/flower.jpg" loading="lazy" data-lightbox
              alt="Pink Rose"
-             data-caption="The mandatory flower painting to prove to my mom I can paint nice things.">
+             data-caption="The mandatory flower painting, to prove to my mom I can paint nice things.">
         <img src="images/self-portrait-1.jpg" loading="lazy" data-lightbox
              alt="Everything Is Fine"
-             data-caption="Just a totally normal self-portrait with zero underlying metaphors.">
+             data-caption="Self-portrait with zero underlying metaphors.">
         <img src="images/chameleon.jpg" loading="lazy" data-lightbox
              alt="Wood Lizard"
-             data-caption="Carved from a single block of wood. The chisel slipped and I needed 11 stitches.">
+             data-caption="Carved from a single block of wood. The chisel slipped once; it cost me 11 stitches.">
         <img src="images/lake-reflection.jpg" loading="lazy" data-lightbox
              alt="Lake Reflection"
-             data-caption="A digital landscape that won a local contest. Naturally, they printed it on a municipal utility box.">
+             data-caption="Digital landscape that won a local contest and was printed on a municipal utility box.">
         <img src="images/utility-box-install.jpg" loading="lazy" data-lightbox
              alt="Utility Box Install"
-             data-caption="Here it is in the wild, circa 2022. I can now claim public infrastructure installations.">
+             data-caption="The utility box in the wild, 2022.">
       </div>
     </section>
 
-  </main>
+    <section data-cmd="contact">
+      <h2>Contact</h2>
+      <div class="row"><span class="key">Email</span><p><a href="mailto:zhand40@mcmaster.ca">zhand40@mcmaster.ca</a></p></div>
+      <div class="row"><span class="key">GitHub</span><p><a href="https://github.com/danielzhang122" target="_blank" rel="noopener">github.com/danielzhang122</a></p></div>
+      <div class="row"><span class="key">LinkedIn</span><p><a href="https://www.linkedin.com/in/zhangdz/" target="_blank" rel="noopener">linkedin.com/in/zhangdz</a></p></div>
+      <p class="dim">© 2026 Daniel Zhang. <a href="v1/">Previous version of this site</a></p>
+    </section>
 
-  <footer>
-    <div class="wrap">
-      <a href="mailto:zhand40@mcmaster.ca">zhand40@mcmaster.ca</a>
-      <p>© 2026 Daniel Zhang</p>
-    </div>
-  </footer>
+  </div>
 
   <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
     <button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous image">‹</button>

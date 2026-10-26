@@ -41,7 +41,7 @@
     const heading = document.createElement('strong');
     heading.textContent = title;
     const description = media.dataset.caption;
-    caption.replaceChildren(heading, description ? ` // ${description}` : '');
+    caption.replaceChildren(heading, description ? Object.assign(document.createElement('span'), { textContent: description }) : '');
 
     const multiple = group.length > 1;
     counter.textContent = multiple ? `${index + 1} / ${group.length}` : '';
