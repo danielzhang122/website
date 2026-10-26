@@ -643,6 +643,12 @@ section {
   object-fit: cover;
 }
 
+/* Wide shots that must not lose their edges: letterbox in the image's own flat background colour. */
+.bench-item > img.fit-whole {
+  object-fit: contain;
+  background: #2e3440;
+}
+
 .bench-item:hover > :is(img, video),
 .art-grid > :is(img, video):hover {
   border-color: var(--red);
