@@ -120,19 +120,19 @@
         <div class="carousel-ring" id="skills-ring">
           <div class="skill-face" style="--i: 0">
             <h3>Hardware &amp; Embedded</h3>
-            <span>ESP32</span><span>STM32</span><span>Raspberry Pi</span><span>PCA9685 / Drivers</span><span>I2C / SPI / UDP</span>
+            <span>STM32</span><span>ESP32</span><span>Raspberry Pi</span><span>Embedded Systems</span><span>PCA9685 / Drivers</span><span>NI Multisim</span><span>Soldering</span><span>3D Printing</span>
           </div>
           <div class="skill-face" style="--i: 1">
             <h3>CAD &amp; Simulation</h3>
-            <span><a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener">CSWA ↗</a></span><span>SolidWorks</span><span>Inventor</span><span>Fusion 360</span><span>MuJoCo</span><span>FEA Stress Analysis</span>
+            <span><a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener">CSWA ↗</a></span><span>SolidWorks</span><span>Inventor</span><span>Fusion 360</span><span>FEA</span><span>MuJoCo</span><span>FlexPDE</span>
           </div>
           <div class="skill-face" style="--i: 2">
             <h3>Software &amp; Computation</h3>
-            <span>C / C++</span><span>Python (OpenCV)</span><span>MATLAB / Simulink</span><span>Julia</span><span>Power Automate</span>
+            <span><a href="https://github.com/danielzhang122/junk-drawer" target="_blank" rel="noopener">Junk drawer ↗</a></span><span>Python (OpenCV)</span><span>C / C++</span><span>MATLAB / Simulink</span><span>Julia</span><span>SMath</span><span>Maple</span><span>Power Automate</span><span>Microsoft 365</span>
           </div>
           <div class="skill-face" style="--i: 3">
-            <h3>Design &amp; Standards</h3>
-            <span>CSA N299.2 / N299.3</span><span>ASD Verification</span><span>GD&amp;T</span><span>FMEA &amp; FAT Plans</span>
+            <h3>Industry &amp; Standards</h3>
+            <span>Project Engineering</span><span>CSA N299.2 / N299.3</span><span>FMEA &amp; FAT Plans</span><span>GD&amp;T</span><span>ASD Verification</span><span>Technical Writing</span><span>WHMIS / LOTO</span>
           </div>
         </div>
       </div>
@@ -159,16 +159,16 @@
         <article class="card reveal">
           <figure>
             <video src="images/quadruped-sim.mp4" autoplay muted loop playsinline data-lightbox
-                   aria-label="Autonomous Quadruped Robot &amp; Locomotion Sim"
+                   aria-label="Quadruped Robot &amp; Locomotion Sim"
                    data-caption="12-DOF legged robotics platform &amp; locomotion sim"></video>
             <figcaption>ROBOT-SIM</figcaption>
           </figure>
           <div class="card-body">
             <div>
-              <h3>Autonomous Quadruped Robot &amp; Locomotion Sim</h3>
-              <p>12-DOF legged robotics platform built around an inverse kinematics solver and dynamic stability modeling. Simulated leg trajectories, center-of-mass stabilization, and ground reaction forces in real time. Works flawlessly in simulation, where gravity is a tidy constant and friction never betrays you.</p>
+              <h3>Quadruped Robot &amp; Locomotion Sim</h3>
+              <p>12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn on the spot, and drives the real servos through a PCA9685 board. Works flawlessly in simulation, where gravity is a tidy constant and friction never betrays you.</p>
             </div>
-            <div class="tags"><span>Inverse Kinematics</span><span>MuJoCo</span><span>Raspberry Pi</span><span>C++</span></div>
+            <div class="tags"><a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener">REPO ↗</a><span>Python</span><span>MuJoCo</span><span>Fusion 360</span><span>Raspberry Pi</span></div>
           </div>
         </article>
 
@@ -269,10 +269,10 @@
           <figcaption>// Worked on the Chem-E-Car transmission system, because apparently even a shoebox-sized car needs gear selection</figcaption>
         </figure>
         <figure class="bench-item" tabindex="0">
-          <img src="images/quadruped-cad.png" loading="lazy" data-lightbox
-               alt="Quadruped CAD"
-               data-caption="Full 12-DOF quadruped assembly. Twelve degrees of freedom, twelve servos, twelve fresh opportunities for a mate error.">
-          <figcaption>// Full 12-DOF quadruped assembly. Twelve degrees of freedom, twelve servos, twelve fresh opportunities for a mate error.</figcaption>
+          <img src="images/quadruped-cad-v2.png" class="fit-whole" loading="lazy" data-lightbox
+               alt="Quadruped CAD with Raspberry Pi and PCA9685 servo board"
+               data-caption="Full 12-DOF quadruped assembly, now with the Raspberry Pi and servo driver on board. Twelve degrees of freedom, twelve servos, twelve fresh opportunities for a mate error.">
+          <figcaption>// Full 12-DOF quadruped assembly, now with the Raspberry Pi and servo driver on board. Twelve degrees of freedom, twelve servos, twelve fresh opportunities for a mate error.</figcaption>
         </figure>
         <figure class="bench-item" tabindex="0">
           <img src="images/quadruped-leg.png" loading="lazy" data-lightbox
@@ -337,7 +337,7 @@
           <time>JAN 2026 — PRESENT · NUCLEAR INDUSTRY</time>
           <h3>Nuclear Engineering Intern</h3>
           <div class="org">Eclipse Automation</div>
-          <p>My Accenture career lasted approximately one orientation, after which the company was reacquired by its former CEO. Spent 8+ months learning that nuclear engineering is 10% high-consequence tooling design and 90% respecting paperwork. Executed ASD safety calculations, authored FMEAs, and verified tooling for the Pickering reactor refurbishment and international CANDU sites.</p>
+          <p>My Accenture career lasted one orientation before the company was bought back by its former CEO. Since then: 8+ months learning nuclear is 10% tooling design, 90% paperwork. Performed ASD calcs and weldment FEAs, wrote FMEAs, and tested N299.2-rated tooling for Pickering and international CANDU sites.</p>
         </article>
         <article class="reveal">
           <time>2024 · AWARD &amp; SHOWCASE</time>
