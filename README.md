@@ -1,10 +1,8 @@
 # portfolio
 
-vibe coded website. dont look too closely lol
+you can tell i am still very actively in the process of learning web development if you look closely
 
 half the commit history is me changing one word and pushing it then changing it back
-
-i love pushing garbage
 
 ## credits
 
