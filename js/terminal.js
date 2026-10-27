@@ -14,10 +14,13 @@
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(pointer: fine)').matches;
 
-  const BLOCK_DELAY = reduceMotion ? 0 : 3;   // ms between printed blocks
-  const BOOT_DELAY = reduceMotion ? 0 : 22;   // slower, so the first screen visibly builds line by line
   const TYPE_DELAY = reduceMotion ? 0 : 12;   // ms per character when a shortcut types a command
-  const BLOCKS = '.chrome-art, h1, h2, h3, p, figure, .row, .thumbs > *';
+  // Output types itself out: at least TYPE_MIN characters a frame, faster for long output
+  // so even a big section finishes in about TYPE_FRAMES frames (~0.7 s).
+  const TYPE_MIN = 6;
+  const TYPE_FRAMES = 40;
+  // Things that pop in whole when the typing reaches them, instead of being typed.
+  const MEDIA = 'figure, .thumbs > :is(img, video), .chrome-art';
 
   const SECTIONS = ['whoami', 'projects', 'misc', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
 
@@ -49,19 +52,71 @@
   /* ---------- printing ---------- */
 
   let fastForward = false;   // set when a new command arrives mid-print
-  let pace = BOOT_DELAY;     // ms between blocks; drops to BLOCK_DELAY once the first screen is up
   let restoring = false;     // re-printing a saved session after a refresh: instant, no scrolling
 
-  // Appends a node, then uncovers its blocks one at a time like a slow terminal.
+  const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+
+  // Appends a node and types its text out, keeping links and formatting intact. Media
+  // (photos, videos, the chrome art) appear when the typing reaches them.
   async function reveal(node) {
-    const blocks = [...node.querySelectorAll(BLOCKS)];
-    const delay = restoring ? 0 : pace;
-    if (delay) blocks.forEach((b) => b.classList.add('pending'));
-    screen.appendChild(node);
-    for (const block of blocks) {
-      block.classList.remove('pending');
-      if (delay && !fastForward) await wait(delay);
+    if (restoring || reduceMotion) {
+      screen.appendChild(node);
+      return;
     }
+
+    // In document order: text nodes to type, and media to uncover.
+    const steps = [];
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        if (n.nodeType === Node.ELEMENT_NODE) return n.matches(MEDIA) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        if (n.parentElement.closest(MEDIA) || !n.data.trim()) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (n.nodeType === Node.ELEMENT_NODE) {
+        n.classList.add('pending');
+        steps.push({ media: n });
+      } else {
+        steps.push({ text: n, full: n.data });
+        n.data = '';
+      }
+    }
+
+    screen.appendChild(node);
+    const total = steps.reduce((sum, step) => sum + (step.full ? step.full.length : 0), 0);
+    const perFrame = Math.max(TYPE_MIN, Math.ceil(total / TYPE_FRAMES));
+
+    let i = 0;
+    while (i < steps.length) {
+      let budget = fastForward ? Infinity : perFrame;   // a new command finishes this one instantly
+      while (i < steps.length && budget > 0) {
+        const step = steps[i];
+        if (step.media) {
+          step.media.classList.remove('pending');
+          i++;
+          continue;
+        }
+        const shown = step.text.data.length;
+        const take = Math.min(budget, step.full.length - shown);
+        step.text.data = step.full.slice(0, shown + take);
+        budget -= take;
+        if (step.text.data.length === step.full.length) i++;
+      }
+      follow(node);
+      if (i < steps.length) await nextFrame();
+    }
+  }
+
+  // Keeps the newest typed line in view, like a terminal following its output, but
+  // never scrolls the command line above the top of the screen.
+  function follow(node) {
+    const box = node.getBoundingClientRect();
+    const bar = document.getElementById('shortcuts').offsetHeight;
+    const overflow = box.bottom + bar + 24 - innerHeight;
+    const room = box.top - 64;   // leaves the "> command" line just above the output visible
+    const by = Math.min(overflow, room);
+    if (by > 0) scrollBy(0, by);
   }
 
   // Autoplaying videos only decode while they're on screen.
@@ -440,7 +495,6 @@
         console.error(error);
       });
       await queue;
-      pace = BLOCK_DELAY;
       document.getElementById('console').classList.remove('is-booting');
       scrollTo({ top: document.documentElement.scrollHeight });
       return;
@@ -450,7 +504,6 @@
     const hash = location.hash.slice(1).toLowerCase();
     const linked = ALIASES[hash] || hash;
     await submit('whoami', { typed: true });
-    pace = BLOCK_DELAY;
     document.getElementById('console').classList.remove('is-booting');
     if (COMMANDS[linked] && linked !== 'whoami' && linked !== 'clear') submit(linked, { typed: true });
   });

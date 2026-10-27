@@ -245,7 +245,7 @@ article > * + * { margin-top: .4rem; }
 /* key / value lines: experience dates, skill groups, help */
 .row {
   display: grid;
-  grid-template-columns: 16ch 1fr;
+  grid-template-columns: 19ch 1fr;
   gap: 2ch;
 }
 
