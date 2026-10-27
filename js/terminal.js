@@ -19,13 +19,13 @@
   const TYPE_DELAY = reduceMotion ? 0 : 12;   // ms per character when a shortcut types a command
   const BLOCKS = '.chrome-art, h1, h2, h3, p, figure, .row, .thumbs > *';
 
-  const SECTIONS = ['whoami', 'projects', 'hardware', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
+  const SECTIONS = ['whoami', 'projects', 'misc', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
 
   const COMMANDS = {
     help: { help: 'list commands', run: printHelp },
     whoami: { help: 'who i am', run: printWhoami },
     projects: { help: 'things i have built', run: () => printSection('projects') },
-    hardware: { help: 'bench work and cad', run: () => printSection('hardware') },
+    misc: { help: 'bench tests, cad and side builds', run: () => printSection('misc') },
     experience: { help: 'work and school', run: () => printSection('experience') },
     skills: { help: 'tools and standards', run: () => printSection('skills') },
     certs: { help: 'certifications', run: () => printSection('certs') },
@@ -34,7 +34,8 @@
     contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
   };
-  const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume' };
+  // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
+  const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume', hardware: 'misc' };
 
   // Easter eggs: work when typed, but stay out of help and tab completion.
   const HIDDEN = {
@@ -388,7 +389,8 @@
   });
 
   addEventListener('hashchange', () => {
-    const name = location.hash.slice(1).toLowerCase();
+    const hash = location.hash.slice(1).toLowerCase();
+    const name = ALIASES[hash] || hash;
     if (COMMANDS[name]) submit(name, { typed: true });
   });
 
@@ -444,10 +446,12 @@
       return;
     }
 
+    // Read a linked section (#projects) before whoami runs, since whoami rewrites the hash.
+    const hash = location.hash.slice(1).toLowerCase();
+    const linked = ALIASES[hash] || hash;
     await submit('whoami', { typed: true });
     pace = BLOCK_DELAY;
     document.getElementById('console').classList.remove('is-booting');
-    const linked = location.hash.slice(1).toLowerCase();
     if (COMMANDS[linked] && linked !== 'whoami' && linked !== 'clear') submit(linked, { typed: true });
   });
 

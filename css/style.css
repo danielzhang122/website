@@ -307,11 +307,11 @@ article > * + * { margin-top: .4rem; }
   line-height: 1.4;
 }
 
-/* Inline command links in a sentence ("More: projects  hardware") need a gap. */
+/* Inline command links in a sentence ("More: projects  misc") need a gap. */
 button.cmd + button.cmd { margin-left: 1.5ch; }
 
 /* The "Featured" strip under whoami: wider 16:10 thumbs, so the first
-   screen shows hardware before anyone types a command. */
+   screen shows real builds before anyone types a command. */
 .thumbs.featured figure { width: 180px; cursor: pointer; }
 .thumbs.featured figure > :is(img, video) { cursor: pointer; }
 

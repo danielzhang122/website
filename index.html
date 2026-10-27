@@ -30,14 +30,16 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
-  <link rel="stylesheet" href="css/style.css">
+  <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
+       files for 10 min). Bump it whenever css/ or js/ changes. -->
+  <link rel="stylesheet" href="css/style.css?v=20261027-2">
 
-  <script src="js/intro-glyphs.js" defer></script>
-  <script src="js/intro.js" defer></script>
-  <script src="js/lightbox.js" defer></script>
-  <script src="js/terminal.js" defer></script>
+  <script src="js/intro-glyphs.js?v=20261027-2" defer></script>
+  <script src="js/intro.js?v=20261027-2" defer></script>
+  <script src="js/lightbox.js?v=20261027-2" defer></script>
+  <script src="js/terminal.js?v=20261027-2" defer></script>
   <!-- Plays the Liquid Chrome ASCII piece (ASCII Magic, MIT) as page text in the banner. -->
-  <script type="module" src="js/chrome.js"></script>
+  <script type="module" src="js/chrome.js?v=20261027-2"></script>
 </head>
 <body>
 
@@ -63,7 +65,7 @@
     <button type="button" data-run="help">help</button>
     <button type="button" data-run="whoami">whoami</button>
     <button type="button" data-run="projects">projects</button>
-    <button type="button" data-run="hardware">hardware</button>
+    <button type="button" data-run="misc">misc</button>
     <button type="button" data-run="experience">experience</button>
     <button type="button" data-run="skills">skills</button>
     <button type="button" data-run="certs">certs</button>
@@ -100,11 +102,11 @@
       <!-- Each opens `projects` and jumps to that project (js/terminal.js, data-show). -->
       <div class="thumbs featured">
         <figure data-show="projects:quadruped" role="link" tabindex="0" aria-label="Quadruped robot: show in projects">
-          <video src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <video disablepictureinpicture src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
           <figcaption>Quadruped robot</figcaption>
         </figure>
         <figure data-show="projects:suspension" role="link" tabindex="0" aria-label="Wishbone suspension: show in projects">
-          <video src="images/suspension.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <video disablepictureinpicture src="images/suspension.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
           <figcaption>Wishbone suspension (concept)</figcaption>
         </figure>
         <figure data-show="projects:wheelsafe" role="link" tabindex="0" aria-label="WheelSafe: show in projects">
@@ -112,7 +114,7 @@
           <figcaption>WheelSafe, top 3 of 200+</figcaption>
         </figure>
       </div>
-      <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="hardware">hardware</button></p>
+      <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="misc">misc</button></p>
     </section>
 
     <section data-cmd="projects" data-gallery>
@@ -123,7 +125,7 @@
         <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place, and drives the real servos through a PCA9685 board on a Raspberry Pi. It walks perfectly in simulation, where friction always behaves.</p>
         <p class="tags">Python, MuJoCo, Fusion 360, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener">Repo</a></p>
         <figure class="thumb">
-          <video src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Quadruped Robot &amp; Locomotion Sim"
                  data-caption="Trot gait running in MuJoCo"></video>
         </figure>
@@ -134,7 +136,7 @@
         <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how the linkage could control dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
         <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
         <figure class="thumb">
-          <video src="images/suspension.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/suspension.mp4" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Double Wishbone Suspension"
                  data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
         </figure>
@@ -156,7 +158,7 @@
         <p>Built in 12 hours, about as long as SolidWorks takes to open. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
         <p class="tags">OpenCV, ESP32, C++, UDP</p>
         <figure class="thumb">
-          <video src="images/robotic-arm.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/robotic-arm.mp4" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Vision-Guided 2-DOF Robotic Arm"
                  data-caption="Real-time OpenCV hand tracking over UDP to an ESP32"></video>
         </figure>
@@ -185,13 +187,13 @@
       </article>
     </section>
 
-    <section data-cmd="hardware">
-      <h2>Hardware &amp; CAD</h2>
+    <section data-cmd="misc">
+      <h2>Misc</h2>
       <p class="dim">Click any image to enlarge.</p>
 
       <div class="thumbs" data-gallery>
         <figure>
-          <video src="images/chemecar-transmission.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/chemecar-transmission.mp4" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Chem-E-Car Transmission"
                  data-caption="Transmission work for Chem-E-Car. Even a shoebox-sized car needs gear selection."></video>
           <figcaption>Chem-E-Car transmission</figcaption>
@@ -209,7 +211,7 @@
           <figcaption>Leg linkage</figcaption>
         </figure>
         <figure>
-          <video src="images/hv-discharge.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/hv-discharge.mp4" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="HV Discharge Test"
                  data-caption="High-voltage pulse discharge test"></video>
           <figcaption>HV discharge test</figcaption>
@@ -217,7 +219,7 @@
         <figure>
           <img src="images/accidental-antenna.jpg" loading="lazy" data-lightbox
                alt="Accidental Antenna"
-               data-caption="Poor probe grounding turned the setup into an RF antenna. The result looked like generative art.">
+               data-caption="Accidental RF antenna: when poor probe grounding becomes generative art">
           <figcaption>Accidental RF antenna</figcaption>
         </figure>
         <figure>
@@ -319,7 +321,7 @@
       <p class="dim">Painting, drawing, printmaking and carving. Click any piece to enlarge.</p>
 
       <div class="thumbs" data-gallery>
-        <video src="images/blender.mp4" muted loop playsinline preload="metadata" data-lightbox
+        <video disablepictureinpicture src="images/blender.mp4" muted loop playsinline preload="metadata" data-lightbox
                aria-label="Hang In There"
                data-caption="Blender animation. A reminder to save before you render."></video>
         <img src="images/sketch-2.jpg" loading="lazy" data-lightbox
@@ -374,7 +376,7 @@
   <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
     <button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous image">‹</button>
     <img alt="">
-    <video muted loop playsinline hidden></video>
+    <video disablepictureinpicture muted loop playsinline hidden></video>
     <p class="lightbox-caption"></p>
     <span class="lightbox-count"></span>
     <button class="lightbox-nav lightbox-next" type="button" aria-label="Next image">›</button>
