@@ -2,8 +2,9 @@
 // in writing order, then "daniel zhang" types out and the screen fades away.
 // Shown once per session. Esc / S / click skips it.
 //
-// The rasterizer is shared as window.IntroArt, so the terminal's hidden `name`
-// command can print the same animation as text inside the console.
+// The final frame is Daniel's hand-tuned ASCII (NAME_ART); the rasterizer only supplies
+// the stroke order it fills in by. Shared as window.IntroArt, so the terminal's hidden
+// `name` command can print the same animation as text inside the console.
 (() => {
   'use strict';
 
@@ -25,8 +26,6 @@
   const HOLD = 300;               // ms after everything is in place
   const FADE_OUT = 450;           // ms, matches the CSS transition
 
-  const COLORS = { ink: '#d8d8d8', accent: '#e5484d' };
-
   // Deterministic pseudo-random in [0, 1) so the fill looks the same after a resize.
   const hash = (n) => {
     const v = Math.sin(n * 127.1 + 311.7) * 43758.5453;
@@ -39,16 +38,14 @@
   // Rasterizes the glyphs onto a character grid, one stroke at a time, so each cell
   // knows its final density and which stroke (and how far along it) reaches it first.
   // glyphCols is the width of one glyph in cells; aspect is cell width / cell height.
-  // vertical stacks the glyphs top to bottom (for narrow screens) instead of in a row.
   // Returns grid units only: { cols, rows, cells: [{ col, row, char, start }], fillEnd }.
-  function rasterize(glyphCols, aspect, { vertical = false } = {}) {
+  function rasterize(glyphCols, aspect) {
     const strokeCount = GLYPHS.reduce((n, g) => n + g.strokes.length, 0);
     const glyphRows = Math.round(glyphCols * aspect);
-    const gap = Math.round(glyphCols * 0.12);       // between glyphs in a row, in columns
-    const gapRows = Math.round(glyphRows * 0.25);   // between stacked glyphs, in rows
+    const gap = Math.round(glyphCols * 0.12);       // between glyphs, in columns
     const count = GLYPHS.length;
-    const cols = vertical ? glyphCols : count * glyphCols + (count - 1) * gap;
-    const rows = vertical ? count * glyphRows + (count - 1) * gapRows : glyphRows;
+    const cols = count * glyphCols + (count - 1) * gap;
+    const rows = glyphRows;
 
     const off = document.createElement('canvas');
     off.width = cols * SUPERSAMPLE;
@@ -72,8 +69,8 @@
 
     GLYPHS.forEach((glyph, g) => {
       // This glyph's top-left corner, in cells.
-      const ox = vertical ? 0 : g * (glyphCols + gap);
-      const oy = vertical ? g * (glyphRows + gapRows) : 0;
+      const ox = g * (glyphCols + gap);
+      const oy = 0;
       glyph.strokes.forEach((d, s) => {
         octx.setTransform(1, 0, 0, 1, 0, 0);
         octx.clearRect(0, 0, off.width, off.height);
@@ -127,7 +124,90 @@
     return { cols, rows, cells, fillEnd };
   }
 
-  window.IntroArt = GLYPHS ? { rasterize, timing: { CELL_FADE, TYPE_START, TYPE_SPEED, LABEL } } : null;
+  // One frame of a rasterized art as HTML text: settling cells show a red dot, then their
+  // character; below, the label types out with a red block cursor (blinking if asked).
+  function renderText({ cols, rows, cells }, t, { done = false, labelPad = '', blink = false } = {}) {
+    const lines = Array.from({ length: rows }, () => Array(cols).fill(' '));
+    for (const cell of cells) {
+      const p = (t - cell.start) / CELL_FADE;
+      if (p <= 0) continue;
+      if (p < 0.45) lines[cell.row][cell.col] = '<span class="accent">·</span>';
+      else lines[cell.row][cell.col] = p > 0.5 ? cell.char : '·';
+    }
+    const typed = Math.max(0, Math.min(LABEL.length, Math.floor((t - TYPE_START) / TYPE_SPEED)));
+    const cursorOn = !done && t >= TYPE_START && (!blink || Math.floor(t / 500) % 2 === 0);
+    const cursor = cursorOn ? '<span class="accent">█</span>' : '';
+    const label = t >= TYPE_START ? labelPad + LABEL.slice(0, typed) + cursor : '';
+    return `${lines.map((row) => row.join('').trimEnd()).join('\n')}\n\n${label}`;
+  }
+
+  /* ---------- the name as drawn (hand-tuned) ---------- */
+
+  // Daniel's hand-tuned final frame of 张卓远: three glyphs of ART_GLYPH_COLS columns
+  // with ART_GAP-column gaps between them, drawn for 13px characters.
+  const NAME_ART = [
+    "                                                 =:",
+    "                                                 ##*                          =",
+    "       :+++*:  ###                               =##*##*+                     +###        :=:",
+    "      :++==##:  ##    ##                         :#:                            =*   +#####*=",
+    "          *#    ##  =##=                   ::::=+*#****###",
+    "     ++=+###    ##:##:                     :##:        =##                   =**:        :=*###+",
+    "     =##        #*      *+:                 *#*******  ##                 =*#+### :########",
+    "     ##   :  =*####*+++===                   #*       ##+                   ##     +*  ##",
+    "    *##+++##*   #*##                         =#++###  +*                     :#:     ##  #=     :",
+    "          ##:   #= =#*                            ##    =+*##*                +#    ##   #=     #+",
+    "          ##    #:   ###=             =++*###****###***********:               #+ +*:    ##+==+###",
+    "         *#+    #: := :####*=          ==:        #*                     +####*####+:      +***+=",
+    "     ++:+##    +#*#=                              #*                               :*###*+=:",
+    "      +###     ##*                                #*                                   :+########*:",
+    "                                                  #=",
+  ];
+  const ART_GLYPH_COLS = 31;
+  const ART_GAP = 4;
+  const ART_ASPECT = 0.6 / 1.15;   // character width / line height
+
+  // The hand-drawn art as { cols, rows, cells, fillEnd }, like rasterize() returns, so it
+  // animates the same way. Each cell takes its fill time from the rasterized strokes at
+  // the same spot (or the nearest stroke cell), so it still fills in writing order.
+  // vertical stacks the three glyphs top to bottom for narrow screens.
+  let timedCells = null;
+  function nameArt({ vertical = false } = {}) {
+    if (!timedCells) {
+      const strokes = rasterize(ART_GLYPH_COLS, ART_ASPECT).cells;
+      timedCells = [];
+      NAME_ART.forEach((line, row) => {
+        [...line].forEach((char, col) => {
+          if (char === ' ') return;
+          let start = 0;
+          let best = Infinity;
+          for (const c of strokes) {
+            const dist = (c.col - col) ** 2 + ((c.row - row) * 2) ** 2;
+            if (dist < best) { best = dist; start = c.start; }
+          }
+          timedCells.push({ col, row, char, start });
+        });
+      });
+    }
+
+    const pitch = ART_GLYPH_COLS + ART_GAP;
+    const glyphRows = NAME_ART.length;
+    const gapRows = Math.round(glyphRows * 0.25);
+    const cells = vertical
+      ? timedCells.map((c) => {
+        const g = Math.floor(c.col / pitch);
+        return { ...c, col: c.col - g * pitch, row: c.row + g * (glyphRows + gapRows) };
+      })
+      : timedCells;
+    const count = GLYPHS.length;
+    return {
+      cols: vertical ? ART_GLYPH_COLS : count * ART_GLYPH_COLS + (count - 1) * ART_GAP,
+      rows: vertical ? count * glyphRows + (count - 1) * gapRows : glyphRows,
+      cells,
+      fillEnd: Math.max(...cells.map((c) => c.start)) + CELL_FADE,
+    };
+  }
+
+  window.IntroArt = GLYPHS ? { nameArt, renderText, timing: { CELL_FADE, TYPE_START, TYPE_SPEED, LABEL } } : null;
 
   /* ---------- full-screen intro ---------- */
 
@@ -145,76 +225,29 @@
     return;
   }
 
-  const canvas = gate.querySelector('canvas');
-  const ctx = canvas.getContext('2d');
+  const pre = gate.querySelector('.gate-art');
 
-  // Character size, set per screen in build(): smaller on phones so all three glyphs fit.
-  let fontSize = 14;              // px
-  let cellW = fontSize * 0.6;     // IBM Plex Mono advance width
-  let cellH = fontSize * 1.15;
+  let art = null;          // the name art, rebuilt on resize
+  let labelPad = '';
 
-  let cells = [];          // { x, y, char, start }
-  let label = { x: 0, y: 0 };
-  let fillEnd = 0;
-
+  // The art has a fixed size, so the font size scales it to the screen: a row on
+  // desktop; on phones the glyphs stack vertically so each gets the full width.
   function build() {
-    const dpr = Math.min(devicePixelRatio || 1, 2);
     const width = innerWidth;
     const height = innerHeight;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    // Phones stack the glyphs vertically so each gets the full width.
     const narrow = width < 600;
-    fontSize = narrow ? 9 : 14;
-    cellW = fontSize * 0.6;
-    cellH = fontSize * 1.15;
-    ctx.font = `400 ${fontSize}px 'IBM Plex Mono', ui-monospace, monospace`;
-    ctx.textBaseline = 'top';
-
-    const aspect = cellW / cellH;
-    // A stack is about 3.5 glyph-heights tall (three glyphs plus gaps); fit it in 75% of the screen.
-    const glyphCols = narrow
-      ? Math.max(12, Math.min(40, Math.floor((width * 0.9) / cellW), Math.floor((height * 0.75) / cellH / (3.5 * aspect))))
-      : Math.max(12, Math.min(40, Math.floor((width * 0.78) / 3.2 / cellW)));
-    const art = rasterize(glyphCols, aspect, { vertical: narrow });
-    const left = Math.round((width - art.cols * cellW) / 2);
-    const top = narrow
-      ? Math.round((height - (art.rows + 3) * cellH) / 2)
-      : Math.round(height * 0.44 - (art.rows * cellH) / 2);
-
-    cells = art.cells.map((c) => ({ x: left + c.col * cellW, y: top + c.row * cellH, char: c.char, start: c.start }));
-    fillEnd = art.fillEnd;
-    label = {
-      x: Math.round((width - LABEL.length * cellW) / 2),
-      y: Math.round(top + art.rows * cellH + cellH * 2.5),
-    };
+    art = nameArt({ vertical: narrow });
+    // Characters are 0.6em wide and 1.15em tall; leave room for the label below.
+    const fit = Math.min((width * (narrow ? 0.9 : 0.8)) / (art.cols * 0.6), (height * 0.8) / ((art.rows + 3) * 1.15));
+    const fontSize = Math.max(6, Math.min(16, Math.floor(fit)));
+    labelPad = ' '.repeat(Math.max(0, Math.floor((art.cols - LABEL.length) / 2)));
+    pre.style.fontSize = `${fontSize}px`;
+    // Fixed to the full art width, so the drawing stays centred while it fills in.
+    pre.style.width = `${art.cols}ch`;
   }
 
   function draw(t) {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    for (const cell of cells) {
-      const p = (t - cell.start) / CELL_FADE;
-      if (p <= 0) continue;
-      const settled = p >= 1;
-      ctx.globalAlpha = settled ? 1 : 0.25 + 0.75 * p;
-      ctx.fillStyle = p < 0.45 ? COLORS.accent : COLORS.ink;
-      ctx.fillText(settled || p > 0.5 ? cell.char : '·', cell.x, cell.y);
-    }
-
-    ctx.globalAlpha = 1;
-    const typed = Math.max(0, Math.min(LABEL.length, Math.floor((t - TYPE_START) / TYPE_SPEED)));
-    if (t >= TYPE_START) {
-      ctx.fillStyle = COLORS.ink;
-      ctx.fillText(LABEL.slice(0, typed), label.x, label.y);
-      if (Math.floor(t / 500) % 2 === 0) {
-        ctx.fillStyle = COLORS.accent;
-        ctx.fillText('█', label.x + typed * cellW, label.y);
-      }
-    }
+    pre.innerHTML = renderText(art, t, { labelPad, blink: true });
   }
 
   /* ---------- timeline ---------- */
@@ -243,7 +276,7 @@
     const t = now - startedAt;
     draw(t);
     const typedEnd = TYPE_START + LABEL.length * TYPE_SPEED;
-    if (t > Math.max(fillEnd, typedEnd) + HOLD) leave();
+    if (t > Math.max(art.fillEnd, typedEnd) + HOLD) leave();
     raf = requestAnimationFrame(frame);
   }
 
@@ -255,7 +288,7 @@
 
   // Wait for the mono font so the characters measure right; don't hang if it never comes.
   Promise.race([
-    document.fonts.load(`${fontSize}px 'IBM Plex Mono'`),
+    document.fonts.load("14px 'IBM Plex Mono'"),
     new Promise((resolve) => setTimeout(resolve, 600)),
   ]).finally(() => {
     build();

@@ -213,23 +213,22 @@ button.cmd:hover { color: var(--accent); }
    Printed content
    ========================================================================== */
 
-/* The liquid-chrome ASCII piece (js/chrome.js) sits above the name as real text
-   at the same 13px as the site's small text. It's decoration only. The filter
+/* The liquid-chrome ASCII piece (js/chrome.js) sits permanently at the top of the
+   console as real text, at the same 13px as the site's small text. It's decoration only. The filter
    makes it black and white, and the mask fades the piece's faint dotted
    background out at the edges so it doesn't read as a box. */
-.banner > .chrome-art {
+.chrome-art {
   display: block;
   overflow: hidden;
   width: max-content;
   max-width: 100%;
-  margin: 0;
+  margin: 0 auto 1.5rem;
   font: 400 13px/1 var(--mono);
   filter: grayscale(1) brightness(.85);
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
 }
 
-.banner > div { margin-top: 1.5rem; }
 .banner > div > * + * { margin-top: .9rem; }
 
 /* The command line already names the section, so printed copies drop the heading.
@@ -380,7 +379,19 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   pointer-events: none;
 }
 
-#gate canvas { display: block; }
+/* The intro's 张卓远 as text (js/intro.js sets the font size), centred on screen. */
+#gate {
+  display: grid;
+  place-items: center;
+}
+
+.gate-art {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--mono);
+  line-height: 1.15;
+  white-space: pre;
+}
 
 .gate-hint {
   position: absolute;
@@ -473,7 +484,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   #shortcuts { justify-content: flex-start; }
 
   /* 72 characters at 13px is wider than a phone; the art is decoration only. */
-  .banner > .chrome-art { display: none; }
+  .chrome-art { display: none; }
 
   .thumbs { gap: .6rem; }
 

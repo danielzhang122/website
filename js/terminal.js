@@ -20,7 +20,7 @@
   const TYPE_MIN = 6;
   const TYPE_FRAMES = 40;
   // Things that pop in whole when the typing reaches them, instead of being typed.
-  const MEDIA = 'figure, .thumbs > :is(img, video), .chrome-art';
+  const MEDIA = 'figure, .thumbs > :is(img, video)';
 
   const SECTIONS = ['whoami', 'projects', 'misc', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
 
@@ -54,7 +54,15 @@
   let fastForward = false;   // set when a new command arrives mid-print
   let restoring = false;     // re-printing a saved session after a refresh: instant, no scrolling
 
-  const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve));
+  // Waits for the next animation frame, or 50 ms if frames aren't coming (a background
+  // tab pauses them), so typing never stalls the command queue.
+  const nextFrame = () => new Promise((resolve) => {
+    const fallback = setTimeout(resolve, 50);
+    requestAnimationFrame(() => {
+      clearTimeout(fallback);
+      resolve();
+    });
+  });
 
   // Appends a node and types its text out, keeping links and formatting intact. Media
   // (photos, videos, the chrome art) appear when the typing reaches them.
@@ -199,14 +207,11 @@
     if (!art) return printLine('name art is unavailable.', 'dim');
     const { CELL_FADE, TYPE_START, TYPE_SPEED, LABEL } = art.timing;
 
+    // The art is drawn for 13px characters; when the console is too narrow for the
+    // row of three (phones), the glyphs stack vertically.
     const charW = 13 * 0.6;     // IBM Plex Mono advance width at 13px
-    const charH = 13 * 1.15;    // matches .name-art line-height
-    // A narrow console (phones) stacks the glyphs vertically so each gets the full width.
-    const vertical = screen.clientWidth < 520;
-    const glyphCols = vertical
-      ? Math.max(10, Math.min(30, Math.floor(screen.clientWidth / charW)))
-      : Math.max(10, Math.min(32, Math.floor(screen.clientWidth / charW / 3.3)));
-    const { cols, rows, cells, fillEnd } = art.rasterize(glyphCols, charW / charH, { vertical });
+    const vertical = screen.clientWidth < art.nameArt().cols * charW;
+    const { cols, rows, cells, fillEnd } = art.nameArt({ vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));
     const end = Math.max(fillEnd, TYPE_START + LABEL.length * TYPE_SPEED) + 100;
 
@@ -216,20 +221,8 @@
     pre.setAttribute('aria-label', '张卓远 (Daniel Zhang) drawn in ASCII');
     screen.appendChild(pre);
 
-    // One frame as text. Settling cells show a red dot, then their character.
-    function render(t, done) {
-      const lines = Array.from({ length: rows }, () => Array(cols).fill(' '));
-      for (const cell of cells) {
-        const p = (t - cell.start) / CELL_FADE;
-        if (p <= 0) continue;
-        if (p < 0.45) lines[cell.row][cell.col] = '<span class="accent">·</span>';
-        else lines[cell.row][cell.col] = p > 0.5 ? cell.char : '·';
-      }
-      const typed = Math.max(0, Math.min(LABEL.length, Math.floor((t - TYPE_START) / TYPE_SPEED)));
-      const cursor = !done && t >= TYPE_START ? '<span class="accent">█</span>' : '';
-      const label = t >= TYPE_START ? labelPad + LABEL.slice(0, typed) + cursor : '';
-      pre.innerHTML = `${lines.map((row) => row.join('').trimEnd()).join('\n')}\n\n${label}`;
-    }
+    const drawing = { cols, rows, cells };
+    const render = (t, done) => { pre.innerHTML = art.renderText(drawing, t, { done, labelPad }); };
 
     // Draw the empty first frame (full height) and scroll now, so the animation
     // plays in view instead of finishing off screen before the usual scroll.
@@ -242,10 +235,9 @@
         resolve();
         return;
       }
-      let startedAt = 0;
-      const frame = (now) => {
-        if (!startedAt) startedAt = now;
-        const t = now - startedAt;
+      const startedAt = performance.now();
+      const frame = () => {
+        const t = performance.now() - startedAt;
         // A new command finishes it instantly, like any other print.
         if (t >= end || fastForward) {
           render(Infinity, true);
@@ -253,9 +245,9 @@
           return;
         }
         render(t, false);
-        requestAnimationFrame(frame);
+        nextFrame().then(frame);
       };
-      requestAnimationFrame(frame);
+      nextFrame().then(frame);
     });
   }
 
