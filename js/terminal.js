@@ -15,8 +15,9 @@
   const finePointer = matchMedia('(pointer: fine)').matches;
 
   const BLOCK_DELAY = reduceMotion ? 0 : 3;   // ms between printed blocks
+  const BOOT_DELAY = reduceMotion ? 0 : 22;   // slower, so the first screen visibly builds line by line
   const TYPE_DELAY = reduceMotion ? 0 : 12;   // ms per character when a shortcut types a command
-  const BLOCKS = 'h1, h2, h3, p, figure, .row, .thumbs > *';
+  const BLOCKS = 'ascii-art, h1, h2, h3, p, figure, .row, .thumbs > *';
 
   const SECTIONS = ['whoami', 'projects', 'hardware', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
 
@@ -40,15 +41,16 @@
   /* ---------- printing ---------- */
 
   let fastForward = false;   // set when a new command arrives mid-print
+  let pace = BOOT_DELAY;     // ms between blocks; drops to BLOCK_DELAY once the first screen is up
 
   // Appends a node, then uncovers its blocks one at a time like a slow terminal.
   async function reveal(node) {
     const blocks = [...node.querySelectorAll(BLOCKS)];
-    if (BLOCK_DELAY) blocks.forEach((b) => b.classList.add('pending'));
+    if (pace) blocks.forEach((b) => b.classList.add('pending'));
     screen.appendChild(node);
     for (const block of blocks) {
       block.classList.remove('pending');
-      if (BLOCK_DELAY && !fastForward) await wait(BLOCK_DELAY);
+      if (pace && !fastForward) await wait(pace);
     }
   }
 
@@ -252,6 +254,24 @@
 
   /* ---------- boot ---------- */
 
+  // Resolves when the intro starts fading out (or right away if there is none), so the
+  // first screen is already printing underneath instead of flashing an empty terminal.
+  function whenIntroLeaving() {
+    return new Promise((resolve) => {
+      const gate = document.getElementById('gate');
+      if (!gate || gate.classList.contains('is-leaving')) return resolve();
+      const observer = new MutationObserver(() => {
+        if (gate.isConnected && !gate.classList.contains('is-leaving')) return;
+        observer.disconnect();
+        resolve();
+      });
+      observer.observe(gate, { attributes: true, attributeFilter: ['class'] });
+      observer.observe(document.body, { childList: true });
+    });
+  }
+
+  // Resolves once the intro is fully removed; focus waits for this so the
+  // intro's skip keys never land in the prompt.
   function whenIntroGone() {
     return new Promise((resolve) => {
       if (!document.getElementById('gate')) return resolve();
@@ -263,11 +283,16 @@
     });
   }
 
-  whenIntroGone().then(async () => {
+  whenIntroLeaving().then(async () => {
     await printSection('banner');
-    submit('whoami', { typed: true });
+    await submit('whoami', { typed: true });
+    pace = BLOCK_DELAY;
+    document.getElementById('console').classList.remove('is-booting');
     const linked = location.hash.slice(1).toLowerCase();
     if (COMMANDS[linked] && linked !== 'whoami' && linked !== 'clear') submit(linked, { typed: true });
+  });
+
+  whenIntroGone().then(() => {
     if (finePointer) input.focus({ preventScroll: true });
   });
 })();

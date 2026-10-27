@@ -111,6 +111,9 @@ a:hover {
 /* Blocks waiting to be printed by js/terminal.js. */
 .pending { visibility: hidden; }
 
+/* No bare prompt on an empty screen while the first screen prints. */
+#console.is-booting #prompt { visibility: hidden; }
+
 #prompt {
   display: flex;
   gap: 1ch;
