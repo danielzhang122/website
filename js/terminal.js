@@ -36,6 +36,13 @@
   };
   const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume' };
 
+  // Easter eggs: work when typed, but stay out of help and tab completion.
+  const HIDDEN = {
+    name: printNameArt,
+    zhuoyuan: printNameArt,
+    '张卓远': printNameArt,
+  };
+
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   /* ---------- printing ---------- */
@@ -121,6 +128,69 @@
     }
   }
 
+  // Easter egg: prints the intro's 张卓远 animation into the console as text, at the
+  // same 13px as the Liquid Chrome art, and leaves the finished frame in the scrollback.
+  function printNameArt(line) {
+    const art = window.IntroArt;
+    if (!art) return printLine('name art is unavailable.', 'dim');
+    const { CELL_FADE, TYPE_START, TYPE_SPEED, LABEL } = art.timing;
+
+    const charW = 13 * 0.6;     // IBM Plex Mono advance width at 13px
+    const charH = 13 * 1.15;    // matches .name-art line-height
+    const glyphCols = Math.max(10, Math.min(28, Math.floor(screen.clientWidth / charW / 3.3)));
+    const { cols, rows, cells, fillEnd } = art.rasterize(glyphCols, charW / charH);
+    const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));
+    const end = Math.max(fillEnd, TYPE_START + LABEL.length * TYPE_SPEED) + 100;
+
+    const pre = document.createElement('pre');
+    pre.className = 'name-art';
+    pre.setAttribute('role', 'img');
+    pre.setAttribute('aria-label', '张卓远 (Daniel Zhang) drawn in ASCII');
+    screen.appendChild(pre);
+
+    // One frame as text. Settling cells show a red dot, then their character.
+    function render(t, done) {
+      const lines = Array.from({ length: rows }, () => Array(cols).fill(' '));
+      for (const cell of cells) {
+        const p = (t - cell.start) / CELL_FADE;
+        if (p <= 0) continue;
+        if (p < 0.45) lines[cell.row][cell.col] = '<span class="accent">·</span>';
+        else lines[cell.row][cell.col] = p > 0.5 ? cell.char : '·';
+      }
+      const typed = Math.max(0, Math.min(LABEL.length, Math.floor((t - TYPE_START) / TYPE_SPEED)));
+      const cursor = !done && t >= TYPE_START ? '<span class="accent">█</span>' : '';
+      const label = t >= TYPE_START ? labelPad + LABEL.slice(0, typed) + cursor : '';
+      pre.innerHTML = `${lines.map((row) => row.join('').trimEnd()).join('\n')}\n\n${label}`;
+    }
+
+    // Draw the empty first frame (full height) and scroll now, so the animation
+    // plays in view instead of finishing off screen before the usual scroll.
+    render(0, false);
+    if (line) scrollAfter(line);
+
+    return new Promise((resolve) => {
+      if (reduceMotion) {
+        render(Infinity, true);
+        resolve();
+        return;
+      }
+      let startedAt = 0;
+      const frame = (now) => {
+        if (!startedAt) startedAt = now;
+        const t = now - startedAt;
+        // A new command finishes it instantly, like any other print.
+        if (t >= end || fastForward) {
+          render(Infinity, true);
+          resolve();
+          return;
+        }
+        render(t, false);
+        requestAnimationFrame(frame);
+      };
+      requestAnimationFrame(frame);
+    });
+  }
+
   function clear() {
     screen.replaceChildren();
     setHash('');
@@ -156,7 +226,9 @@
     const word = text.toLowerCase().split(/\s+/)[0];
     const name = ALIASES[word] || word;
     const command = COMMANDS[name];
-    if (command) {
+    if (HIDDEN[name]) {
+      await HIDDEN[name](line);
+    } else if (command) {
       await command.run();
       if (SECTIONS.includes(name)) setHash(name);
     } else {

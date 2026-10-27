@@ -1,33 +1,18 @@
 // Intro screen: 张卓远 fills in quietly out of ASCII characters, stroke by stroke
 // in writing order, then "daniel zhang" types out and the screen fades away.
 // Shown once per session. Esc / S / click skips it.
+//
+// The rasterizer is shared as window.IntroArt, so the terminal's hidden `name`
+// command can print the same animation as text inside the console.
 (() => {
   'use strict';
 
-  const gate = document.getElementById('gate');
-
-  let seenThisSession = false;
-  try {
-    seenThisSession = Boolean(sessionStorage.getItem('gate'));
-  } catch {
-    // storage blocked (private mode etc.): just show the intro
-  }
-
-  const GLYPHS = window.INTRO_GLYPHS;
-  if (seenThisSession || !GLYPHS || matchMedia('(prefers-reduced-motion: reduce)').matches) {
-    gate.remove();
-    return;
-  }
-
   /* ---------- config ---------- */
 
+  const GLYPHS = window.INTRO_GLYPHS;
   const LABEL = 'daniel zhang';
   const RAMP = '·:-=+*#';        // light to dense, picked by how much of a cell the strokes cover
   const MIN_COVERAGE = 0.12;      // cells with less stroke than this stay empty
-  // Character size, set per screen in build(): smaller on phones so all three glyphs fit.
-  let FONT_SIZE = 14;             // px
-  let CELL_W = FONT_SIZE * 0.6;   // IBM Plex Mono advance width
-  let CELL_H = FONT_SIZE * 1.15;
   const SUPERSAMPLE = 4;          // offscreen pixels per cell edge, for coverage
 
   const FILL_TIME = 850;          // ms from first stroke starting to last stroke starting
@@ -48,39 +33,17 @@
   };
   const clamp01 = (x) => Math.max(0, Math.min(1, x));
 
-  /* ---------- layout ---------- */
+  /* ---------- rasterizer (shared) ---------- */
 
-  const canvas = gate.querySelector('canvas');
-  const ctx = canvas.getContext('2d');
-  const strokeCount = GLYPHS.reduce((n, g) => n + g.strokes.length, 0);
-
-  let cells = [];          // { x, y, char, start }
-  let label = { x: 0, y: 0 };
-  let fillEnd = 0;
-
-  // Rasterizes the glyphs onto a small offscreen grid, one stroke at a time, so each
-  // cell knows its final density and which stroke (and how far along it) reaches it first.
-  function build() {
-    const dpr = Math.min(devicePixelRatio || 1, 2);
-    const width = innerWidth;
-    const height = innerHeight;
-    canvas.width = width * dpr;
-    canvas.height = height * dpr;
-    canvas.style.width = `${width}px`;
-    canvas.style.height = `${height}px`;
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    const narrow = width < 600;
-    FONT_SIZE = narrow ? 9 : 14;
-    CELL_W = FONT_SIZE * 0.6;
-    CELL_H = FONT_SIZE * 1.15;
-    ctx.font = `400 ${FONT_SIZE}px 'IBM Plex Mono', ui-monospace, monospace`;
-    ctx.textBaseline = 'top';
-
-    const glyphCols = Math.max(12, Math.min(40, Math.floor((width * (narrow ? 0.9 : 0.78)) / 3.2 / CELL_W)));
-    const glyphRows = Math.round((glyphCols * CELL_W) / CELL_H);
+  // Rasterizes the glyphs onto a character grid, one stroke at a time, so each cell
+  // knows its final density and which stroke (and how far along it) reaches it first.
+  // glyphCols is the width of one glyph in cells; aspect is cell width / cell height.
+  // Returns grid units only: { cols, rows, cells: [{ col, row, char, start }], fillEnd }.
+  function rasterize(glyphCols, aspect) {
+    const strokeCount = GLYPHS.reduce((n, g) => n + g.strokes.length, 0);
+    const rows = Math.round(glyphCols * aspect);
     const gap = Math.round(glyphCols * 0.12);
     const cols = GLYPHS.length * glyphCols + (GLYPHS.length - 1) * gap;
-    const rows = glyphRows;
 
     const off = document.createElement('canvas');
     off.width = cols * SUPERSAMPLE;
@@ -99,8 +62,6 @@
       return sum / (255 * SUPERSAMPLE * SUPERSAMPLE);
     };
 
-    const left = Math.round((width - cols * CELL_W) / 2);
-    const top = Math.round(height * 0.44 - (rows * CELL_H) / 2);
     const grid = new Map();   // "col,row" -> cell
     let strokeIndex = 0;
 
@@ -138,8 +99,8 @@
             });
             const along = median.length > 1 ? nearest / (median.length - 1) : 0;
             grid.set(key, {
-              x: left + col * CELL_W,
-              y: top + row * CELL_H,
+              col,
+              row,
               coverage,
               start: startTime + along * STROKE_TIME + hash(col * 31 + row * 17) * JITTER,
             });
@@ -149,20 +110,74 @@
       });
     });
 
-    cells = [...grid.values()].filter((c) => c.coverage >= MIN_COVERAGE);
+    const cells = [...grid.values()].filter((c) => c.coverage >= MIN_COVERAGE);
     for (const cell of cells) {
       // sqrt leans toward the denser characters, so thin strokes still read clearly.
       const t = Math.sqrt(clamp01((cell.coverage - MIN_COVERAGE) / (1 - MIN_COVERAGE)));
       cell.char = RAMP[Math.min(RAMP.length - 1, Math.floor(t * RAMP.length))];
     }
-    fillEnd = Math.max(...cells.map((c) => c.start)) + CELL_FADE;
-    label = {
-      x: Math.round((width - LABEL.length * CELL_W) / 2),
-      y: Math.round(top + rows * CELL_H + CELL_H * 2.5),
-    };
+    const fillEnd = Math.max(...cells.map((c) => c.start)) + CELL_FADE;
+    return { cols, rows, cells, fillEnd };
   }
 
-  /* ---------- drawing ---------- */
+  window.IntroArt = GLYPHS ? { rasterize, timing: { CELL_FADE, TYPE_START, TYPE_SPEED, LABEL } } : null;
+
+  /* ---------- full-screen intro ---------- */
+
+  const gate = document.getElementById('gate');
+
+  let seenThisSession = false;
+  try {
+    seenThisSession = Boolean(sessionStorage.getItem('gate'));
+  } catch {
+    // storage blocked (private mode etc.): just show the intro
+  }
+
+  if (seenThisSession || !GLYPHS || matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    gate.remove();
+    return;
+  }
+
+  const canvas = gate.querySelector('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // Character size, set per screen in build(): smaller on phones so all three glyphs fit.
+  let fontSize = 14;              // px
+  let cellW = fontSize * 0.6;     // IBM Plex Mono advance width
+  let cellH = fontSize * 1.15;
+
+  let cells = [];          // { x, y, char, start }
+  let label = { x: 0, y: 0 };
+  let fillEnd = 0;
+
+  function build() {
+    const dpr = Math.min(devicePixelRatio || 1, 2);
+    const width = innerWidth;
+    const height = innerHeight;
+    canvas.width = width * dpr;
+    canvas.height = height * dpr;
+    canvas.style.width = `${width}px`;
+    canvas.style.height = `${height}px`;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const narrow = width < 600;
+    fontSize = narrow ? 9 : 14;
+    cellW = fontSize * 0.6;
+    cellH = fontSize * 1.15;
+    ctx.font = `400 ${fontSize}px 'IBM Plex Mono', ui-monospace, monospace`;
+    ctx.textBaseline = 'top';
+
+    const glyphCols = Math.max(12, Math.min(40, Math.floor((width * (narrow ? 0.9 : 0.78)) / 3.2 / cellW)));
+    const art = rasterize(glyphCols, cellW / cellH);
+    const left = Math.round((width - art.cols * cellW) / 2);
+    const top = Math.round(height * 0.44 - (art.rows * cellH) / 2);
+
+    cells = art.cells.map((c) => ({ x: left + c.col * cellW, y: top + c.row * cellH, char: c.char, start: c.start }));
+    fillEnd = art.fillEnd;
+    label = {
+      x: Math.round((width - LABEL.length * cellW) / 2),
+      y: Math.round(top + art.rows * cellH + cellH * 2.5),
+    };
+  }
 
   function draw(t) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -183,7 +198,7 @@
       ctx.fillText(LABEL.slice(0, typed), label.x, label.y);
       if (Math.floor(t / 500) % 2 === 0) {
         ctx.fillStyle = COLORS.accent;
-        ctx.fillText('█', label.x + typed * CELL_W, label.y);
+        ctx.fillText('█', label.x + typed * cellW, label.y);
       }
     }
   }
@@ -226,7 +241,7 @@
 
   // Wait for the mono font so the characters measure right; don't hang if it never comes.
   Promise.race([
-    document.fonts.load(`${FONT_SIZE}px 'IBM Plex Mono'`),
+    document.fonts.load(`${fontSize}px 'IBM Plex Mono'`),
     new Promise((resolve) => setTimeout(resolve, 600)),
   ]).finally(() => {
     build();

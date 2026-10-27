@@ -108,6 +108,18 @@ a:hover {
   color: var(--accent);
 }
 
+/* The hidden `name` command's 张卓远 art: same 13px as the Liquid Chrome piece,
+   with the line-height the art's cell grid was built for. */
+.name-art {
+  overflow: hidden;
+  margin: 0;
+  color: var(--ink);
+  font: 400 13px/1.15 var(--mono);
+  white-space: pre;
+}
+
+.accent { color: var(--accent); }
+
 /* Blocks waiting to be printed by js/terminal.js. */
 .pending { visibility: hidden; }
 
