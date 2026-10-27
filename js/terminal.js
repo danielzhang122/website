@@ -23,7 +23,7 @@
 
   const COMMANDS = {
     help: { help: 'list commands', run: printHelp },
-    whoami: { help: 'who i am', run: () => printSection('whoami') },
+    whoami: { help: 'who i am', run: printWhoami },
     projects: { help: 'things i have built', run: () => printSection('projects') },
     hardware: { help: 'bench work and cad', run: () => printSection('hardware') },
     experience: { help: 'work and school', run: () => printSection('experience') },
@@ -79,6 +79,12 @@
     copy.querySelectorAll('video').forEach((video) => { video.autoplay = true; });
     await reveal(copy);
     copy.querySelectorAll('video').forEach((video) => videoObserver.observe(video));
+  }
+
+  // The banner (art and name) comes with whoami, so it can be brought back after clear.
+  async function printWhoami() {
+    await printSection('banner');
+    await printSection('whoami');
   }
 
   function printLine(text, className = '') {
@@ -390,7 +396,6 @@
       queue = queue.then(async () => {
         restoring = true;
         try {
-          await printSection('banner');
           for (const text of ran) await run(text);
         } finally {
           restoring = false;
@@ -406,7 +411,6 @@
       return;
     }
 
-    await printSection('banner');
     await submit('whoami', { typed: true });
     pace = BLOCK_DELAY;
     document.getElementById('console').classList.remove('is-booting');
