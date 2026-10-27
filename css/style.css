@@ -218,7 +218,7 @@ button.cmd:hover { color: var(--accent); }
    in the text colour, contained so its frames only repaint its own box, and the mask fades the piece's faint dotted
    background out at the edges so it doesn't read as a box. */
 .chrome-art {
-  display: block;
+  display: grid;
   overflow: hidden;
   width: max-content;
   max-width: 100%;
@@ -230,6 +230,18 @@ button.cmd:hover { color: var(--accent); }
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
 }
+
+/* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
+   are no per-character spans: heavy glyphs in the text colour, mid tones rose, the
+   faintest (the piece's dark areas) red. */
+.chrome-art > pre {
+  grid-area: 1 / 1;
+  margin: 0;
+  font: inherit;
+}
+
+.chrome-mid { color: color-mix(in srgb, var(--accent) 50%, var(--ink)); }
+.chrome-red { color: var(--accent); }
 
 .banner > div > * + * { margin-top: .9rem; }
 
