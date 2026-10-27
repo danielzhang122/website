@@ -307,6 +307,29 @@ article > * + * { margin-top: .4rem; }
   line-height: 1.4;
 }
 
+/* Inline command links in a sentence ("More: projects  hardware") need a gap. */
+button.cmd + button.cmd { margin-left: 1.5ch; }
+
+/* The "Featured" strip under whoami: wider 16:10 thumbs, so the first
+   screen shows hardware before anyone types a command. */
+.thumbs.featured figure { width: 180px; cursor: pointer; }
+.thumbs.featured figure > :is(img, video) { cursor: pointer; }
+
+/* A project jumped to from Featured flashes briefly. */
+[data-id] { scroll-margin-top: 1.5rem; }
+.is-shown { animation: shown 1.6s ease-out; }
+
+@keyframes shown {
+  0%, 25% { box-shadow: -1ch 0 0 -.5ch var(--accent); background: rgba(229, 72, 77, .08); }
+  100% { box-shadow: -1ch 0 0 -.5ch transparent; background: transparent; }
+}
+
+.thumbs.featured figure > :is(img, video) {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
+}
+
 
 /* ==========================================================================
    Without JavaScript: #content is a plain README; with it, the console takes over
@@ -452,6 +475,10 @@ article > * + * { margin-top: .4rem; }
 
   .thumbs > :is(img, video),
   .thumbs figure > :is(img, video) { height: 96px; }
+
+  /* Two across on a phone; the third wraps underneath. */
+  .thumbs.featured figure { width: calc(50% - .3rem); }
+  .thumbs.featured figure > :is(img, video) { width: 100%; height: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

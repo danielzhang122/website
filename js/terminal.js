@@ -285,7 +285,8 @@
   }
 
   // Commands run one after another; a new one makes the current print finish instantly.
-  function submit(text, { typed = false } = {}) {
+  // `after` runs once the command has printed (used to jump to a specific item).
+  function submit(text, { typed = false, after } = {}) {
     fastForward = true;
     queue = queue.then(async () => {
       fastForward = false;
@@ -293,6 +294,7 @@
       input.value = '';
       updateCursor();
       await run(text);
+      after?.();
     }).catch((error) => {
       // One failed command shouldn't jam every command after it.
       console.error(error);
@@ -343,7 +345,34 @@
   for (const type of ['input', 'click', 'focus', 'select']) input.addEventListener(type, updateCursor);
 
   // Shortcut bar and the command names printed by help.
+  // Scrolls to the newest printed copy of [data-id="id"] and flashes it.
+  function showItem(id) {
+    const matches = screen.querySelectorAll(`[data-id="${id}"]`);
+    const item = matches[matches.length - 1];
+    if (!item) return;
+    item.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+    item.classList.remove('is-shown');
+    void item.offsetWidth;   // restart the flash if it's already running
+    item.classList.add('is-shown');
+  }
+
+  // Featured thumbs: data-show="command:id" runs the command, then jumps to the item.
+  function showFrom(target) {
+    const [command, id] = target.dataset.show.split(':');
+    submit(command, { typed: true, after: () => showItem(id) });
+  }
+
+  addEventListener('keydown', (e) => {
+    const target = e.key === 'Enter' && document.activeElement?.closest?.('[data-show]');
+    if (target) showFrom(target);
+  });
+
   document.addEventListener('click', (e) => {
+    const shown = e.target.closest('[data-show]');
+    if (shown) {
+      showFrom(shown);
+      return;
+    }
     const button = e.target.closest('[data-run]');
     if (button) {
       submit(button.dataset.run, { typed: true });

@@ -7,8 +7,9 @@
   <meta name="description" content="Daniel Zhang — Mechatronics Engineering co-op at McMaster. Robotics, CAD, nuclear tooling.">
   <meta name="theme-color" content="#0b0b0b">
   <link rel="canonical" href="https://danielzhang122.github.io/website">
-  <link rel="icon" type="image/png" href="images/favicon.png">
-  <link rel="apple-touch-icon" href="images/favicon.png">
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
   <script type="application/ld+json">
   {
@@ -94,12 +95,30 @@
       <p>I build robots, design mechanical parts, and work on nuclear tooling, ranked in ascending order of paperwork.</p>
       <p class="dim">B.Eng. Mechatronics Engineering Co-op (Level III), McMaster University</p>
       <p>Available for a Spring 2027 co-op.</p>
+
+      <p class="dim">Featured:</p>
+      <!-- Each opens `projects` and jumps to that project (js/terminal.js, data-show). -->
+      <div class="thumbs featured">
+        <figure data-show="projects:quadruped" role="link" tabindex="0" aria-label="Quadruped robot: show in projects">
+          <video src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <figcaption>Quadruped robot</figcaption>
+        </figure>
+        <figure data-show="projects:suspension" role="link" tabindex="0" aria-label="Wishbone suspension: show in projects">
+          <video src="images/suspension.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <figcaption>Wishbone suspension (concept)</figcaption>
+        </figure>
+        <figure data-show="projects:wheelsafe" role="link" tabindex="0" aria-label="WheelSafe: show in projects">
+          <img src="images/wheelsafe.jpg" loading="lazy" alt="">
+          <figcaption>WheelSafe, top 3 of 200+</figcaption>
+        </figure>
+      </div>
+      <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="hardware">hardware</button></p>
     </section>
 
     <section data-cmd="projects" data-gallery>
       <h2>Projects</h2>
 
-      <article>
+      <article data-id="quadruped">
         <h3>Quadruped Robot &amp; Locomotion Sim</h3>
         <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place, and drives the real servos through a PCA9685 board on a Raspberry Pi. It walks perfectly in simulation, where friction always behaves.</p>
         <p class="tags">Python, MuJoCo, Fusion 360, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener">Repo</a></p>
@@ -110,18 +129,18 @@
         </figure>
       </article>
 
-      <article>
-        <h3>Double Wishbone Suspension</h3>
-        <p>A proof-of-concept double wishbone assembly designed in SolidWorks for McMaster Chem-E-Car. It controls dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
+      <article data-id="suspension">
+        <h3>Double Wishbone Suspension (Concept)</h3>
+        <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how the linkage could control dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
         <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
         <figure class="thumb">
           <video src="images/suspension.mp4" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Double Wishbone Suspension"
-                 data-caption="Camber control through the suspension travel"></video>
+                 data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
         </figure>
       </article>
 
-      <article>
+      <article data-id="wheelsafe">
         <h3>WheelSafe Storage</h3>
         <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the McMaster Design Showcase.</p>
         <p class="tags">Autodesk Inventor, client prototyping, carbon fiber</p>
@@ -236,7 +255,7 @@
         <span class="key">Sep 2026 – present</span>
         <div>
           <p><b>Mechanical Sub-team Member, Wheel Assembly</b>, McMaster Chem-E-Car</p>
-          <p class="dim">Designing custom wheel assemblies and suspension geometry to keep 500 mL of water from sloshing over a 33 m run. Overkill, but it works.</p>
+          <p class="dim">Designing custom wheel assemblies and suspension geometry for the 2026–2027 car, to keep 500 mL of water from sloshing over a 33 m run. Overkill, but the geometry checks out.</p>
         </div>
       </div>
       <div class="row">
