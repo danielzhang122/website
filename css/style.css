@@ -260,19 +260,22 @@ article > * + * { margin-top: .4rem; }
 .output > .row + .row { margin-top: .6rem; }
 
 .thumb {
-  width: 320px;
-  max-width: 100%;
+  width: fit-content;
+  max-width: min(420px, 100%);
   margin-top: .75rem !important;
-  background: #000;
   cursor: zoom-in;
 }
 
 .thumb:hover { outline: 1px solid var(--accent); }
 
+/* Project media keeps its own shape, uncropped: landscape up to 420px wide,
+   portrait up to 340px tall. width/height in the HTML reserve the shape. */
 .thumb > :is(img, video) {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 340px;
 }
 
 .thumbs {
@@ -297,6 +300,13 @@ article > * + * { margin-top: .4rem; }
 .thumbs figure:hover figcaption { color: var(--accent); }
 
 .thumbs .fit-whole { object-fit: contain; }
+
+/* Art shows each piece whole: one row height, natural widths, like a photo strip. */
+.thumbs.whole > :is(img, video) {
+  width: auto;
+  height: 160px;
+  object-fit: contain;
+}
 
 .thumbs figure { width: 120px; }
 
@@ -475,6 +485,8 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 
   .thumbs > :is(img, video),
   .thumbs figure > :is(img, video) { height: 96px; }
+
+  .thumbs.whole > :is(img, video) { width: auto; height: 110px; }
 
   /* Two across on a phone; the third wraps underneath. */
   .thumbs.featured figure { width: calc(50% - .3rem); }

@@ -32,14 +32,14 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261027-3">
+  <link rel="stylesheet" href="css/style.css?v=20261027-4">
 
-  <script src="js/intro-glyphs.js?v=20261027-3" defer></script>
-  <script src="js/intro.js?v=20261027-3" defer></script>
-  <script src="js/lightbox.js?v=20261027-3" defer></script>
-  <script src="js/terminal.js?v=20261027-3" defer></script>
+  <script src="js/intro-glyphs.js?v=20261027-4" defer></script>
+  <script src="js/intro.js?v=20261027-4" defer></script>
+  <script src="js/lightbox.js?v=20261027-4" defer></script>
+  <script src="js/terminal.js?v=20261027-4" defer></script>
   <!-- Plays the Liquid Chrome ASCII piece (ASCII Magic, MIT) as page text in the banner. -->
-  <script type="module" src="js/chrome.js?v=20261027-3"></script>
+  <script type="module" src="js/chrome.js?v=20261027-4"></script>
 </head>
 <body>
 
@@ -125,7 +125,7 @@
         <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place, and drives the real servos through a PCA9685 board on a Raspberry Pi. It walks perfectly in simulation, where friction always behaves.</p>
         <p class="tags">Python, MuJoCo, Fusion 360, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener">Repo</a></p>
         <figure class="thumb">
-          <video disablepictureinpicture src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/quadruped-sim.mp4" width="1066" height="756" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Quadruped Robot &amp; Locomotion Sim"
                  data-caption="Trot gait running in MuJoCo"></video>
         </figure>
@@ -136,7 +136,7 @@
         <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how the linkage could control dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
         <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
         <figure class="thumb">
-          <video disablepictureinpicture src="images/suspension.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Double Wishbone Suspension"
                  data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
         </figure>
@@ -147,7 +147,7 @@
         <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the McMaster Design Showcase.</p>
         <p class="tags">Autodesk Inventor, client prototyping, carbon fiber</p>
         <figure class="thumb">
-          <img src="images/wheelsafe.jpg" loading="lazy" data-lightbox
+          <img src="images/wheelsafe.jpg" width="1280" height="1706" loading="lazy" data-lightbox
                alt="WheelSafe Storage"
                data-caption="Carbon-fiber wheelchair storage module, Top 3 at the McMaster Design Showcase">
         </figure>
@@ -158,7 +158,7 @@
         <p>Built in 12 hours, about as long as SolidWorks takes to open. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
         <p class="tags">OpenCV, ESP32, C++, UDP</p>
         <figure class="thumb">
-          <video disablepictureinpicture src="images/robotic-arm.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/robotic-arm.mp4" width="400" height="714" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Vision-Guided 2-DOF Robotic Arm"
                  data-caption="Real-time OpenCV hand tracking over UDP to an ESP32"></video>
         </figure>
@@ -169,7 +169,7 @@
         <p>Sets an iPhone's actual GPS location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester. Find My now thinks I've been to California.</p>
         <p class="tags">Python, pymobiledevice3, OpenStreetMap <a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener">Repo</a></p>
         <figure class="thumb">
-          <img src="images/spoofer.jpg" loading="lazy" data-lightbox
+          <img src="images/spoofer.jpg" width="1502" height="912" loading="lazy" data-lightbox
                alt="Globe Ghost — iOS GPS Simulator"
                data-caption="A scripted walk through Manhattan on the live map, logged step by step">
         </figure>
@@ -180,7 +180,7 @@
         <p>A live Python dashboard that shows earnings adding up in real time, down to the microsecond. Built to put an exact dollar figure on a 45-minute meeting that could have been an email.</p>
         <p class="tags">Python, GUI <a href="https://github.com/danielzhang122/wage-tracker" target="_blank" rel="noopener">Repo</a></p>
         <figure class="thumb">
-          <img src="images/wage-tracker.png" loading="lazy" data-lightbox
+          <img src="images/wage-tracker.png" width="600" height="579" loading="lazy" data-lightbox
                alt="Real-Time Compensation Visualizer"
                data-caption="Live earnings dashboard in Python">
         </figure>
@@ -320,44 +320,44 @@
       <h2>Art</h2>
       <p class="dim">Painting, drawing, printmaking and carving. Click any piece to enlarge.</p>
 
-      <div class="thumbs" data-gallery>
-        <video disablepictureinpicture src="images/blender.mp4" muted loop playsinline preload="metadata" data-lightbox
+      <div class="thumbs whole" data-gallery>
+        <video disablepictureinpicture src="images/blender.mp4" width="1080" height="1740" muted loop playsinline preload="metadata" data-lightbox
                aria-label="Hang In There"
                data-caption="Blender animation. A reminder to save before you render."></video>
-        <img src="images/sketch-2.jpg" loading="lazy" data-lightbox
+        <img src="images/sketch-2.jpg" width="1078" height="1333" loading="lazy" data-lightbox
              alt="Toned Back Study"
              data-caption="Charcoal on paper. I still find black dust from this on my desk.">
-        <img src="images/painting.jpg" loading="lazy" data-lightbox
+        <img src="images/painting.jpg" width="1094" height="861" loading="lazy" data-lightbox
              alt="Floral Heads"
              data-caption="Painting faces requires perfect symmetry. Painting flowers over them does not.">
-        <img src="images/sketch.jpg" loading="lazy" data-lightbox
+        <img src="images/sketch.jpg" width="930" height="1010" loading="lazy" data-lightbox
              alt="Live Figure Drawing"
              data-caption="An hour-long live pose, carefully avoiding the hands.">
-        <img src="images/self-portrait-3.jpg" loading="lazy" data-lightbox
+        <img src="images/self-portrait-3.jpg" width="1122" height="1454" loading="lazy" data-lightbox
              alt="Half Dead Portrait"
              data-caption="Acrylic self-portrait. About how fixing CAD constraints at 2 AM feels.">
-        <img src="images/digital-teeth.jpeg" loading="lazy" data-lightbox
+        <img src="images/digital-teeth.jpeg" width="469" height="294" loading="lazy" data-lightbox
              alt="Dental Study"
              data-caption="Digital study of teeth. A reminder to floss.">
-        <img src="images/skull.jpg" loading="lazy" data-lightbox
+        <img src="images/skull.jpg" width="938" height="693" loading="lazy" data-lightbox
              alt="Flayed Skull"
              data-caption="Anatomical study of facial musculature, and a good excuse to use up the red paint.">
-        <img src="images/skull2.jpg" loading="lazy" data-lightbox
+        <img src="images/skull2.jpg" width="1016" height="768" loading="lazy" data-lightbox
              alt="Block Print Skull"
              data-caption="Linocut print. The hard part was not carving my thumb.">
-        <img src="images/flower.jpg" loading="lazy" data-lightbox
+        <img src="images/flower.jpg" width="670" height="988" loading="lazy" data-lightbox
              alt="Pink Rose"
              data-caption="The mandatory flower painting, to prove to my mom I can paint nice things.">
-        <img src="images/self-portrait-1.jpg" loading="lazy" data-lightbox
+        <img src="images/self-portrait-1.jpg" width="924" height="768" loading="lazy" data-lightbox
              alt="Everything Is Fine"
              data-caption="Self-portrait with zero underlying metaphors.">
-        <img src="images/chameleon.jpg" loading="lazy" data-lightbox
+        <img src="images/chameleon.jpg" width="1620" height="890" loading="lazy" data-lightbox
              alt="Wood Lizard"
              data-caption="Carved from a single block of wood. The chisel slipped once; it cost me 11 stitches.">
-        <img src="images/lake-reflection.jpg" loading="lazy" data-lightbox
+        <img src="images/lake-reflection.jpg" width="800" height="613" loading="lazy" data-lightbox
              alt="Lake Reflection"
              data-caption="Digital landscape that won a local contest and was printed on a municipal utility box.">
-        <img src="images/utility-box-install.jpg" loading="lazy" data-lightbox
+        <img src="images/utility-box-install.jpg" width="600" height="800" loading="lazy" data-lightbox
              alt="Utility Box Install"
              data-caption="In the wild, 2022. Technically a public infrastructure install.">
       </div>
