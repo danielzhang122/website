@@ -17,7 +17,7 @@
   const BLOCK_DELAY = reduceMotion ? 0 : 3;   // ms between printed blocks
   const BOOT_DELAY = reduceMotion ? 0 : 22;   // slower, so the first screen visibly builds line by line
   const TYPE_DELAY = reduceMotion ? 0 : 12;   // ms per character when a shortcut types a command
-  const BLOCKS = 'ascii-art, h1, h2, h3, p, figure, .row, .thumbs > *';
+  const BLOCKS = '.chrome-art, h1, h2, h3, p, figure, .row, .thumbs > *';
 
   const SECTIONS = ['whoami', 'projects', 'hardware', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
 
@@ -145,8 +145,12 @@
 
     const charW = 13 * 0.6;     // IBM Plex Mono advance width at 13px
     const charH = 13 * 1.15;    // matches .name-art line-height
-    const glyphCols = Math.max(10, Math.min(28, Math.floor(screen.clientWidth / charW / 3.3)));
-    const { cols, rows, cells, fillEnd } = art.rasterize(glyphCols, charW / charH);
+    // A narrow console (phones) stacks the glyphs vertically so each gets the full width.
+    const vertical = screen.clientWidth < 520;
+    const glyphCols = vertical
+      ? Math.max(10, Math.min(30, Math.floor(screen.clientWidth / charW)))
+      : Math.max(10, Math.min(32, Math.floor(screen.clientWidth / charW / 3.3)));
+    const { cols, rows, cells, fillEnd } = art.rasterize(glyphCols, charW / charH, { vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));
     const end = Math.max(fillEnd, TYPE_START + LABEL.length * TYPE_SPEED) + 100;
 

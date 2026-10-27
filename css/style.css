@@ -213,15 +213,17 @@ button.cmd:hover { color: var(--accent); }
    Printed content
    ========================================================================== */
 
-/* The liquid-chrome ASCII piece sits above the name at the same 13px as the
-   site's small text. It's decoration only. The filter makes it black and white,
-   and the mask fades the piece's faint dotted background out at the edges so it
-   doesn't read as a box. */
-.banner > ascii-art {
+/* The liquid-chrome ASCII piece (js/chrome.js) sits above the name as real text
+   at the same 13px as the site's small text. It's decoration only. The filter
+   makes it black and white, and the mask fades the piece's faint dotted
+   background out at the edges so it doesn't read as a box. */
+.banner > .chrome-art {
   display: block;
+  overflow: hidden;
   width: max-content;
-  margin-top: 0;
-  font-family: var(--mono);
+  max-width: 100%;
+  margin: 0;
+  font: 400 13px/1 var(--mono);
   filter: grayscale(1) brightness(.85);
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
@@ -438,7 +440,7 @@ article > * + * { margin-top: .4rem; }
   #shortcuts { justify-content: flex-start; }
 
   /* 72 characters at 13px is wider than a phone; the art is decoration only. */
-  .banner > ascii-art { display: none; }
+  .banner > .chrome-art { display: none; }
 
   .thumbs { gap: .6rem; }
 

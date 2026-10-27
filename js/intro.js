@@ -11,8 +11,9 @@
 
   const GLYPHS = window.INTRO_GLYPHS;
   const LABEL = 'daniel zhang';
-  const RAMP = '·:-=+*#';        // light to dense, picked by how much of a cell the strokes cover
-  const MIN_COVERAGE = 0.12;      // cells with less stroke than this stay empty
+  const RAMP = ':=+*#';          // light to dense, picked by how much of a cell the strokes cover
+  const MIN_COVERAGE = 0.2;       // cells only grazed by a stroke stay empty, so edges stay crisp
+  const FULL_COVERAGE = 0.7;      // from here on a cell gets the densest character
   const SUPERSAMPLE = 4;          // offscreen pixels per cell edge, for coverage
 
   const FILL_TIME = 850;          // ms from first stroke starting to last stroke starting
@@ -38,19 +39,23 @@
   // Rasterizes the glyphs onto a character grid, one stroke at a time, so each cell
   // knows its final density and which stroke (and how far along it) reaches it first.
   // glyphCols is the width of one glyph in cells; aspect is cell width / cell height.
+  // vertical stacks the glyphs top to bottom (for narrow screens) instead of in a row.
   // Returns grid units only: { cols, rows, cells: [{ col, row, char, start }], fillEnd }.
-  function rasterize(glyphCols, aspect) {
+  function rasterize(glyphCols, aspect, { vertical = false } = {}) {
     const strokeCount = GLYPHS.reduce((n, g) => n + g.strokes.length, 0);
-    const rows = Math.round(glyphCols * aspect);
-    const gap = Math.round(glyphCols * 0.12);
-    const cols = GLYPHS.length * glyphCols + (GLYPHS.length - 1) * gap;
+    const glyphRows = Math.round(glyphCols * aspect);
+    const gap = Math.round(glyphCols * 0.12);       // between glyphs in a row, in columns
+    const gapRows = Math.round(glyphRows * 0.25);   // between stacked glyphs, in rows
+    const count = GLYPHS.length;
+    const cols = vertical ? glyphCols : count * glyphCols + (count - 1) * gap;
+    const rows = vertical ? count * glyphRows + (count - 1) * gapRows : glyphRows;
 
     const off = document.createElement('canvas');
     off.width = cols * SUPERSAMPLE;
     off.height = rows * SUPERSAMPLE;
     const octx = off.getContext('2d', { willReadFrequently: true });
     const scaleX = (glyphCols * SUPERSAMPLE) / 1024;
-    const scaleY = (rows * SUPERSAMPLE) / 1024;
+    const scaleY = (glyphRows * SUPERSAMPLE) / 1024;
 
     const coverageOf = (data, col, row) => {
       let sum = 0;
@@ -66,20 +71,21 @@
     let strokeIndex = 0;
 
     GLYPHS.forEach((glyph, g) => {
-      const originX = g * (glyphCols + gap) * SUPERSAMPLE;
+      // This glyph's top-left corner, in cells.
+      const ox = vertical ? 0 : g * (glyphCols + gap);
+      const oy = vertical ? g * (glyphRows + gapRows) : 0;
       glyph.strokes.forEach((d, s) => {
         octx.setTransform(1, 0, 0, 1, 0, 0);
         octx.clearRect(0, 0, off.width, off.height);
         // Glyph data has y pointing up with the top at 900.
-        octx.setTransform(scaleX, 0, 0, -scaleY, originX, 900 * scaleY);
+        octx.setTransform(scaleX, 0, 0, -scaleY, ox * SUPERSAMPLE, oy * SUPERSAMPLE + 900 * scaleY);
         octx.fill(new Path2D(d));
         const data = octx.getImageData(0, 0, off.width, off.height).data;
         const median = glyph.medians[s];
         const startTime = (strokeIndex / Math.max(1, strokeCount - 1)) * FILL_TIME;
 
-        const colFrom = Math.floor(originX / SUPERSAMPLE);
-        for (let row = 0; row < rows; row++) {
-          for (let col = colFrom; col < colFrom + glyphCols; col++) {
+        for (let row = oy; row < oy + glyphRows; row++) {
+          for (let col = ox; col < ox + glyphCols; col++) {
             const coverage = coverageOf(data, col, row);
             if (coverage <= 0) continue;
             const key = `${col},${row}`;
@@ -89,8 +95,8 @@
               continue;
             }
             // How far along this stroke's centerline the cell sits, 0 to 1.
-            const ux = ((col - colFrom + 0.5) * 1024) / glyphCols;
-            const uy = 900 - ((row + 0.5) * 1024) / rows;
+            const ux = ((col - ox + 0.5) * 1024) / glyphCols;
+            const uy = 900 - ((row - oy + 0.5) * 1024) / glyphRows;
             let nearest = 0;
             let best = Infinity;
             median.forEach(([mx, my], i) => {
@@ -112,8 +118,9 @@
 
     const cells = [...grid.values()].filter((c) => c.coverage >= MIN_COVERAGE);
     for (const cell of cells) {
-      // sqrt leans toward the denser characters, so thin strokes still read clearly.
-      const t = Math.sqrt(clamp01((cell.coverage - MIN_COVERAGE) / (1 - MIN_COVERAGE)));
+      // A steep ramp: mostly covered cells get the solid characters, so strokes read
+      // as clean lines rather than soft gradients.
+      const t = clamp01((cell.coverage - MIN_COVERAGE) / (FULL_COVERAGE - MIN_COVERAGE));
       cell.char = RAMP[Math.min(RAMP.length - 1, Math.floor(t * RAMP.length))];
     }
     const fillEnd = Math.max(...cells.map((c) => c.start)) + CELL_FADE;
@@ -159,6 +166,7 @@
     canvas.style.width = `${width}px`;
     canvas.style.height = `${height}px`;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    // Phones stack the glyphs vertically so each gets the full width.
     const narrow = width < 600;
     fontSize = narrow ? 9 : 14;
     cellW = fontSize * 0.6;
@@ -166,10 +174,16 @@
     ctx.font = `400 ${fontSize}px 'IBM Plex Mono', ui-monospace, monospace`;
     ctx.textBaseline = 'top';
 
-    const glyphCols = Math.max(12, Math.min(40, Math.floor((width * (narrow ? 0.9 : 0.78)) / 3.2 / cellW)));
-    const art = rasterize(glyphCols, cellW / cellH);
+    const aspect = cellW / cellH;
+    // A stack is about 3.5 glyph-heights tall (three glyphs plus gaps); fit it in 75% of the screen.
+    const glyphCols = narrow
+      ? Math.max(12, Math.min(40, Math.floor((width * 0.9) / cellW), Math.floor((height * 0.75) / cellH / (3.5 * aspect))))
+      : Math.max(12, Math.min(40, Math.floor((width * 0.78) / 3.2 / cellW)));
+    const art = rasterize(glyphCols, aspect, { vertical: narrow });
     const left = Math.round((width - art.cols * cellW) / 2);
-    const top = Math.round(height * 0.44 - (art.rows * cellH) / 2);
+    const top = narrow
+      ? Math.round((height - (art.rows + 3) * cellH) / 2)
+      : Math.round(height * 0.44 - (art.rows * cellH) / 2);
 
     cells = art.cells.map((c) => ({ x: left + c.col * cellW, y: top + c.row * cellH, char: c.char, start: c.start }));
     fillEnd = art.fillEnd;

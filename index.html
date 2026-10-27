@@ -35,8 +35,8 @@
   <script src="js/intro.js" defer></script>
   <script src="js/lightbox.js" defer></script>
   <script src="js/terminal.js" defer></script>
-  <!-- Animated ASCII art from ASCII Magic (MIT): defines the <ascii-art> element. -->
-  <script type="module" src="https://www.ascii-magic.com/ascii/ascii.js"></script>
+  <!-- Plays the Liquid Chrome ASCII piece (ASCII Magic, MIT) as page text in the banner. -->
+  <script type="module" src="js/chrome.js"></script>
 </head>
 <body>
 
@@ -82,7 +82,7 @@
   <div id="content">
 
     <header data-cmd="banner" class="banner">
-      <ascii-art piece="liquid-chrome" look="dense" contrast="100" size="13" aria-hidden="true"></ascii-art>
+      <pre class="chrome-art" aria-hidden="true"></pre>
       <div>
         <h1>Daniel Zhang</h1>
         <p class="dim">Mechatronics Engineering, McMaster University</p>
@@ -101,7 +101,7 @@
 
       <article>
         <h3>Quadruped Robot &amp; Locomotion Sim</h3>
-        <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place, and drives the real servos through a PCA9685 board on a Raspberry Pi.</p>
+        <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place, and drives the real servos through a PCA9685 board on a Raspberry Pi. It walks perfectly in simulation, where friction always behaves.</p>
         <p class="tags">Python, MuJoCo, Fusion 360, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener">Repo</a></p>
         <figure class="thumb">
           <video src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" data-lightbox
@@ -112,7 +112,7 @@
 
       <article>
         <h3>Double Wishbone Suspension</h3>
-        <p>A proof-of-concept double wishbone assembly designed in SolidWorks for McMaster Chem-E-Car. It controls dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run.</p>
+        <p>A proof-of-concept double wishbone assembly designed in SolidWorks for McMaster Chem-E-Car. It controls dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
         <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
         <figure class="thumb">
           <video src="images/suspension.mp4" muted loop playsinline preload="metadata" data-lightbox
@@ -134,7 +134,7 @@
 
       <article>
         <h3>Vision-Guided 2-DOF Robotic Arm</h3>
-        <p>Built in 12 hours. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
+        <p>Built in 12 hours, about as long as SolidWorks takes to open. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
         <p class="tags">OpenCV, ESP32, C++, UDP</p>
         <figure class="thumb">
           <video src="images/robotic-arm.mp4" muted loop playsinline preload="metadata" data-lightbox
@@ -145,7 +145,7 @@
 
       <article>
         <h3>Globe Ghost — iOS GPS Simulator</h3>
-        <p>Sets an iPhone's actual GPS location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester.</p>
+        <p>Sets an iPhone's actual GPS location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester. Find My now thinks I've been to California.</p>
         <p class="tags">Python, pymobiledevice3, OpenStreetMap <a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener">Repo</a></p>
         <figure class="thumb">
           <img src="images/spoofer.jpg" loading="lazy" data-lightbox
@@ -156,7 +156,7 @@
 
       <article>
         <h3>Real-Time Compensation Visualizer</h3>
-        <p>A live Python dashboard that shows earnings adding up in real time, down to the microsecond. Built to put an exact dollar figure on a 45-minute meeting.</p>
+        <p>A live Python dashboard that shows earnings adding up in real time, down to the microsecond. Built to put an exact dollar figure on a 45-minute meeting that could have been an email.</p>
         <p class="tags">Python, GUI <a href="https://github.com/danielzhang122/wage-tracker" target="_blank" rel="noopener">Repo</a></p>
         <figure class="thumb">
           <img src="images/wage-tracker.png" loading="lazy" data-lightbox
@@ -180,13 +180,13 @@
         <figure>
           <img src="images/quadruped-cad-v2.png" class="fit-whole" loading="lazy" data-lightbox
                alt="Quadruped CAD Assembly"
-               data-caption="Full 12-DOF quadruped assembly with the Raspberry Pi and PCA9685 servo driver mounted">
+               data-caption="Full 12-DOF quadruped assembly with the Raspberry Pi and PCA9685 servo driver mounted. Twelve servos, twelve chances for a mate error.">
           <figcaption>Quadruped assembly</figcaption>
         </figure>
         <figure>
           <img src="images/quadruped-leg.png" loading="lazy" data-lightbox
                alt="Leg Linkage"
-               data-caption="Kinematic linkage for one quadruped leg">
+               data-caption="Kinematic linkage for one leg. There are four, so every problem comes in fours.">
           <figcaption>Leg linkage</figcaption>
         </figure>
         <figure>
@@ -216,7 +216,7 @@
         <figure>
           <img src="images/newcomputer.jpg" loading="lazy" data-lightbox
                alt="First POST"
-               data-caption="New build, first boot. Everything worked on the first try.">
+               data-caption="New build, first boot. Everything worked on the first try, which almost never happens.">
           <figcaption>New build, first boot</figcaption>
         </figure>
       </div>
@@ -229,28 +229,28 @@
         <span class="key">Jan 2026 – present</span>
         <div>
           <p><b>Nuclear Engineering Intern</b>, Eclipse Automation</p>
-          <p class="dim">Tooling design and verification for CANDU sites, including Pickering and international stations. Performed ASD calculations and weldment FEA, wrote FMEAs, and tested CSA N299.2-rated tooling.</p>
+          <p class="dim">Tooling design and verification for CANDU sites, including Pickering and international stations. Performed ASD calculations and weldment FEA, wrote FMEAs, and tested CSA N299.2-rated tooling. Nuclear turns out to be roughly 10% tooling, 90% paperwork.</p>
         </div>
       </div>
       <div class="row">
         <span class="key">Sep 2026 – present</span>
         <div>
           <p><b>Mechanical Sub-team Member, Wheel Assembly</b>, McMaster Chem-E-Car</p>
-          <p class="dim">Designing custom wheel assemblies and suspension geometry to keep a 500 mL payload stable over a 33 m run.</p>
+          <p class="dim">Designing custom wheel assemblies and suspension geometry to keep 500 mL of water from sloshing over a 33 m run. Overkill, but it works.</p>
         </div>
       </div>
       <div class="row">
         <span class="key">2024</span>
         <div>
           <p><b>Top 3 Finalist, ENGINEER 1P13 Showcase</b>, McMaster University</p>
-          <p class="dim">Placed top 3 of 200+ teams with a carbon-fiber wheelchair storage unit, presented to a panel of P.Eng judges.</p>
+          <p class="dim">Placed top 3 of 200+ teams with a carbon-fiber wheelchair storage unit, presented to a panel of P.Eng judges, and survived the questions.</p>
         </div>
       </div>
       <div class="row">
         <span class="key">2023 – present</span>
         <div>
           <p><b>B.Eng., Mechatronics Engineering Co-op (Level III)</b>, McMaster University</p>
-          <p class="dim">Coursework in statics and dynamics, embedded systems, circuit theory and applied math.</p>
+          <p class="dim">Statics, dynamics, embedded systems, circuit theory, and math that feels made up until co-op needs it.</p>
         </div>
       </div>
     </section>
@@ -291,7 +291,7 @@
 
     <section data-cmd="resume">
       <h2>Resume</h2>
-      <p>One page covering nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and computer vision projects.</p>
+      <p>One page; every bullet had to earn its spot. Covers nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and computer vision projects.</p>
       <p class="dim">PDF, one page, updated Oct 2026. <a href="Daniel_Zhang_Resume.pdf" download>Download</a> or <a href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
     </section>
 
@@ -311,19 +311,19 @@
              data-caption="Painting faces requires perfect symmetry. Painting flowers over them does not.">
         <img src="images/sketch.jpg" loading="lazy" data-lightbox
              alt="Live Figure Drawing"
-             data-caption="An hour-long live figure pose.">
+             data-caption="An hour-long live pose, carefully avoiding the hands.">
         <img src="images/self-portrait-3.jpg" loading="lazy" data-lightbox
              alt="Half Dead Portrait"
-             data-caption="Acrylic self-portrait.">
+             data-caption="Acrylic self-portrait. About how fixing CAD constraints at 2 AM feels.">
         <img src="images/digital-teeth.jpeg" loading="lazy" data-lightbox
              alt="Dental Study"
-             data-caption="Digital study of teeth.">
+             data-caption="Digital study of teeth. A reminder to floss.">
         <img src="images/skull.jpg" loading="lazy" data-lightbox
              alt="Flayed Skull"
-             data-caption="Anatomical study of facial musculature.">
+             data-caption="Anatomical study of facial musculature, and a good excuse to use up the red paint.">
         <img src="images/skull2.jpg" loading="lazy" data-lightbox
              alt="Block Print Skull"
-             data-caption="Linocut print.">
+             data-caption="Linocut print. The hard part was not carving my thumb.">
         <img src="images/flower.jpg" loading="lazy" data-lightbox
              alt="Pink Rose"
              data-caption="The mandatory flower painting, to prove to my mom I can paint nice things.">
@@ -338,7 +338,7 @@
              data-caption="Digital landscape that won a local contest and was printed on a municipal utility box.">
         <img src="images/utility-box-install.jpg" loading="lazy" data-lightbox
              alt="Utility Box Install"
-             data-caption="The utility box in the wild, 2022.">
+             data-caption="In the wild, 2022. Technically a public infrastructure install.">
       </div>
     </section>
 
