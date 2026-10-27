@@ -49,15 +49,17 @@
 
   let fastForward = false;   // set when a new command arrives mid-print
   let pace = BOOT_DELAY;     // ms between blocks; drops to BLOCK_DELAY once the first screen is up
+  let restoring = false;     // re-printing a saved session after a refresh: instant, no scrolling
 
   // Appends a node, then uncovers its blocks one at a time like a slow terminal.
   async function reveal(node) {
     const blocks = [...node.querySelectorAll(BLOCKS)];
-    if (pace) blocks.forEach((b) => b.classList.add('pending'));
+    const delay = restoring ? 0 : pace;
+    if (delay) blocks.forEach((b) => b.classList.add('pending'));
     screen.appendChild(node);
     for (const block of blocks) {
       block.classList.remove('pending');
-      if (pace && !fastForward) await wait(pace);
+      if (delay && !fastForward) await wait(delay);
     }
   }
 
@@ -166,10 +168,10 @@
     // Draw the empty first frame (full height) and scroll now, so the animation
     // plays in view instead of finishing off screen before the usual scroll.
     render(0, false);
-    if (line) scrollAfter(line);
+    if (line && !restoring) scrollAfter(line);
 
     return new Promise((resolve) => {
-      if (reduceMotion) {
+      if (reduceMotion || restoring) {
         render(Infinity, true);
         resolve();
         return;
@@ -194,12 +196,36 @@
   function clear() {
     screen.replaceChildren();
     setHash('');
+    ran = [];
+    saveSession();
   }
 
   /* ---------- running commands ---------- */
 
   const past = [];       // command history for the up/down arrows
   let pastIndex = 0;
+
+  // The session survives a refresh: the commands run (re-printed on load) and the
+  // arrow-key history, kept per tab in sessionStorage. `clear` empties the re-print list.
+  const SESSION_KEY = 'console';
+  const MAX_SAVED = 50;
+  let ran = [];
+  try {
+    const saved = JSON.parse(sessionStorage.getItem(SESSION_KEY)) || {};
+    if (Array.isArray(saved.ran)) ran = saved.ran.slice(-MAX_SAVED);
+    if (Array.isArray(saved.past)) past.push(...saved.past.slice(-MAX_SAVED));
+    pastIndex = past.length;
+  } catch {
+    // storage blocked or unreadable: start a fresh session
+  }
+
+  function saveSession() {
+    try {
+      sessionStorage.setItem(SESSION_KEY, JSON.stringify({ ran: ran.slice(-MAX_SAVED), past: past.slice(-MAX_SAVED) }));
+    } catch {
+      // storage blocked: a refresh just starts fresh
+    }
+  }
   let queue = Promise.resolve();
 
   // Keeps the new output readable: a long one starts at the top of the screen,
@@ -219,7 +245,7 @@
   async function run(raw) {
     const text = raw.trim();
     const line = echo(text);
-    if (text && past[past.length - 1] !== text) past.push(text);
+    if (!restoring && text && past[past.length - 1] !== text) past.push(text);
     pastIndex = past.length;
     if (!text) return;
 
@@ -234,6 +260,9 @@
     } else {
       await printLine(`'${word}' is not recognized as a command. type help for the list.`, 'dim');
     }
+    if (restoring) return;
+    if (name !== 'clear') ran.push(text);
+    saveSession();
     scrollAfter(line);
   }
 
@@ -356,6 +385,27 @@
   }
 
   whenIntroLeaving().then(async () => {
+    if (ran.length) {
+      // Refreshed mid-session: re-print everything instantly and land at the prompt.
+      queue = queue.then(async () => {
+        restoring = true;
+        try {
+          await printSection('banner');
+          for (const text of ran) await run(text);
+        } finally {
+          restoring = false;
+        }
+      }).catch((error) => {
+        // A broken saved session shouldn't leave the prompt hidden.
+        console.error(error);
+      });
+      await queue;
+      pace = BLOCK_DELAY;
+      document.getElementById('console').classList.remove('is-booting');
+      scrollTo({ top: document.documentElement.scrollHeight });
+      return;
+    }
+
     await printSection('banner');
     await submit('whoami', { typed: true });
     pace = BLOCK_DELAY;
