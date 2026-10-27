@@ -213,7 +213,7 @@ button.cmd:hover { color: var(--accent); }
    Printed content
    ========================================================================== */
 
-/* The liquid-chrome ASCII piece (js/chrome.js) sits permanently at the top of the
+/* The ASCII Magic piece (js/chrome.js picks one per load) sits permanently at the top of the
    console as real text, at the same 13px as the site's small text. It's decoration only. The filter
    makes it black and white, and the mask fades the piece's faint dotted
    background out at the edges so it doesn't read as a box. */
