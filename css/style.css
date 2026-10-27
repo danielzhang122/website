@@ -214,8 +214,8 @@ button.cmd:hover { color: var(--accent); }
    ========================================================================== */
 
 /* The ASCII Magic piece (js/chrome.js picks one per load) sits permanently at the top of the
-   console as real text, at the same 13px as the site's small text. It's decoration only. The filter
-   makes it black and white, and the mask fades the piece's faint dotted
+   console as real text, at the same 13px as the site's small text. It's decoration only. It's drawn
+   in the text colour, contained so its frames only repaint its own box, and the mask fades the piece's faint dotted
    background out at the edges so it doesn't read as a box. */
 .chrome-art {
   display: block;
@@ -224,7 +224,9 @@ button.cmd:hover { color: var(--accent); }
   max-width: 100%;
   margin: 0 auto 1.5rem;
   font: 400 13px/1 var(--mono);
-  filter: grayscale(1) brightness(.85);
+  color: var(--ink);
+  opacity: .85;
+  contain: content;
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
 }
