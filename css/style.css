@@ -213,21 +213,36 @@ button.cmd:hover { color: var(--accent); }
    Printed content
    ========================================================================== */
 
-/* The liquid-chrome ASCII piece sits above the name at the same 13px as the
-   site's small text. It's decoration only. The filter makes it black and white,
-   and the mask fades the piece's faint dotted background out at the edges so it
-   doesn't read as a box. */
-.banner > ascii-art {
-  display: block;
+/* The ASCII Magic piece (js/chrome.js picks one per load) sits permanently at the top of the
+   console as real text, at the same 13px as the site's small text. It's decoration only. It's drawn
+   in the text colour, contained so its frames only repaint its own box, and the mask fades the piece's faint dotted
+   background out at the edges so it doesn't read as a box. */
+.chrome-art {
+  display: grid;
+  overflow: hidden;
   width: max-content;
-  margin-top: 0;
-  font-family: var(--mono);
-  filter: grayscale(1) brightness(.85);
+  max-width: 100%;
+  margin: 0 auto 1.5rem;
+  font: 400 13px/1 var(--mono);
+  color: var(--ink);
+  opacity: .85;
+  contain: content;
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
 }
 
-.banner > div { margin-top: 1.5rem; }
+/* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
+   are no per-character spans: mid tones rose, the faint glyphs inside the shape
+   red, everything else (including the dotted backdrop) the text colour. */
+.chrome-art > pre {
+  grid-area: 1 / 1;
+  margin: 0;
+  font: inherit;
+}
+
+.chrome-mid { color: color-mix(in srgb, var(--accent) 50%, var(--ink)); }
+.chrome-red { color: var(--accent); }
+
 .banner > div > * + * { margin-top: .9rem; }
 
 /* The command line already names the section, so printed copies drop the heading.
@@ -243,7 +258,7 @@ article > * + * { margin-top: .4rem; }
 /* key / value lines: experience dates, skill groups, help */
 .row {
   display: grid;
-  grid-template-columns: 16ch 1fr;
+  grid-template-columns: 19ch 1fr;
   gap: 2ch;
 }
 
@@ -258,19 +273,22 @@ article > * + * { margin-top: .4rem; }
 .output > .row + .row { margin-top: .6rem; }
 
 .thumb {
-  width: 320px;
-  max-width: 100%;
+  width: fit-content;
+  max-width: min(420px, 100%);
   margin-top: .75rem !important;
-  background: #000;
   cursor: zoom-in;
 }
 
 .thumb:hover { outline: 1px solid var(--accent); }
 
+/* Project media keeps its own shape, uncropped: landscape up to 420px wide,
+   portrait up to 340px tall. width/height in the HTML reserve the shape. */
 .thumb > :is(img, video) {
-  width: 100%;
-  aspect-ratio: 16 / 10;
-  object-fit: cover;
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 340px;
 }
 
 .thumbs {
@@ -296,6 +314,13 @@ article > * + * { margin-top: .4rem; }
 
 .thumbs .fit-whole { object-fit: contain; }
 
+/* Art shows each piece whole: one row height, natural widths, like a photo strip. */
+.thumbs.whole > :is(img, video) {
+  width: auto;
+  height: 160px;
+  object-fit: contain;
+}
+
 .thumbs figure { width: 120px; }
 
 .thumbs figcaption {
@@ -303,6 +328,29 @@ article > * + * { margin-top: .4rem; }
   color: var(--dim);
   font-size: .75rem;
   line-height: 1.4;
+}
+
+/* Inline command links in a sentence ("More: projects  misc") need a gap. */
+button.cmd + button.cmd { margin-left: 1.5ch; }
+
+/* The "Featured" strip under whoami: wider 16:10 thumbs, so the first
+   screen shows real builds before anyone types a command. */
+.thumbs.featured figure { width: 180px; cursor: pointer; }
+.thumbs.featured figure > :is(img, video) { cursor: pointer; }
+
+/* A project jumped to from Featured flashes briefly. */
+[data-id] { scroll-margin-top: 1.5rem; }
+.is-shown { animation: shown 1.6s ease-out; }
+
+@keyframes shown {
+  0%, 25% { box-shadow: -1ch 0 0 -.5ch var(--accent); background: rgba(229, 72, 77, .08); }
+  100% { box-shadow: -1ch 0 0 -.5ch transparent; background: transparent; }
+}
+
+.thumbs.featured figure > :is(img, video) {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 10;
 }
 
 
@@ -345,7 +393,19 @@ article > * + * { margin-top: .4rem; }
   pointer-events: none;
 }
 
-#gate canvas { display: block; }
+/* The intro's 张卓远 as text (js/intro.js sets the font size), centred on screen. */
+#gate {
+  display: grid;
+  place-items: center;
+}
+
+.gate-art {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--mono);
+  line-height: 1.15;
+  white-space: pre;
+}
 
 .gate-hint {
   position: absolute;
@@ -438,7 +498,7 @@ article > * + * { margin-top: .4rem; }
   #shortcuts { justify-content: flex-start; }
 
   /* 72 characters at 13px is wider than a phone; the art is decoration only. */
-  .banner > ascii-art { display: none; }
+  .chrome-art { display: none; }
 
   .thumbs { gap: .6rem; }
 
@@ -450,6 +510,12 @@ article > * + * { margin-top: .4rem; }
 
   .thumbs > :is(img, video),
   .thumbs figure > :is(img, video) { height: 96px; }
+
+  .thumbs.whole > :is(img, video) { width: auto; height: 110px; }
+
+  /* Two across on a phone; the third wraps underneath. */
+  .thumbs.featured figure { width: calc(50% - .3rem); }
+  .thumbs.featured figure > :is(img, video) { width: 100%; height: auto; }
 }
 
 @media (prefers-reduced-motion: reduce) {

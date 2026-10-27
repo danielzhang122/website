@@ -14,18 +14,21 @@
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(pointer: fine)').matches;
 
-  const BLOCK_DELAY = reduceMotion ? 0 : 3;   // ms between printed blocks
-  const BOOT_DELAY = reduceMotion ? 0 : 22;   // slower, so the first screen visibly builds line by line
   const TYPE_DELAY = reduceMotion ? 0 : 12;   // ms per character when a shortcut types a command
-  const BLOCKS = 'ascii-art, h1, h2, h3, p, figure, .row, .thumbs > *';
+  // Output types itself out: at least TYPE_MIN characters a frame, faster for long output
+  // so even a big section finishes in about TYPE_FRAMES frames (~0.7 s).
+  const TYPE_MIN = 6;
+  const TYPE_FRAMES = 40;
+  // Things that pop in whole when the typing reaches them, instead of being typed.
+  const MEDIA = 'figure, .thumbs > :is(img, video)';
 
-  const SECTIONS = ['whoami', 'projects', 'hardware', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
+  const SECTIONS = ['whoami', 'projects', 'misc', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
 
   const COMMANDS = {
     help: { help: 'list commands', run: printHelp },
     whoami: { help: 'who i am', run: printWhoami },
     projects: { help: 'things i have built', run: () => printSection('projects') },
-    hardware: { help: 'bench work and cad', run: () => printSection('hardware') },
+    misc: { help: 'bench tests, cad and side builds', run: () => printSection('misc') },
     experience: { help: 'work and school', run: () => printSection('experience') },
     skills: { help: 'tools and standards', run: () => printSection('skills') },
     certs: { help: 'certifications', run: () => printSection('certs') },
@@ -34,7 +37,8 @@
     contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
   };
-  const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume' };
+  // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
+  const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume', hardware: 'misc' };
 
   // Easter eggs: work when typed, but stay out of help and tab completion.
   const HIDDEN = {
@@ -48,19 +52,79 @@
   /* ---------- printing ---------- */
 
   let fastForward = false;   // set when a new command arrives mid-print
-  let pace = BOOT_DELAY;     // ms between blocks; drops to BLOCK_DELAY once the first screen is up
   let restoring = false;     // re-printing a saved session after a refresh: instant, no scrolling
 
-  // Appends a node, then uncovers its blocks one at a time like a slow terminal.
+  // Waits for the next animation frame, or 50 ms if frames aren't coming (a background
+  // tab pauses them), so typing never stalls the command queue.
+  const nextFrame = () => new Promise((resolve) => {
+    const fallback = setTimeout(resolve, 50);
+    requestAnimationFrame(() => {
+      clearTimeout(fallback);
+      resolve();
+    });
+  });
+
+  // Appends a node and types its text out, keeping links and formatting intact. Media
+  // (photos, videos, the chrome art) appear when the typing reaches them.
   async function reveal(node) {
-    const blocks = [...node.querySelectorAll(BLOCKS)];
-    const delay = restoring ? 0 : pace;
-    if (delay) blocks.forEach((b) => b.classList.add('pending'));
-    screen.appendChild(node);
-    for (const block of blocks) {
-      block.classList.remove('pending');
-      if (delay && !fastForward) await wait(delay);
+    if (restoring || reduceMotion) {
+      screen.appendChild(node);
+      return;
     }
+
+    // In document order: text nodes to type, and media to uncover.
+    const steps = [];
+    const walker = document.createTreeWalker(node, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+      acceptNode: (n) => {
+        if (n.nodeType === Node.ELEMENT_NODE) return n.matches(MEDIA) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+        if (n.parentElement.closest(MEDIA) || !n.data.trim()) return NodeFilter.FILTER_REJECT;
+        return NodeFilter.FILTER_ACCEPT;
+      },
+    });
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (n.nodeType === Node.ELEMENT_NODE) {
+        n.classList.add('pending');
+        steps.push({ media: n });
+      } else {
+        steps.push({ text: n, full: n.data });
+        n.data = '';
+      }
+    }
+
+    screen.appendChild(node);
+    const total = steps.reduce((sum, step) => sum + (step.full ? step.full.length : 0), 0);
+    const perFrame = Math.max(TYPE_MIN, Math.ceil(total / TYPE_FRAMES));
+
+    let i = 0;
+    while (i < steps.length) {
+      let budget = fastForward ? Infinity : perFrame;   // a new command finishes this one instantly
+      while (i < steps.length && budget > 0) {
+        const step = steps[i];
+        if (step.media) {
+          step.media.classList.remove('pending');
+          i++;
+          continue;
+        }
+        const shown = step.text.data.length;
+        const take = Math.min(budget, step.full.length - shown);
+        step.text.data = step.full.slice(0, shown + take);
+        budget -= take;
+        if (step.text.data.length === step.full.length) i++;
+      }
+      follow(node);
+      if (i < steps.length) await nextFrame();
+    }
+  }
+
+  // Keeps the newest typed line in view, like a terminal following its output, but
+  // never scrolls the command line above the top of the screen.
+  function follow(node) {
+    const box = node.getBoundingClientRect();
+    const bar = document.getElementById('shortcuts').offsetHeight;
+    const overflow = box.bottom + bar + 24 - innerHeight;
+    const room = box.top - 64;   // leaves the "> command" line just above the output visible
+    const by = Math.min(overflow, room);
+    if (by > 0) scrollBy(0, by);
   }
 
   // Autoplaying videos only decode while they're on screen.
@@ -143,10 +207,11 @@
     if (!art) return printLine('name art is unavailable.', 'dim');
     const { CELL_FADE, TYPE_START, TYPE_SPEED, LABEL } = art.timing;
 
+    // The art is drawn for 13px characters; when the console is too narrow for the
+    // row of three (phones), the glyphs stack vertically.
     const charW = 13 * 0.6;     // IBM Plex Mono advance width at 13px
-    const charH = 13 * 1.15;    // matches .name-art line-height
-    const glyphCols = Math.max(10, Math.min(28, Math.floor(screen.clientWidth / charW / 3.3)));
-    const { cols, rows, cells, fillEnd } = art.rasterize(glyphCols, charW / charH);
+    const vertical = screen.clientWidth < art.nameArt().cols * charW;
+    const { cols, rows, cells, fillEnd } = art.nameArt({ vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));
     const end = Math.max(fillEnd, TYPE_START + LABEL.length * TYPE_SPEED) + 100;
 
@@ -156,20 +221,8 @@
     pre.setAttribute('aria-label', '张卓远 (Daniel Zhang) drawn in ASCII');
     screen.appendChild(pre);
 
-    // One frame as text. Settling cells show a red dot, then their character.
-    function render(t, done) {
-      const lines = Array.from({ length: rows }, () => Array(cols).fill(' '));
-      for (const cell of cells) {
-        const p = (t - cell.start) / CELL_FADE;
-        if (p <= 0) continue;
-        if (p < 0.45) lines[cell.row][cell.col] = '<span class="accent">·</span>';
-        else lines[cell.row][cell.col] = p > 0.5 ? cell.char : '·';
-      }
-      const typed = Math.max(0, Math.min(LABEL.length, Math.floor((t - TYPE_START) / TYPE_SPEED)));
-      const cursor = !done && t >= TYPE_START ? '<span class="accent">█</span>' : '';
-      const label = t >= TYPE_START ? labelPad + LABEL.slice(0, typed) + cursor : '';
-      pre.innerHTML = `${lines.map((row) => row.join('').trimEnd()).join('\n')}\n\n${label}`;
-    }
+    const drawing = { cols, rows, cells };
+    const render = (t, done) => { pre.innerHTML = art.renderText(drawing, t, { done, labelPad }); };
 
     // Draw the empty first frame (full height) and scroll now, so the animation
     // plays in view instead of finishing off screen before the usual scroll.
@@ -182,10 +235,9 @@
         resolve();
         return;
       }
-      let startedAt = 0;
-      const frame = (now) => {
-        if (!startedAt) startedAt = now;
-        const t = now - startedAt;
+      const startedAt = performance.now();
+      const frame = () => {
+        const t = performance.now() - startedAt;
         // A new command finishes it instantly, like any other print.
         if (t >= end || fastForward) {
           render(Infinity, true);
@@ -193,9 +245,9 @@
           return;
         }
         render(t, false);
-        requestAnimationFrame(frame);
+        nextFrame().then(frame);
       };
-      requestAnimationFrame(frame);
+      nextFrame().then(frame);
     });
   }
 
@@ -281,7 +333,8 @@
   }
 
   // Commands run one after another; a new one makes the current print finish instantly.
-  function submit(text, { typed = false } = {}) {
+  // `after` runs once the command has printed (used to jump to a specific item).
+  function submit(text, { typed = false, after } = {}) {
     fastForward = true;
     queue = queue.then(async () => {
       fastForward = false;
@@ -289,6 +342,7 @@
       input.value = '';
       updateCursor();
       await run(text);
+      after?.();
     }).catch((error) => {
       // One failed command shouldn't jam every command after it.
       console.error(error);
@@ -339,7 +393,34 @@
   for (const type of ['input', 'click', 'focus', 'select']) input.addEventListener(type, updateCursor);
 
   // Shortcut bar and the command names printed by help.
+  // Scrolls to the newest printed copy of [data-id="id"] and flashes it.
+  function showItem(id) {
+    const matches = screen.querySelectorAll(`[data-id="${id}"]`);
+    const item = matches[matches.length - 1];
+    if (!item) return;
+    item.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+    item.classList.remove('is-shown');
+    void item.offsetWidth;   // restart the flash if it's already running
+    item.classList.add('is-shown');
+  }
+
+  // Featured thumbs: data-show="command:id" runs the command, then jumps to the item.
+  function showFrom(target) {
+    const [command, id] = target.dataset.show.split(':');
+    submit(command, { typed: true, after: () => showItem(id) });
+  }
+
+  addEventListener('keydown', (e) => {
+    const target = e.key === 'Enter' && document.activeElement?.closest?.('[data-show]');
+    if (target) showFrom(target);
+  });
+
   document.addEventListener('click', (e) => {
+    const shown = e.target.closest('[data-show]');
+    if (shown) {
+      showFrom(shown);
+      return;
+    }
     const button = e.target.closest('[data-run]');
     if (button) {
       submit(button.dataset.run, { typed: true });
@@ -355,7 +436,8 @@
   });
 
   addEventListener('hashchange', () => {
-    const name = location.hash.slice(1).toLowerCase();
+    const hash = location.hash.slice(1).toLowerCase();
+    const name = ALIASES[hash] || hash;
     if (COMMANDS[name]) submit(name, { typed: true });
   });
 
@@ -405,16 +487,16 @@
         console.error(error);
       });
       await queue;
-      pace = BLOCK_DELAY;
       document.getElementById('console').classList.remove('is-booting');
       scrollTo({ top: document.documentElement.scrollHeight });
       return;
     }
 
+    // Read a linked section (#projects) before whoami runs, since whoami rewrites the hash.
+    const hash = location.hash.slice(1).toLowerCase();
+    const linked = ALIASES[hash] || hash;
     await submit('whoami', { typed: true });
-    pace = BLOCK_DELAY;
     document.getElementById('console').classList.remove('is-booting');
-    const linked = location.hash.slice(1).toLowerCase();
     if (COMMANDS[linked] && linked !== 'whoami' && linked !== 'clear') submit(linked, { typed: true });
   });
 

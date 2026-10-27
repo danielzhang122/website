@@ -8,7 +8,7 @@ half the commit history is me changing one word and pushing it then changing it 
 
 all the cool visuals were found on https://21st.dev/. intro stroke data taken from (https://github.com/skishore/makemeahanzi).
 
-ascii styling inspired by https://www.ascii-magic.com/ascii (MIT), and the chrome blobs at the top of the console are their "liquid-chrome" piece. the intro still uses the make me a hanzi stroke data.
+ascii styling inspired by https://www.ascii-magic.com/ascii (MIT), and the chrome blobs at the top of the console are their "liquid-chrome" piece, played as page text through their player. the intro still uses the make me a hanzi stroke data.
 
 ## old version
 
