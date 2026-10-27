@@ -232,8 +232,8 @@ button.cmd:hover { color: var(--accent); }
 }
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
-   are no per-character spans: heavy glyphs in the text colour, mid tones rose, the
-   faintest (the piece's dark areas) red. */
+   are no per-character spans: mid tones rose, the faint glyphs inside the shape
+   red, everything else (including the dotted backdrop) the text colour. */
 .chrome-art > pre {
   grid-area: 1 / 1;
   margin: 0;
