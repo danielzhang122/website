@@ -122,6 +122,13 @@ a:hover {
 
 /* Blocks waiting to be printed by js/terminal.js. */
 .pending { visibility: hidden; }
+/* Media then draws itself in, top to bottom in scanline steps. No fill-mode forwards,
+   so the clip is gone afterwards and focus outlines aren't cut off. */
+.printing { animation: print-in 0.6s steps(16) backwards; }
+@keyframes print-in {
+  from { clip-path: inset(0 0 100% 0); }
+  to { clip-path: inset(0); }
+}
 
 /* No bare prompt on an empty screen while the first screen prints. */
 #console.is-booting #prompt { visibility: hidden; }

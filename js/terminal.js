@@ -102,6 +102,7 @@
         const step = steps[i];
         if (step.media) {
           step.media.classList.remove('pending');
+          step.media.classList.add('printing');
           i++;
           continue;
         }
