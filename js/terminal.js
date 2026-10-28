@@ -14,9 +14,9 @@
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(pointer: fine)').matches;
 
-  // The CRT effect (css/style.css) stays off across visits once `crt` turns it off.
+  // The retro effect (css/style.css) stays off across visits once `retro` turns it off.
   try {
-    if (localStorage.getItem('crt') === 'off') document.documentElement.classList.add('no-crt');
+    if (localStorage.getItem('retro') === 'off') document.documentElement.classList.add('no-retro');
   } catch {
     // storage blocked: the effect just stays on
   }
@@ -43,7 +43,7 @@
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
     contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
-    crt: { help: 'toggle the crt screen effect', run: toggleCrt },
+    retro: { help: 'toggle the retro screen effect', run: toggleRetro },
   };
   // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
   const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume', hardware: 'misc' };
@@ -219,14 +219,14 @@
   }
 
   // Easter egg: a link to the archived first version of the site.
-  function toggleCrt() {
-    const off = document.documentElement.classList.toggle('no-crt');
+  function toggleRetro() {
+    const off = document.documentElement.classList.toggle('no-retro');
     try {
-      localStorage.setItem('crt', off ? 'off' : 'on');
+      localStorage.setItem('retro', off ? 'off' : 'on');
     } catch {
       // storage blocked: the choice lasts until the page closes
     }
-    return printLine(off ? 'crt off' : 'crt on', 'dim');
+    return printLine(off ? 'retro off' : 'retro on', 'dim');
   }
 
   function printOg() {
@@ -387,8 +387,8 @@
       await printLine(`'${word}' is not recognized as a command. type help for the list.`, 'dim');
     }
     if (restoring) return;
-    // crt isn't re-run on refresh, or it would flip the saved setting back.
-    if (name !== 'clear' && name !== 'crt') ran.push(text);
+    // retro isn't re-run on refresh, or it would flip the saved setting back.
+    if (name !== 'clear' && name !== 'retro') ran.push(text);
     saveSession();
     scrollAfter(line);
   }
