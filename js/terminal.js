@@ -14,13 +14,6 @@
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(pointer: fine)').matches;
 
-  // The retro effect (css/style.css) stays off across visits once `retro` turns it off.
-  try {
-    if (localStorage.getItem('retro') === 'off') document.documentElement.classList.add('no-retro');
-  } catch {
-    // storage blocked: the effect just stays on
-  }
-
   const TYPE_DELAY = reduceMotion ? 0 : 12;   // ms per character when a shortcut types a command
   // Output types itself out: at least TYPE_MIN characters a frame, faster for long output
   // so even a big section finishes in about TYPE_FRAMES frames (~0.7 s).
