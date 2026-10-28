@@ -14,6 +14,13 @@
   const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const finePointer = matchMedia('(pointer: fine)').matches;
 
+  // The CRT effect (css/style.css) stays off across visits once `crt` turns it off.
+  try {
+    if (localStorage.getItem('crt') === 'off') document.documentElement.classList.add('no-crt');
+  } catch {
+    // storage blocked: the effect just stays on
+  }
+
   const TYPE_DELAY = reduceMotion ? 0 : 12;   // ms per character when a shortcut types a command
   // Output types itself out: at least TYPE_MIN characters a frame, faster for long output
   // so even a big section finishes in about TYPE_FRAMES frames (~0.7 s).
@@ -36,6 +43,7 @@
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
     contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
+    crt: { help: 'toggle the crt screen effect', run: toggleCrt },
   };
   // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
   const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume', hardware: 'misc' };
@@ -211,6 +219,16 @@
   }
 
   // Easter egg: a link to the archived first version of the site.
+  function toggleCrt() {
+    const off = document.documentElement.classList.toggle('no-crt');
+    try {
+      localStorage.setItem('crt', off ? 'off' : 'on');
+    } catch {
+      // storage blocked: the choice lasts until the page closes
+    }
+    return printLine(off ? 'crt off' : 'crt on', 'dim');
+  }
+
   function printOg() {
     const line = document.createElement('p');
     const link = document.createElement('a');
@@ -369,7 +387,8 @@
       await printLine(`'${word}' is not recognized as a command. type help for the list.`, 'dim');
     }
     if (restoring) return;
-    if (name !== 'clear') ran.push(text);
+    // crt isn't re-run on refresh, or it would flip the saved setting back.
+    if (name !== 'clear' && name !== 'crt') ran.push(text);
     saveSession();
     scrollAfter(line);
   }

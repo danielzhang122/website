@@ -84,6 +84,48 @@ a:hover {
 
 
 /* ==========================================================================
+   CRT: scanlines, a faint flicker, a rolling streak and a hint of RGB fringe.
+   The `crt` command toggles .no-crt on <html> to turn it all off.
+   ========================================================================== */
+
+html:not(.no-crt) body::before,
+html:not(.no-crt) body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+html:not(.no-crt) body::before {
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px);
+  animation: crt-flicker 4s steps(1) infinite;
+}
+
+html:not(.no-crt) body::after {
+  bottom: auto;
+  height: 20vh;
+  background: linear-gradient(transparent, rgba(255, 255, 255, .03), transparent);
+  animation: crt-roll 8s linear infinite;
+}
+
+html:not(.no-crt) #console {
+  text-shadow: -.75px 0 rgba(255, 40, 80, .4), .75px 0 rgba(40, 200, 255, .4);
+}
+
+@keyframes crt-flicker {
+  0%, 8%, 35%, 72% { opacity: 1; }
+  7%, 33%, 71% { opacity: .9; }
+  34% { opacity: .85; }
+}
+
+@keyframes crt-roll {
+  from { transform: translateY(-20vh); }
+  to { transform: translateY(100vh); }
+}
+
+
+/* ==========================================================================
    Console
    ========================================================================== */
 
@@ -530,4 +572,6 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 
 @media (prefers-reduced-motion: reduce) {
   .cursor { animation: none; }
+  body::before { animation: none !important; }
+  body::after { display: none !important; }
 }
