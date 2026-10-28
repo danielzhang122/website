@@ -12,4 +12,4 @@ ascii styling inspired by https://www.ascii-magic.com/ascii (MIT), and the chrom
 
 ## old version
 
-the original site (intro animation, particles, neon sign, all of it) is archived in `v1/` and still viewable at /website/v1/. the credits above are for that version. it's also saved as the git tag `v1-original`.
+the original site (intro animation, particles, neon sign, all of it) is archived in `v1/` and still viewable at zhangdz.ca/v1/ (or type `og` in the terminal). the credits above are for that version. it's also saved as the git tag `v1-original`.
