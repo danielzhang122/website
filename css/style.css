@@ -109,7 +109,11 @@ html:not(.no-retro) body::after {
   animation: crt-roll 12s linear infinite;
 }
 
-html:not(.no-retro) #console {
+/* Buttons and inputs don't inherit text-shadow by default; the commands are buttons. */
+button,
+input { text-shadow: inherit; }
+
+html:not(.no-retro) body {
   text-shadow: -.75px 0 rgba(255, 40, 80, .4), .75px 0 rgba(40, 200, 255, .4);
 }
 
