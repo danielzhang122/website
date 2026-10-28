@@ -32,14 +32,14 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261027-15">
+  <link rel="stylesheet" href="css/style.css?v=20261027-16">
 
-  <script src="js/intro-glyphs.js?v=20261027-15" defer></script>
-  <script src="js/intro.js?v=20261027-15" defer></script>
-  <script src="js/lightbox.js?v=20261027-15" defer></script>
-  <script src="js/terminal.js?v=20261027-15" defer></script>
+  <script src="js/intro-glyphs.js?v=20261027-16" defer></script>
+  <script src="js/intro.js?v=20261027-16" defer></script>
+  <script src="js/lightbox.js?v=20261027-16" defer></script>
+  <script src="js/terminal.js?v=20261027-16" defer></script>
   <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
-  <script type="module" src="js/chrome.js?v=20261027-15"></script>
+  <script type="module" src="js/chrome.js?v=20261027-16"></script>
 </head>
 <body>
 
@@ -64,16 +64,16 @@
   </main>
 
   <nav id="shortcuts" aria-label="Commands">
-    <button type="button" data-run="help">help</button>
     <button type="button" data-run="whoami">whoami</button>
+    <button type="button" data-run="resume">resume</button>
     <button type="button" data-run="projects">projects</button>
-    <button type="button" data-run="misc">misc</button>
     <button type="button" data-run="experience">experience</button>
+    <button type="button" data-run="contact">contact</button>
     <button type="button" data-run="skills">skills</button>
     <button type="button" data-run="certs">certs</button>
+    <button type="button" data-run="misc">misc</button>
     <button type="button" data-run="art">art</button>
-    <button type="button" data-run="resume">resume</button>
-    <button type="button" data-run="contact">contact</button>
+    <button type="button" data-run="help">help</button>
   </nav>
 
   <!--
@@ -106,9 +106,9 @@
           <video disablepictureinpicture src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
           <figcaption>Quadruped robot</figcaption>
         </figure>
-        <figure data-show="projects:suspension" role="link" tabindex="0" aria-label="Wishbone suspension: show in projects">
-          <video disablepictureinpicture src="images/suspension.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
-          <figcaption>Wishbone suspension (concept)</figcaption>
+        <figure data-show="projects:pacemaker" role="link" tabindex="0" aria-label="Pacemaker firmware: show in projects">
+          <img src="images/pacemaker-modes.png" class="fit-whole" loading="lazy" alt="">
+          <figcaption>Rate-adaptive pacemaker firmware</figcaption>
         </figure>
         <figure data-show="projects:wheelsafe" role="link" tabindex="0" aria-label="WheelSafe: show in projects">
           <img src="images/wheelsafe.jpg" loading="lazy" alt="">
@@ -132,14 +132,19 @@
         </figure>
       </article>
 
-      <article data-id="suspension">
-        <h3>Double Wishbone Suspension (Concept)</h3>
-        <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how the linkage could control dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
-        <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
+      <article data-id="pacemaker">
+        <h3>Rate-Adaptive Pacemaker Firmware</h3>
+        <p>Pacemaker firmware modelled in Simulink and Stateflow for an NXP FRDM-K64F board, with Embedded Coder generating the C that runs on it. The team model paces in AOO, VOO, AAI and VVI modes. My part was the rate-adaptive modes (AOOR, VOOR, AAIR, VVIR): they read the board's FXOS8700 accelerometer and raise the pacing rate with activity, tuned by threshold, reaction and recovery times. The smooth ramp back down to resting rate turned out not to be required, but the TA liked it.</p>
+        <p class="tags">Simulink, Stateflow, Embedded Coder, NXP FRDM-K64F <a href="https://github.com/danielzhang122/sfwreng-3k04-pacemaker" target="_blank" rel="noopener">Repo</a></p>
         <figure class="thumb">
-          <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="metadata" data-lightbox
-                 aria-label="Double Wishbone Suspension"
-                 data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
+          <img src="images/pacemaker-rate-adaptive.png" width="2400" height="1002" loading="lazy" data-lightbox
+               alt="Rate-adaptive pacing subsystem"
+               data-caption="My part: accelerometer magnitude, moving standard deviation as the activity level, then a Stateflow chart that sets and ramps the pacing rate">
+        </figure>
+        <figure class="thumb">
+          <img src="images/pacemaker-modes.png" width="1800" height="1424" loading="lazy" data-lightbox
+               alt="Pacemaker mode chart"
+               data-caption="Top-level Stateflow chart switching between the eight pacing modes">
         </figure>
       </article>
 
@@ -162,6 +167,17 @@
           <video disablepictureinpicture src="images/robotic-arm.mp4" width="400" height="714" muted loop playsinline preload="metadata" data-lightbox
                  aria-label="Vision-Guided 2-DOF Robotic Arm"
                  data-caption="Real-time OpenCV hand tracking over UDP to an ESP32"></video>
+        </figure>
+      </article>
+
+      <article data-id="suspension">
+        <h3>Double Wishbone Suspension (Concept)</h3>
+        <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how the linkage could control dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
+        <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
+        <figure class="thumb">
+          <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="metadata" data-lightbox
+                 aria-label="Double Wishbone Suspension"
+                 data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
         </figure>
       </article>
 
@@ -302,10 +318,10 @@
 
     <section data-cmd="resume">
       <h2>Resume</h2>
-      <p>One page; every bullet had to earn its spot. Covers nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and computer vision projects.</p>
+      <p>One page; every bullet had to earn its spot. Covers nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and pacemaker firmware projects.</p>
       <p class="dim">PDF, one page, updated Oct 2026. <a href="Daniel_Zhang_Resume.pdf" download>Download</a> or <a href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
       <div class="thumbs whole">
-        <img src="images/resume-preview.png" width="1654" height="2340" class="resume-thumb" loading="lazy" data-lightbox
+        <img src="images/resume-preview.png" width="1654" height="2339" class="resume-thumb" loading="lazy" data-lightbox
              alt="Resume" data-caption="One page, updated Oct 2026.">
       </div>
     </section>
@@ -362,7 +378,7 @@
       <div class="row"><span class="key">Email</span><p><a href="mailto:zhand40@mcmaster.ca">zhand40@mcmaster.ca</a></p></div>
       <div class="row"><span class="key">GitHub</span><p><a href="https://github.com/danielzhang122" target="_blank" rel="noopener">github.com/danielzhang122</a></p></div>
       <div class="row"><span class="key">LinkedIn</span><p><a href="https://www.linkedin.com/in/zhangdz/" target="_blank" rel="noopener">linkedin.com/in/zhangdz</a></p></div>
-      <p class="dim">© 2026 Daniel Zhang. <a href="v1/">Previous version of this site</a></p>
+      <p class="dim">© 2026 Daniel Zhang.</p>
     </section>
 
   </div>

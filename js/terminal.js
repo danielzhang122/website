@@ -45,6 +45,7 @@
     name: printNameArt,
     zhuoyuan: printNameArt,
     '张卓远': printNameArt,
+    og: printOg,
   };
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
@@ -207,6 +208,16 @@
     } catch {
       // some file:// setups refuse URL changes; linking just won't update
     }
+  }
+
+  // Easter egg: a link to the archived first version of the site.
+  function printOg() {
+    const line = document.createElement('p');
+    const link = document.createElement('a');
+    link.href = 'v1/';
+    link.textContent = 'zhangdz.ca/v1';
+    line.append(link);
+    return reveal(line);
   }
 
   // Easter egg: prints the intro's 张卓远 animation into the console as text, at the
