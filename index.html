@@ -154,6 +154,22 @@
         </figure>
       </article>
 
+      <article data-id="pacemaker">
+        <h3>Rate-Adaptive Pacemaker Firmware</h3>
+        <p>Pacemaker firmware modelled in Simulink and Stateflow for an NXP FRDM-K64F board, with Embedded Coder generating the C that runs on it. The team model paces in AOO, VOO, AAI and VVI modes. My part was the rate-adaptive modes (AOOR, VOOR, AAIR, VVIR): they read the board's FXOS8700 accelerometer and raise the pacing rate with activity, tuned by threshold, reaction and recovery times. The smooth ramp back down to resting rate turned out not to be required, but the TA liked it.</p>
+        <p class="tags">Simulink, Stateflow, Embedded Coder, NXP FRDM-K64F <a href="https://github.com/danielzhang122/sfwreng-3k04-pacemaker" target="_blank" rel="noopener">Repo</a></p>
+        <figure class="thumb">
+          <img src="images/pacemaker-rate-adaptive.png" width="2400" height="1002" loading="lazy" data-lightbox
+               alt="Rate-adaptive pacing subsystem"
+               data-caption="My part: accelerometer magnitude, moving standard deviation as the activity level, then a Stateflow chart that sets and ramps the pacing rate">
+        </figure>
+        <figure class="thumb">
+          <img src="images/pacemaker-modes.png" width="1800" height="1424" loading="lazy" data-lightbox
+               alt="Pacemaker mode chart"
+               data-caption="Top-level Stateflow chart switching between the eight pacing modes">
+        </figure>
+      </article>
+
       <article>
         <h3>Vision-Guided 2-DOF Robotic Arm</h3>
         <p>Built in 12 hours, about as long as SolidWorks takes to open. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
@@ -302,7 +318,7 @@
 
     <section data-cmd="resume">
       <h2>Resume</h2>
-      <p>One page; every bullet had to earn its spot. Covers nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and computer vision projects.</p>
+      <p>One page; every bullet had to earn its spot. Covers nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and legged-robot and pacemaker firmware projects.</p>
       <p class="dim">PDF, one page, updated Oct 2026. <a href="Daniel_Zhang_Resume.pdf" download>Download</a> or <a href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
       <div class="thumbs whole">
         <img src="images/resume-preview.png" width="1654" height="2339" class="resume-thumb" loading="lazy" data-lightbox
