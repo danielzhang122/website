@@ -36,6 +36,7 @@
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
     contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
+    retro: { help: 'toggle the retro screen effect', run: toggleRetro },
   };
   // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
   const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume', hardware: 'misc' };
@@ -211,6 +212,16 @@
   }
 
   // Easter egg: a link to the archived first version of the site.
+  function toggleRetro() {
+    const off = document.documentElement.classList.toggle('no-retro');
+    try {
+      localStorage.setItem('retro', off ? 'off' : 'on');
+    } catch {
+      // storage blocked: the choice lasts until the page closes
+    }
+    return printLine(off ? 'retro off' : 'retro on', 'dim');
+  }
+
   function printOg() {
     const line = document.createElement('p');
     const link = document.createElement('a');
@@ -320,6 +331,35 @@
     scrollTo({ top: Math.max(0, target), behavior: reduceMotion ? 'auto' : 'smooth' });
   }
 
+  // Typo tolerance: the nearest command or alias, within 1 edit (2 for names over 6 letters).
+  // Easter eggs need exact spelling.
+  function closest(word) {
+    let best = null;
+    let bestDistance = Infinity;
+    for (const candidate of [...Object.keys(COMMANDS), ...Object.keys(ALIASES)]) {
+      if (candidate.length < 3) continue;   // ls, cv and ? would swallow any short word
+      const distance = editDistance(word, candidate);
+      if (distance <= (candidate.length > 6 ? 2 : 1) && distance < bestDistance) {
+        best = candidate;
+        bestDistance = distance;
+      }
+    }
+    return best && (ALIASES[best] || best);
+  }
+
+  // Edits between two words: inserts, deletes, substitutions and swapped neighbours.
+  function editDistance(a, b) {
+    const d = Array.from({ length: a.length + 1 }, (_, i) => [i]);
+    for (let j = 1; j <= b.length; j++) d[0][j] = j;
+    for (let i = 1; i <= a.length; i++) {
+      for (let j = 1; j <= b.length; j++) {
+        d[i][j] = Math.min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + (a[i - 1] === b[j - 1] ? 0 : 1));
+        if (i > 1 && j > 1 && a[i - 1] === b[j - 2] && a[i - 2] === b[j - 1]) d[i][j] = Math.min(d[i][j], d[i - 2][j - 2] + 1);
+      }
+    }
+    return d[a.length][b.length];
+  }
+
   async function run(raw) {
     const text = raw.trim();
     const line = echo(text);
@@ -328,7 +368,8 @@
     if (!text) return;
 
     const word = text.toLowerCase().split(/\s+/)[0];
-    const name = ALIASES[word] || word;
+    const exact = ALIASES[word] || word;
+    const name = COMMANDS[exact] || HIDDEN[exact] ? exact : closest(word) || exact;
     const command = COMMANDS[name];
     if (HIDDEN[name]) {
       await HIDDEN[name](line);
@@ -339,7 +380,8 @@
       await printLine(`'${word}' is not recognized as a command. type help for the list.`, 'dim');
     }
     if (restoring) return;
-    if (name !== 'clear') ran.push(text);
+    // retro isn't re-run on refresh, or it would flip the saved setting back.
+    if (name !== 'clear' && name !== 'retro') ran.push(text);
     saveSession();
     scrollAfter(line);
   }
