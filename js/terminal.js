@@ -146,6 +146,14 @@
     copy.querySelectorAll('video').forEach((video) => videoObserver.observe(video));
   }
 
+  // Once the page has loaded, fetch every photo and video into the browser cache, so a
+  // printed section shows its media straight away. Skipped when the visitor asked to save data.
+  addEventListener('load', () => {
+    if (navigator.connection?.saveData) return;
+    const sources = new Set([...content.querySelectorAll('img, video')].map((media) => media.getAttribute('src')));
+    for (const src of sources) fetch(src, { priority: 'low' }).catch(() => {});
+  });
+
   // The banner (art and name) comes with whoami, so it can be brought back after clear.
   async function printWhoami() {
     await printSection('banner');

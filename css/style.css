@@ -328,6 +328,9 @@ article > * + * { margin-top: .4rem; }
   object-fit: contain;
 }
 
+/* The resume page is the one thumb worth reading at a glance. */
+.thumbs.whole > .resume-thumb { height: 320px; }
+
 .thumbs figure { width: 120px; }
 
 .thumbs figcaption {
