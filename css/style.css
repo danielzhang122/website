@@ -104,9 +104,9 @@ html:not(.no-retro) body::before {
 
 html:not(.no-retro) body::after {
   bottom: auto;
-  height: 20vh;
-  background: linear-gradient(transparent, rgba(255, 255, 255, .03), transparent);
-  animation: crt-roll 8s linear infinite;
+  height: 40vh;
+  background: linear-gradient(transparent, rgba(255, 255, 255, .015), transparent);
+  animation: crt-roll 12s linear infinite;
 }
 
 html:not(.no-retro) #console {
@@ -120,7 +120,7 @@ html:not(.no-retro) #console {
 }
 
 @keyframes crt-roll {
-  from { transform: translateY(-20vh); }
+  from { transform: translateY(-40vh); }
   to { transform: translateY(100vh); }
 }
 
