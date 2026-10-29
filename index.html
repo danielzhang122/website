@@ -34,14 +34,14 @@
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261028-2">
+  <link rel="stylesheet" href="css/style.css?v=20261028-3">
 
-  <script src="js/intro-glyphs.js?v=20261028-2" defer></script>
-  <script src="js/intro.js?v=20261028-2" defer></script>
-  <script src="js/lightbox.js?v=20261028-2" defer></script>
-  <script src="js/terminal.js?v=20261028-2" defer></script>
+  <script src="js/intro-glyphs.js?v=20261028-3" defer></script>
+  <script src="js/intro.js?v=20261028-3" defer></script>
+  <script src="js/lightbox.js?v=20261028-3" defer></script>
+  <script src="js/terminal.js?v=20261028-3" defer></script>
   <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
-  <script type="module" src="js/chrome.js?v=20261028-2"></script>
+  <script type="module" src="js/chrome.js?v=20261028-3"></script>
 </head>
 <body>
 
@@ -193,6 +193,12 @@
                data-caption="A scripted walk through Manhattan on the live map, logged step by step">
         </figure>
       </article>
+
+      <article data-id="nuclear">
+        <h3>Ontario Nuclear Outage Analysis (In Progress)</h3>
+        <p>What happens to Ontario's grid when a nuclear reactor goes offline? Hourly IESO output for every generator of 20 MW or more since May 2019, 11.8 million rows in DuckDB. SQL detects 206 nuclear outages of a day or longer and separates announced refurbishments from routine maintenance. Next: what filled the gap, what it did to prices and how much extra CO2 it cost. No front end yet. I'm learning SQL as I go, so the queries start at SELECT and work up to window functions.</p>
+        <p class="tags">SQL (DuckDB), Python, IESO data <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener">Repo</a></p>
+      </article>
     </section>
 
     <section data-cmd="misc">
@@ -297,7 +303,7 @@
       </div>
       <div class="row">
         <span class="key">Software</span>
-        <p>Python (OpenCV), C / C++, MATLAB / Simulink, Julia, SMath, Maple, Power Automate <a href="https://github.com/danielzhang122/junk-drawer" target="_blank" rel="noopener">Misc scripts</a></p>
+        <p>Python (OpenCV), C / C++, SQL (DuckDB), MATLAB / Simulink, Julia, SMath, Maple, Power Automate <a href="https://github.com/danielzhang122/junk-drawer" target="_blank" rel="noopener">Misc scripts</a></p>
       </div>
       <div class="row">
         <span class="key">Industry</span>
