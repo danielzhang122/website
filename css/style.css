@@ -98,7 +98,7 @@ html:not(.no-retro) body::after {
 }
 
 html:not(.no-retro) body::before {
-  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .22) 0 1px, transparent 1px 3px);
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .08) 0 1px, transparent 1px 3px);
   animation: crt-flicker 4s steps(1) infinite;
 }
 
@@ -120,12 +120,22 @@ html:not(.no-retro) body {
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
   html:not(.no-retro) body::before {
-    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .26) 0 1px, transparent 1px 3px);
+    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .1) 0 1px, transparent 1px 3px);
   }
 
   html:not(.no-retro) body {
     text-shadow: -1px 0 rgba(255, 40, 80, .5), 1px 0 rgba(40, 200, 255, .5);
   }
+}
+
+/* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
+html:not(.no-retro) body:has(#lightbox.is-open)::before {
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 1px, transparent 1px 3px);
+}
+
+/* Grey text is thin enough that the full fringe swamps it; give it a lighter one. */
+html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
+  text-shadow: -.75px 0 rgba(255, 40, 80, .4), .75px 0 rgba(40, 200, 255, .4);
 }
 
 @keyframes crt-flicker {
@@ -452,7 +462,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   z-index: 100;
   background: var(--bg);
   cursor: pointer;
-  transition: opacity .45s ease;
+  transition: opacity .2s ease;
 }
 
 #gate.is-leaving {
