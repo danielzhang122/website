@@ -135,7 +135,7 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
 
 /* Grey text is thin enough that the full fringe swamps it; give it a lighter one. */
 html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
-  text-shadow: -.75px 0 rgba(255, 40, 80, .3), .75px 0 rgba(40, 200, 255, .3);
+  text-shadow: -.75px 0 rgba(255, 40, 80, .4), .75px 0 rgba(40, 200, 255, .4);
 }
 
 @keyframes crt-flicker {
