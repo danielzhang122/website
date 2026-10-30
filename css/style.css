@@ -452,7 +452,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   z-index: 100;
   background: var(--bg);
   cursor: pointer;
-  transition: opacity .45s ease;
+  transition: opacity .2s ease;
 }
 
 #gate.is-leaving {

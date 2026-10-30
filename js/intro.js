@@ -1,5 +1,5 @@
 // Intro screen: 张卓远 fills in quietly out of ASCII characters, stroke by stroke
-// in writing order, then "daniel zhang" types out and the screen fades away.
+// in writing order, then "daniel zhang" types out, the art crumbles away and the screen fades.
 // Shown once per session. Esc / S / click skips it.
 //
 // The final frame is Daniel's hand-tuned ASCII (NAME_ART); the rasterizer only supplies
@@ -24,7 +24,10 @@
   const TYPE_START = 600;         // ms
   const TYPE_SPEED = 35;          // ms per letter
   const HOLD = 300;               // ms after everything is in place
-  const FADE_OUT = 450;           // ms, matches the CSS transition
+  const DECAY_SPREAD = 150;       // ms over which cells start breaking down, in random order
+  const DECAY_CELL = 100;         // ms for one cell to crumble down the ramp to nothing
+  const DECAY_TIME = DECAY_SPREAD + DECAY_CELL;
+  const FADE_OUT = 200;           // ms, matches the CSS transition
 
   // Deterministic pseudo-random in [0, 1) so the fill looks the same after a resize.
   const hash = (n) => {
@@ -126,16 +129,25 @@
 
   // One frame of a rasterized art as HTML text: settling cells show a red dot, then their
   // character; below, the label types out with a red block cursor (blinking if asked).
-  function renderText({ cols, rows, cells }, t, { done = false, labelPad = '', blink = false } = {}) {
+  // decay (ms since the exit began, if given) crumbles each cell down the ramp to a red
+  // dot and then away, in random order, while the label erases itself.
+  function renderText({ cols, rows, cells }, t, { done = false, labelPad = '', blink = false, decay = -1 } = {}) {
     const lines = Array.from({ length: rows }, () => Array(cols).fill(' '));
     for (const cell of cells) {
       const p = (t - cell.start) / CELL_FADE;
       if (p <= 0) continue;
-      if (p < 0.45) lines[cell.row][cell.col] = '<span class="accent">·</span>';
-      else lines[cell.row][cell.col] = p > 0.5 ? cell.char : '·';
+      let char = p < 0.45 ? '<span class="accent">·</span>' : p > 0.5 ? cell.char : '·';
+      if (decay >= 0) {
+        const q = (decay - hash(cell.col * 13 + cell.row * 7) * DECAY_SPREAD) / DECAY_CELL;
+        if (q >= 1) continue;
+        if (q > 0.7) char = '<span class="accent">·</span>';
+        else if (q > 0 && p > 0.5) char = RAMP[Math.max(0, Math.floor(RAMP.indexOf(cell.char) * (1 - q / 0.7)))];
+      }
+      lines[cell.row][cell.col] = char;
     }
-    const typed = Math.max(0, Math.min(LABEL.length, Math.floor((t - TYPE_START) / TYPE_SPEED)));
-    const cursorOn = !done && t >= TYPE_START && (!blink || Math.floor(t / 500) % 2 === 0);
+    let typed = Math.max(0, Math.min(LABEL.length, Math.floor((t - TYPE_START) / TYPE_SPEED)));
+    if (decay >= 0) typed = Math.floor(typed * clamp01(1 - decay / DECAY_TIME));
+    const cursorOn = !done && decay < 0 && t >= TYPE_START && (!blink || Math.floor(t / 500) % 2 === 0);
     const cursor = cursorOn ? '<span class="accent">█</span>' : '';
     const label = t >= TYPE_START ? labelPad + LABEL.slice(0, typed) + cursor : '';
     return `${lines.map((row) => row.join('').trimEnd()).join('\n')}\n\n${label}`;
@@ -246,14 +258,15 @@
     pre.style.width = `${art.cols}ch`;
   }
 
-  function draw(t) {
-    pre.innerHTML = renderText(art, t, { labelPad, blink: true });
+  function draw(t, decay) {
+    pre.innerHTML = renderText(art, t, { labelPad, blink: true, decay });
   }
 
   /* ---------- timeline ---------- */
 
   let startedAt = 0;
   let leaving = false;
+  let leftAt = 0;
   let raf = 0;
 
   function leave() {
@@ -264,19 +277,27 @@
     } catch {
       // storage blocked: the intro just plays again next time
     }
-    gate.classList.add('is-leaving');
+    // Not drawn yet (skipped before the font loaded): nothing to crumble, just fade.
+    const crumble = art && startedAt ? DECAY_TIME : 0;
+    leftAt = performance.now();
+    setTimeout(() => gate.classList.add('is-leaving'), crumble);
     setTimeout(() => {
       cancelAnimationFrame(raf);
       gate.remove();
-    }, FADE_OUT);
+    }, crumble + FADE_OUT);
   }
 
   function frame(now) {
     if (!startedAt) startedAt = now;
-    const t = now - startedAt;
-    draw(t);
-    const typedEnd = TYPE_START + LABEL.length * TYPE_SPEED;
-    if (t > Math.max(art.fillEnd, typedEnd) + HOLD) leave();
+    if (leaving) {
+      // Freeze the fill where it was and crumble from there.
+      draw(leftAt - startedAt, now - leftAt);
+    } else {
+      const t = now - startedAt;
+      draw(t);
+      const typedEnd = TYPE_START + LABEL.length * TYPE_SPEED;
+      if (t > Math.max(art.fillEnd, typedEnd) + HOLD) leave();
+    }
     raf = requestAnimationFrame(frame);
   }
 
