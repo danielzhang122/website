@@ -116,6 +116,10 @@
           <img src="images/wheelsafe.jpg" loading="lazy" alt="">
           <figcaption>WheelSafe, top 3 of 200+</figcaption>
         </figure>
+        <figure data-show="projects:nuclear" role="link" tabindex="0" aria-label="Ontario nuclear grid analysis: show in projects">
+          <img src="images/nuclear-thumb.png" loading="lazy" alt="">
+          <figcaption>Ontario nuclear grid analysis</figcaption>
+        </figure>
       </div>
       <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="misc">misc</button> <button type="button" class="cmd" data-run="resume">resume</button></p>
     </section>
@@ -150,14 +154,19 @@
         </figure>
       </article>
 
-      <article data-id="wheelsafe">
-        <h3>WheelSafe Storage</h3>
-        <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the McMaster Design Showcase.</p>
-        <p class="tags">Autodesk Inventor, client prototyping, carbon fiber</p>
+      <article data-id="nuclear">
+        <h3>Ontario Nuclear Grid Impact Analysis</h3>
+        <p>What happens to Ontario's grid when a reactor goes offline? 11.8 million rows of hourly IESO data in DuckDB, SQL that finds 206 outages of a day or longer, and an interactive dashboard that shows who picks up the slack. Mostly gas and fewer exports, it turns out, at about $4/MWh more and 145 extra tonnes of CO2 an hour. Reactor behaviour is next. I'm learning SQL from scratch, so the queries get noticeably more confident toward the end.</p>
+        <p class="tags">SQL (DuckDB), Python, Streamlit, IESO data <a href="https://nuclear-dashboard.streamlit.app/" target="_blank" rel="noopener">Live app</a> <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener">Repo</a></p>
         <figure class="thumb">
-          <img src="images/wheelsafe.jpg" width="1280" height="1706" loading="lazy" data-lightbox
-               alt="WheelSafe Storage"
-               data-caption="Carbon-fiber wheelchair storage module, Top 3 at the McMaster Design Showcase">
+          <img src="images/nuclear-generation.png" width="1965" height="870" loading="lazy" data-lightbox
+               alt="Daily nuclear energy by plant on the dashboard"
+               data-caption="Daily energy from each plant, all nuclear and every Ontario power plant, over any date range">
+        </figure>
+        <figure class="thumb">
+          <img src="images/nuclear-gap.png" width="1965" height="990" loading="lazy" data-lightbox
+               alt="What replaces the missing nuclear power"
+               data-caption="When ~840 MW of nuclear goes missing, gas, imports and lower demand fill the gap, and they add up to it">
         </figure>
       </article>
 
@@ -172,17 +181,6 @@
         </figure>
       </article>
 
-      <article data-id="suspension">
-        <h3>Double Wishbone Suspension (Concept)</h3>
-        <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how the linkage could control dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
-        <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
-        <figure class="thumb">
-          <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="metadata" data-lightbox
-                 aria-label="Double Wishbone Suspension"
-                 data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
-        </figure>
-      </article>
-
       <article>
         <h3>Globe Ghost — iOS GPS Simulator</h3>
         <p>Sets an iPhone's actual GPS location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester. Find My now thinks I've been to California.</p>
@@ -194,10 +192,26 @@
         </figure>
       </article>
 
-      <article data-id="nuclear">
-        <h3>Ontario Nuclear Grid Impact Analysis</h3>
-        <p>What happens to Ontario's grid when a reactor goes offline? 11.8 million rows of hourly IESO data in DuckDB, and SQL that finds 206 outages of a day or longer. Prices, CO2 and a front end are next. I'm learning SQL from scratch, so the queries get noticeably more confident toward the end.</p>
-        <p class="tags">SQL (DuckDB), Python, IESO data <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener">Repo</a></p>
+      <article data-id="wheelsafe">
+        <h3>WheelSafe Storage</h3>
+        <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the McMaster Design Showcase.</p>
+        <p class="tags">Autodesk Inventor, client prototyping, carbon fiber</p>
+        <figure class="thumb">
+          <img src="images/wheelsafe.jpg" width="1280" height="1706" loading="lazy" data-lightbox
+               alt="WheelSafe Storage"
+               data-caption="Carbon-fiber wheelchair storage module, Top 3 at the McMaster Design Showcase">
+        </figure>
+      </article>
+
+      <article data-id="suspension">
+        <h3>Double Wishbone Suspension (Concept)</h3>
+        <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how the linkage could control dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
+        <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
+        <figure class="thumb">
+          <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="metadata" data-lightbox
+                 aria-label="Double Wishbone Suspension"
+                 data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
+        </figure>
       </article>
     </section>
 
