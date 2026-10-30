@@ -15,9 +15,9 @@
   const finePointer = matchMedia('(pointer: fine)').matches;
 
   const TYPE_DELAY = reduceMotion ? 0 : 12;   // ms per character when a shortcut types a command
-  // Output types itself out: at least TYPE_MIN characters a frame, faster for long output
+  // Output types itself out: at least TYPE_MIN character a frame, faster for long output
   // so even a big section finishes in about TYPE_FRAMES frames (~0.7 s).
-  const TYPE_MIN = 6;
+  const TYPE_MIN = 1;
   const TYPE_FRAMES = 40;
   // Things that pop in whole when the typing reaches them, instead of being typed.
   const MEDIA = 'figure, .thumbs > :is(img, video)';
