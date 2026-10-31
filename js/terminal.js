@@ -22,13 +22,14 @@
   // Things that pop in whole when the typing reaches them, instead of being typed.
   const MEDIA = 'figure, .thumbs > :is(img, video)';
 
-  const SECTIONS = ['whoami', 'projects', 'misc', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
+  const SECTIONS = ['whoami', 'projects', 'misc', 'interests', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
 
   const COMMANDS = {
     help: { help: 'list commands', run: printHelp },
     whoami: { help: 'who i am', run: printWhoami },
     projects: { help: 'things i have built', run: () => printSection('projects') },
     misc: { help: 'bench tests, cad and side builds', run: () => printSection('misc') },
+    interests: { help: 'what i do outside work', run: () => printSection('interests') },
     experience: { help: 'work and school', run: () => printSection('experience') },
     skills: { help: 'tools and standards', run: () => printSection('skills') },
     certs: { help: 'certifications', run: () => printSection('certs') },
