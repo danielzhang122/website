@@ -29,19 +29,18 @@
   <!-- The `retro` command's saved choice, applied before first paint so it covers the intro too. -->
   <script>try { if (localStorage.getItem('retro') === 'off') document.documentElement.classList.add('no-retro'); } catch {}</script>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&display=swap">
+  <!-- Self-hosted (see @font-face in css/style.css) so no third-party server can block or break the first paint. -->
+  <link rel="preload" href="fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261031-1">
+  <link rel="stylesheet" href="css/style.css?v=20261031-2">
 
-  <script src="js/intro-glyphs.js?v=20261031-1" defer></script>
-  <script src="js/intro.js?v=20261031-1" defer></script>
-  <script src="js/lightbox.js?v=20261031-1" defer></script>
-  <script src="js/terminal.js?v=20261031-1" defer></script>
+  <script src="js/intro-glyphs.js?v=20261031-2" defer></script>
+  <script src="js/intro.js?v=20261031-2" defer></script>
+  <script src="js/lightbox.js?v=20261031-2" defer></script>
+  <script src="js/terminal.js?v=20261031-2" defer></script>
   <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
-  <script type="module" src="js/chrome.js?v=20261031-1"></script>
+  <script type="module" src="js/chrome.js?v=20261031-2"></script>
 </head>
 <body>
 
@@ -84,7 +83,8 @@
     that command. Without JavaScript this whole block shows as a plain README.
 
     Lightbox convention: any <img>/<video> with data-lightbox opens in the viewer.
-    Its alt / aria-label is the title, data-caption the description, and the
+    Its data-title (else alt / aria-label) is the title, data-caption the description,
+    alt the full description for screen readers, and the
     arrows cycle through the other media inside the same [data-gallery].
   -->
   <div id="content">
@@ -107,19 +107,19 @@
       <!-- Each opens `projects` and jumps to that project (js/terminal.js, data-show). -->
       <div class="thumbs featured">
         <figure data-show="projects:quadruped" role="link" tabindex="0" aria-label="Quadruped robot: show in projects">
-          <video disablepictureinpicture src="images/quadruped-sim.mp4" muted loop playsinline preload="metadata" aria-hidden="true"></video>
+          <video disablepictureinpicture src="images/quadruped-sim.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
           <figcaption>Quadruped robot</figcaption>
         </figure>
         <figure data-show="projects:pacemaker" role="link" tabindex="0" aria-label="Pacemaker firmware: show in projects">
-          <img src="images/pacemaker-modes.png" class="fit-whole" loading="lazy" alt="">
+          <img src="images/pacemaker-modes.webp" class="fit-whole" loading="lazy" alt="">
           <figcaption>Rate-adaptive pacemaker firmware</figcaption>
         </figure>
         <figure data-show="projects:nuclear" role="link" tabindex="0" aria-label="Ontario nuclear grid analysis: show in projects">
-          <img src="images/nuclear-thumb.png" loading="lazy" alt="">
+          <img src="images/nuclear-thumb.webp" loading="lazy" alt="">
           <figcaption>Ontario nuclear grid analysis</figcaption>
         </figure>
         <figure data-show="projects:wheelsafe" role="link" tabindex="0" aria-label="WheelSafe: show in projects">
-          <img src="images/wheelsafe.jpg" loading="lazy" alt="">
+          <img src="images/wheelsafe.webp" loading="lazy" alt="">
           <figcaption>WheelSafe, top 3 of 200+</figcaption>
         </figure>
       </div>
@@ -132,9 +132,9 @@
       <article data-id="quadruped">
         <h3>Quadruped Robot &amp; Locomotion Sim</h3>
         <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place, and drives the real servos through a PCA9685 board on a Raspberry Pi. It walks perfectly in simulation, where friction always behaves.</p>
-        <p class="tags">Python, MuJoCo, Fusion 360, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener">Repo</a></p>
+        <p class="tags">Python, MuJoCo, Fusion 360, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <figure class="thumb">
-          <video disablepictureinpicture src="images/quadruped-sim.mp4" width="1066" height="756" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/quadruped-sim.mp4" width="1066" height="756" muted loop playsinline preload="none" data-lightbox
                  aria-label="Quadruped Robot &amp; Locomotion Sim"
                  data-caption="Trot gait running in MuJoCo"></video>
         </figure>
@@ -143,15 +143,15 @@
       <article data-id="pacemaker">
         <h3>Rate-Adaptive Pacemaker Firmware</h3>
         <p>Pacemaker firmware modelled in Simulink and Stateflow for an NXP FRDM-K64F board, with Embedded Coder generating the C that runs on it. The team model paces in AOO, VOO, AAI and VVI modes. My part was the rate-adaptive modes (AOOR, VOOR, AAIR, VVIR): they read the board's FXOS8700 accelerometer and raise the pacing rate with activity, tuned by threshold, reaction and recovery times. The smooth ramp back down to resting rate turned out not to be required, but the TA liked it.</p>
-        <p class="tags">Simulink, Stateflow, Embedded Coder, NXP FRDM-K64F <a href="https://github.com/danielzhang122/sfwreng-3k04-pacemaker" target="_blank" rel="noopener">Repo</a></p>
+        <p class="tags">Simulink, Stateflow, Embedded Coder, NXP FRDM-K64F <a href="https://github.com/danielzhang122/sfwreng-3k04-pacemaker" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <figure class="thumb">
-          <img src="images/pacemaker-rate-adaptive.png" width="2400" height="1002" loading="lazy" data-lightbox
-               alt="Rate-adaptive pacing subsystem"
+          <img src="images/pacemaker-rate-adaptive.webp" width="2400" height="1002" loading="lazy" data-lightbox
+               alt="Simulink diagram of the rate-adaptive pacing subsystem: the FRDM-K64F accelerometer's three axes are squared, summed and square-rooted, a moving standard deviation turns that into an activity level, and two Stateflow charts set and ramp the pacing rate between the lower and upper rate limits" data-title="Rate-adaptive pacing subsystem"
                data-caption="My part: accelerometer magnitude, moving standard deviation as the activity level, then a Stateflow chart that sets and ramps the pacing rate">
         </figure>
         <figure class="thumb">
-          <img src="images/pacemaker-modes.png" width="1800" height="1424" loading="lazy" data-lightbox
-               alt="Pacemaker mode chart"
+          <img src="images/pacemaker-modes.webp" width="1800" height="1424" loading="lazy" data-lightbox
+               alt="Top-level Stateflow chart: a Start state switches by mode number to eight pacing-mode states, AOO, VOO, AAI, VVI, AOOR, VOOR, AAIR and VVIR" data-title="Pacemaker mode chart"
                data-caption="Top-level Stateflow chart switching between the eight pacing modes">
         </figure>
       </article>
@@ -159,15 +159,15 @@
       <article data-id="nuclear">
         <h3>Ontario Nuclear Grid Impact Analysis</h3>
         <p>What happens to Ontario's grid when a reactor goes offline? 11.8 million rows of hourly IESO data in DuckDB, SQL that finds 206 outages of a day or longer, and an interactive dashboard that shows who picks up the slack. Mostly gas and fewer exports, it turns out, at about $4/MWh more and 145 extra tonnes of CO2 an hour. Reactor behaviour is next. I'm learning SQL from scratch, so the queries get noticeably more confident toward the end.</p>
-        <p class="tags">SQL (DuckDB), Python, Streamlit, IESO data <a href="https://nuclear-dashboard.streamlit.app/" target="_blank" rel="noopener">Live app</a> <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener">Repo</a></p>
+        <p class="tags">SQL (DuckDB), Python, Streamlit, IESO data <a href="https://nuclear-dashboard.streamlit.app/" target="_blank" rel="noopener noreferrer">Live app</a> <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <figure class="thumb">
-          <img src="images/nuclear-generation.png" width="1965" height="870" loading="lazy" data-lightbox
-               alt="Daily nuclear energy by plant on the dashboard"
+          <img src="images/nuclear-generation.webp" width="1965" height="870" loading="lazy" data-lightbox
+               alt="Dashboard line chart of daily energy in GWh from October 2025 to September 2026 for Bruce, Darlington, Pickering, all nuclear, and all Ontario power plants" data-title="Daily nuclear energy by plant on the dashboard"
                data-caption="Daily energy from each plant, all nuclear and every Ontario power plant, over any date range">
         </figure>
         <figure class="thumb">
-          <img src="images/nuclear-gap.png" width="1965" height="990" loading="lazy" data-lightbox
-               alt="What replaces the missing nuclear power"
+          <img src="images/nuclear-gap.webp" width="1965" height="990" loading="lazy" data-lightbox
+               alt="Dashboard bar chart: when nuclear runs about 840 MW below its monthly average, natural gas, net imports, hydro, wind and solar, and lower demand add up to cover the missing power" data-title="What replaces the missing nuclear power"
                data-caption="When ~840 MW of nuclear goes missing, gas, imports and lower demand fill the gap, and they add up to it">
         </figure>
       </article>
@@ -177,7 +177,7 @@
         <p>Built in 12 hours, about as long as SolidWorks takes to open. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
         <p class="tags">OpenCV, ESP32, C++, UDP</p>
         <figure class="thumb">
-          <video disablepictureinpicture src="images/robotic-arm.mp4" width="400" height="714" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/robotic-arm.mp4" width="400" height="714" muted loop playsinline preload="none" data-lightbox
                  aria-label="Vision-Guided 2-DOF Robotic Arm"
                  data-caption="Real-time OpenCV hand tracking over UDP to an ESP32"></video>
         </figure>
@@ -186,10 +186,10 @@
       <article>
         <h3>Globe Ghost — iOS GPS Simulator</h3>
         <p>Sets an iPhone's actual GPS location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester. Find My now thinks I've been to California.</p>
-        <p class="tags">Python, pymobiledevice3, OpenStreetMap <a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener">Repo</a></p>
+        <p class="tags">Python, pymobiledevice3, OpenStreetMap <a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <figure class="thumb">
-          <img src="images/spoofer.jpg" width="1502" height="912" loading="lazy" data-lightbox
-               alt="Globe Ghost — iOS GPS Simulator"
+          <img src="images/spoofer.webp" width="1502" height="912" loading="lazy" data-lightbox
+               alt="Globe Ghost desktop app: connection and location controls, a scenario script walking from Times Square to Central Park, a run log, and an OpenStreetMap view of Manhattan with the simulated iPhone position" data-title="Globe Ghost — iOS GPS Simulator"
                data-caption="A scripted walk through Manhattan on the live map, logged step by step">
         </figure>
       </article>
@@ -197,10 +197,10 @@
       <article data-id="wheelsafe">
         <h3>WheelSafe Storage</h3>
         <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the McMaster Design Showcase.</p>
-        <p class="tags">Autodesk Inventor, client prototyping, carbon fiber <a href="https://www.youtube.com/watch?v=3dYv_6PoitU" target="_blank" rel="noopener">Demo</a> <a href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:a0181878-fe27-42bb-92b6-26a483603809" target="_blank" rel="noopener">Presentation</a></p>
+        <p class="tags">Autodesk Inventor, client prototyping, carbon fiber <a href="https://www.youtube.com/watch?v=3dYv_6PoitU" target="_blank" rel="noopener noreferrer">Demo</a> <a href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:a0181878-fe27-42bb-92b6-26a483603809" target="_blank" rel="noopener noreferrer">Presentation</a></p>
         <figure class="thumb">
-          <img src="images/wheelsafe.jpg" width="1280" height="1706" loading="lazy" data-lightbox
-               alt="WheelSafe Storage"
+          <img src="images/wheelsafe.webp" width="1280" height="1706" loading="lazy" data-lightbox
+               alt="WheelSafe storage module, a black weatherproof fabric bag, next to two McMaster Engineering 3rd-place certificates of achievement" data-title="WheelSafe Storage"
                data-caption="Carbon-fiber wheelchair storage module, Top 3 at the McMaster Design Showcase">
         </figure>
       </article>
@@ -210,7 +210,7 @@
         <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how the linkage could control dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run. More suspension than a straight line strictly needs, but the camber curves are worth it.</p>
         <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
         <figure class="thumb">
-          <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="none" data-lightbox
                  aria-label="Double Wishbone Suspension"
                  data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
         </figure>
@@ -223,50 +223,50 @@
 
       <div class="thumbs" data-gallery>
         <figure>
-          <video disablepictureinpicture src="images/chemecar-transmission.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/chemecar-transmission.mp4" muted loop playsinline preload="none" data-lightbox
                  aria-label="Chem-E-Car Transmission"
                  data-caption="Transmission work for Chem-E-Car. Even a shoebox-sized car needs gear selection."></video>
           <figcaption>Chem-E-Car transmission</figcaption>
         </figure>
         <figure>
-          <img src="images/quadruped-cad-v2.png" class="fit-whole" loading="lazy" data-lightbox
-               alt="Quadruped CAD Assembly"
+          <img src="images/quadruped-cad-v2.webp" class="fit-whole" loading="lazy" data-lightbox
+               alt="Fusion 360 render of the 12-servo quadruped: four three-joint legs around a central body plate carrying a Raspberry Pi and a PCA9685 servo driver board" data-title="Quadruped CAD Assembly"
                data-caption="Full 12-DOF quadruped assembly with the Raspberry Pi and PCA9685 servo driver mounted. Twelve servos, twelve chances for a mate error.">
           <figcaption>Quadruped assembly</figcaption>
         </figure>
         <figure>
-          <img src="images/quadruped-leg.png" loading="lazy" data-lightbox
-               alt="Leg Linkage"
+          <img src="images/quadruped-leg.webp" loading="lazy" data-lightbox
+               alt="Fusion 360 render of one quadruped leg: a Tower Pro micro servo in the hip bracket, a two-link linkage and a rounded foot" data-title="Leg Linkage"
                data-caption="Kinematic linkage for one leg. There are four, so every problem comes in fours.">
           <figcaption>Leg linkage</figcaption>
         </figure>
         <figure>
-          <video disablepictureinpicture src="images/hv-discharge.mp4" muted loop playsinline preload="metadata" data-lightbox
+          <video disablepictureinpicture src="images/hv-discharge.mp4" muted loop playsinline preload="none" data-lightbox
                  aria-label="HV Discharge Test"
                  data-caption="High-voltage pulse discharge test"></video>
           <figcaption>HV discharge test</figcaption>
         </figure>
         <figure>
-          <img src="images/accidental-antenna.jpg" loading="lazy" data-lightbox
-               alt="Accidental Antenna"
+          <img src="images/accidental-antenna.webp" loading="lazy" data-lightbox
+               alt="Keysight oscilloscope screen showing two noisy, overlapping wave traces in yellow and green, picked up through poorly grounded probes" data-title="Accidental Antenna"
                data-caption="Accidental RF antenna: when poor probe grounding becomes generative art">
           <figcaption>Accidental RF antenna</figcaption>
         </figure>
         <figure>
-          <img src="images/spoofer-apple-park.jpg" loading="lazy" data-lightbox
-               alt="Globe Ghost Field Test"
+          <img src="images/spoofer-apple-park.webp" loading="lazy" data-lightbox
+               alt="iPhone Find My map placing the phone at Apple Park in Cupertino, California, a location set by Globe Ghost" data-title="Globe Ghost Field Test"
                data-caption="Find My placing me at Apple Park. I have never been to California.">
           <figcaption>Globe Ghost field test</figcaption>
         </figure>
         <figure>
-          <img src="images/computer-bootleg.jpg" loading="lazy" data-lightbox
-               alt="Rebuilt Dell"
+          <img src="images/computer-bootleg.webp" loading="lazy" data-lightbox
+               alt="Open Dell desktop tower with its motherboard, CPU cooler and RAM visible, and a 250 GB WD Blue hard drive in a blue caddy in front" data-title="Rebuilt Dell"
                data-caption="An old Dell from my high school, upgraded with spare and e-waste parts. It ran a 24/7 Minecraft server for two months.">
           <figcaption>Rebuilt Dell server</figcaption>
         </figure>
         <figure>
-          <img src="images/newcomputer.jpg" loading="lazy" data-lightbox
-               alt="First POST"
+          <img src="images/newcomputer.webp" loading="lazy" data-lightbox
+               alt="New PC build with an RGB liquid cooler and a Gigabyte GeForce graphics card beside a monitor showing the ASUS UEFI BIOS, which detects an Intel Core i7-13700KF and 32 GB of RAM" data-title="First POST"
                data-caption="New build, first boot. Everything worked on the first try, which almost never happens.">
           <figcaption>New build, first boot</figcaption>
         </figure>
@@ -319,7 +319,7 @@
       </div>
       <div class="row">
         <span class="key">Software</span>
-        <p>Python (OpenCV), C / C++, SQL (DuckDB), MATLAB / Simulink, Julia, SMath, Maple, Power Automate <a href="https://github.com/danielzhang122/junk-drawer" target="_blank" rel="noopener">Misc scripts</a></p>
+        <p>Python (OpenCV), C / C++, SQL (DuckDB), MATLAB / Simulink, Julia, SMath, Maple, Power Automate <a href="https://github.com/danielzhang122/junk-drawer" target="_blank" rel="noopener noreferrer">Misc scripts</a></p>
       </div>
       <div class="row">
         <span class="key">Industry</span>
@@ -332,21 +332,21 @@
 
       <div class="row">
         <span class="key">Oct 2026</span>
-        <p><b>Certified SOLIDWORKS Associate (CSWA)</b>, Dassault Systèmes <span class="dim">ID C-TVPDAF78ML</span> <a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener">Verify</a></p>
+        <p><b>Certified SOLIDWORKS Associate (CSWA)</b>, Dassault Systèmes <span class="dim">ID C-TVPDAF78ML</span> <a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener noreferrer">Verify</a></p>
       </div>
       <div class="row">
         <span class="key">Oct 2026</span>
-        <p><b>Claude Code 101</b>, Anthropic Academy <a href="https://academy.claude.com/verify/66dcad03033df581fcda7c09f68d719d" target="_blank" rel="noopener">Verify</a></p>
+        <p><b>Claude Code 101</b>, Anthropic Academy <a href="https://academy.claude.com/verify/66dcad03033df581fcda7c09f68d719d" target="_blank" rel="noopener noreferrer">Verify</a></p>
       </div>
     </section>
 
     <section data-cmd="resume">
       <h2>Resume</h2>
       <p>One page; every bullet had to earn its spot. Covers nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and projects from an Ontario nuclear grid dashboard to a legged robot and pacemaker firmware.</p>
-      <p class="dim">PDF, one page, updated Oct 2026. <a href="Daniel_Zhang_Resume.pdf" download>Download</a> or <a href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener">open it in a new tab</a>.</p>
+      <p class="dim">PDF, one page, updated Oct 2026. <a href="Daniel_Zhang_Resume.pdf" download>Download</a> or <a href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener noreferrer">open it in a new tab</a>.</p>
       <div class="thumbs whole">
-        <img src="images/resume-preview.png" width="1654" height="2339" class="resume-thumb" loading="lazy" data-lightbox
-             alt="Resume" data-caption="One page, updated Oct 2026.">
+        <img src="images/resume-preview.webp" width="1654" height="2339" class="resume-thumb" loading="lazy" data-lightbox
+             alt="Preview of Daniel Zhang's one-page resume" data-title="Resume" data-caption="One page, updated Oct 2026.">
       </div>
 
     </section>
@@ -362,44 +362,44 @@
       <p class="dim">Painting, drawing, printmaking and carving. Click any piece to enlarge.</p>
 
       <div class="thumbs whole" data-gallery>
-        <video disablepictureinpicture src="images/blender.mp4" width="1080" height="1740" muted loop playsinline preload="metadata" data-lightbox
+        <video disablepictureinpicture src="images/blender.mp4" width="720" height="1160" muted loop playsinline preload="none" data-lightbox
                aria-label="Hang In There"
                data-caption="Blender animation. A reminder to save before you render."></video>
-        <img src="images/sketch-2.jpg" width="1078" height="1333" loading="lazy" data-lightbox
-             alt="Toned Back Study"
+        <img src="images/sketch-2.webp" width="1078" height="1333" loading="lazy" data-lightbox
+             alt="Charcoal and white chalk drawing of a figure seen from behind, arms raised overhead and drapery at the hips, on a purple background" data-title="Toned Back Study"
              data-caption="Charcoal on paper. I still find black dust from this on my desk.">
-        <img src="images/painting.jpg" width="1094" height="861" loading="lazy" data-lightbox
-             alt="Floral Heads"
+        <img src="images/painting.webp" width="1094" height="861" loading="lazy" data-lightbox
+             alt="Painting of two people sitting cross-legged on a dark floor in front of red curtains, their faces covered by pink poppies, with candles and bowls of fruit before them" data-title="Floral Heads"
              data-caption="Painting faces requires perfect symmetry. Painting flowers over them does not.">
-        <img src="images/sketch.jpg" width="930" height="1010" loading="lazy" data-lightbox
-             alt="Live Figure Drawing"
+        <img src="images/sketch.webp" width="930" height="1010" loading="lazy" data-lightbox
+             alt="Pencil drawing of a seated figure seen from behind, with a long braid and both arms raised holding a frame overhead" data-title="Live Figure Drawing"
              data-caption="An hour-long live pose, carefully avoiding the hands.">
-        <img src="images/self-portrait-3.jpg" width="1122" height="1454" loading="lazy" data-lightbox
-             alt="Half Dead Portrait"
+        <img src="images/self-portrait-3.webp" width="1122" height="1454" loading="lazy" data-lightbox
+             alt="Acrylic self-portrait on a green background: half the face is exposed skull with a staring eye, and the neck shows spine and muscle above an orange hoodie" data-title="Half Dead Portrait"
              data-caption="Acrylic self-portrait. About how fixing CAD constraints at 2 AM feels.">
-        <img src="images/digital-teeth.jpeg" width="469" height="294" loading="lazy" data-lightbox
-             alt="Dental Study"
+        <img src="images/digital-teeth.webp" width="469" height="294" loading="lazy" data-lightbox
+             alt="Digital painting of a close-up of teeth and gums, with loose purple sketch lines around the edges" data-title="Dental Study"
              data-caption="Digital study of teeth. A reminder to floss.">
-        <img src="images/skull.jpg" width="938" height="693" loading="lazy" data-lightbox
-             alt="Flayed Skull"
+        <img src="images/skull.webp" width="938" height="693" loading="lazy" data-lightbox
+             alt="Painting of a skull and upper body with red facial and neck muscles partly peeled away and the tongue out, against a torn black-and-white background" data-title="Flayed Skull"
              data-caption="Anatomical study of facial musculature, and a good excuse to use up the red paint.">
-        <img src="images/skull2.jpg" width="1016" height="768" loading="lazy" data-lightbox
-             alt="Block Print Skull"
+        <img src="images/skull2.webp" width="1016" height="768" loading="lazy" data-lightbox
+             alt="Black-and-white linocut print of a skull, signed and numbered 1/1" data-title="Block Print Skull"
              data-caption="Linocut print. The hard part was not carving my thumb.">
-        <img src="images/flower.jpg" width="670" height="988" loading="lazy" data-lightbox
-             alt="Pink Rose"
+        <img src="images/flower.webp" width="670" height="988" loading="lazy" data-lightbox
+             alt="Painting of a single pink rose with green leaves against loose grey, green and blue brushwork" data-title="Pink Rose"
              data-caption="The mandatory flower painting, to prove to my mom I can paint nice things.">
-        <img src="images/self-portrait-1.jpg" width="924" height="768" loading="lazy" data-lightbox
-             alt="Everything Is Fine"
+        <img src="images/self-portrait-1.webp" width="924" height="768" loading="lazy" data-lightbox
+             alt="Oil self-portrait with a calm expression in front of a burning house" data-title="Everything Is Fine"
              data-caption="Self-portrait with zero underlying metaphors.">
-        <img src="images/chameleon.jpg" width="1620" height="890" loading="lazy" data-lightbox
-             alt="Wood Lizard"
+        <img src="images/chameleon.webp" width="1620" height="890" loading="lazy" data-lightbox
+             alt="Hand-carved wooden chameleon on a grey surface" data-title="Wood Lizard"
              data-caption="Carved from a single block of wood. The chisel slipped once; it cost me 11 stitches.">
-        <img src="images/lake-reflection.jpg" width="800" height="613" loading="lazy" data-lightbox
-             alt="Lake Reflection"
+        <img src="images/lake-reflection.webp" width="800" height="613" loading="lazy" data-lightbox
+             alt="Flat-colour digital landscape of pine trees and a boardwalk reflected in still lake water" data-title="Lake Reflection"
              data-caption="Digital landscape that won a local contest and was printed on a municipal utility box.">
-        <img src="images/utility-box-install.jpg" width="600" height="800" loading="lazy" data-lightbox
-             alt="Utility Box Install"
+        <img src="images/utility-box-install.webp" width="600" height="800" loading="lazy" data-lightbox
+             alt="The lake reflection artwork printed on a roadside utility box, photographed at night" data-title="Utility Box Install"
              data-caption="In the wild, 2022. Technically a public infrastructure install.">
       </div>
     </section>
@@ -407,8 +407,8 @@
     <section data-cmd="contact">
       <h2>Contact</h2>
       <div class="row"><span class="key">Email</span><p><a href="mailto:zhand40@mcmaster.ca">zhand40@mcmaster.ca</a></p></div>
-      <div class="row"><span class="key">GitHub</span><p><a href="https://github.com/danielzhang122" target="_blank" rel="noopener">github.com/danielzhang122</a></p></div>
-      <div class="row"><span class="key">LinkedIn</span><p><a href="https://www.linkedin.com/in/zhangdz/" target="_blank" rel="noopener">linkedin.com/in/zhangdz</a></p></div>
+      <div class="row"><span class="key">GitHub</span><p><a href="https://github.com/danielzhang122" target="_blank" rel="noopener noreferrer">github.com/danielzhang122</a></p></div>
+      <div class="row"><span class="key">LinkedIn</span><p><a href="https://www.linkedin.com/in/zhangdz/" target="_blank" rel="noopener noreferrer">linkedin.com/in/zhangdz</a></p></div>
       <p class="dim">© 2026 Daniel Zhang.</p>
     </section>
 
