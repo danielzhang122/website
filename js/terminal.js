@@ -36,7 +36,7 @@
     resume: { help: 'one-page pdf', run: () => printSection('resume') },
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
     contact: { help: 'email and links', run: () => printSection('contact') },
-    clear: { help: 'clear the screen, keeping whoami', run: clear },
+    clear: { help: 'clear the screen', run: clear },
     retro: { help: 'toggle the retro screen effect', run: toggleRetro },
   };
   // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
