@@ -13,9 +13,18 @@
 
   let group = [];
   let index = 0;
+  let opener = null;
+
+  // Thumbnails are keyboard-reachable buttons. Set on the #content originals,
+  // so the copies js/terminal.js prints inherit it.
+  for (const media of document.querySelectorAll('[data-lightbox]')) {
+    media.tabIndex = 0;
+    media.setAttribute('role', 'button');
+  }
+  box.tabIndex = -1;
 
   const isOpen = () => box.classList.contains('is-open');
-  const titleOf = (media) => (media.tagName === 'VIDEO' ? media.getAttribute('aria-label') : media.alt);
+  const titleOf = (media) => media.dataset.title || (media.tagName === 'VIDEO' ? media.getAttribute('aria-label') : media.alt);
 
   function show(i) {
     index = (i + group.length) % group.length;
@@ -35,7 +44,7 @@
       video.pause();
       video.removeAttribute('src');
       image.src = src;
-      image.alt = title;
+      image.alt = media.alt || title;
     }
 
     const heading = document.createElement('strong');
@@ -53,11 +62,14 @@
     group = gallery ? [...gallery.querySelectorAll('[data-lightbox]')] : [media];
     show(group.indexOf(media));
     box.classList.add('is-open');
+    opener = document.activeElement;
+    box.focus();
   }
 
   function close() {
     box.classList.remove('is-open');
     video.pause();
+    opener?.focus();
   }
 
   // The clickable area is the media itself or the figure wrapping it,
@@ -88,9 +100,11 @@
       else if (e.key === 'ArrowLeft') show(index - 1);
       return;
     }
-    if (e.key === 'Enter' && document.activeElement) {
+    if ((e.key === 'Enter' || e.key === ' ') && document.activeElement) {
       const media = mediaFor(document.activeElement);
-      if (media) open(media);
+      if (!media) return;
+      e.preventDefault(); // Space would otherwise scroll the page
+      open(media);
     }
   });
 })();
