@@ -36,7 +36,7 @@
     resume: { help: 'one-page pdf', run: () => printSection('resume') },
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
     contact: { help: 'email and links', run: () => printSection('contact') },
-    clear: { help: 'clear the screen', run: clear },
+    clear: { help: 'clear the screen, keeping whoami', run: clear },
     retro: { help: 'toggle the retro screen effect', run: toggleRetro },
   };
   // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
@@ -139,9 +139,52 @@
     }
   }, { rootMargin: '200px' });
 
+  // The reverse of reveal: erases the nodes' text from the end backwards, hiding media
+  // as the erasing reaches it and dropping each node once it's empty.
+  async function unreveal(nodes) {
+    if (!restoring && !reduceMotion) {
+      const steps = [];
+      for (const owner of nodes) {
+        const walker = document.createTreeWalker(owner, NodeFilter.SHOW_ELEMENT | NodeFilter.SHOW_TEXT, {
+          acceptNode: (n) => {
+            if (n.nodeType === Node.ELEMENT_NODE) return n.matches(MEDIA) ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+            if (n.parentElement.closest(MEDIA) || !n.data.trim()) return NodeFilter.FILTER_REJECT;
+            return NodeFilter.FILTER_ACCEPT;
+          },
+        });
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+          steps.push(n.nodeType === Node.ELEMENT_NODE ? { owner, media: n } : { owner, text: n });
+        }
+      }
+      const total = steps.reduce((sum, step) => sum + (step.text ? step.text.data.length : 0), 0);
+      const perFrame = Math.max(TYPE_MIN, Math.ceil(total / TYPE_FRAMES));
+
+      let i = steps.length - 1;
+      while (i >= 0) {
+        let budget = fastForward ? Infinity : perFrame;   // a new command finishes this one instantly
+        while (i >= 0 && budget > 0) {
+          const step = steps[i];
+          if (step.media) {
+            step.media.classList.add('pending');
+          } else {
+            const take = Math.min(budget, step.text.data.length);
+            step.text.data = step.text.data.slice(0, step.text.data.length - take);
+            budget -= take;
+            if (step.text.data.length) continue;
+          }
+          i--;
+          if (steps[i]?.owner !== step.owner) step.owner.remove();
+        }
+        if (i >= 0) await nextFrame();
+      }
+    }
+    nodes.forEach((node) => node.remove());
+  }
+
   async function printSection(name) {
     const copy = content.querySelector(`[data-cmd="${name}"]`).cloneNode(true);
     copy.removeAttribute('data-cmd');
+    copy.dataset.from = name;   // lets clear find the whoami it keeps
     copy.classList.add('output');
     // Videos in #content stay idle; printed copies play.
     copy.querySelectorAll('video').forEach((video) => { video.autoplay = true; });
@@ -157,7 +200,7 @@
     for (const src of sources) fetch(src, { priority: 'low' }).catch(() => {});
   });
 
-  // The banner (art and name) comes with whoami, so it can be brought back after clear.
+  // The banner (art and name) comes with whoami, so the two print as one block.
   async function printWhoami() {
     await printSection('banner');
     await printSection('whoami');
@@ -283,11 +326,20 @@
     });
   }
 
-  function clear() {
-    screen.replaceChildren();
+  // Erases everything below the first whoami, which stays put, so the page never goes blank.
+  async function clear() {
     setHash('');
-    ran = [];
+    ran = ['whoami'];
     saveSession();
+    const kept = screen.querySelector('[data-from="whoami"]');
+    if (!kept) {
+      screen.replaceChildren();
+      await printWhoami();
+      return;
+    }
+    const after = [];
+    for (let n = kept.nextElementSibling; n; n = n.nextElementSibling) after.push(n);
+    await unreveal(after);
   }
 
   /* ---------- running commands ---------- */
@@ -448,7 +500,7 @@
       }
     } else if (e.key === 'l' && e.ctrlKey) {
       e.preventDefault();
-      clear();
+      submit('clear'); // queued, so it can't interleave with a print in progress
     }
     requestAnimationFrame(updateCursor);
   });

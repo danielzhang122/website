@@ -33,14 +33,14 @@
   <link rel="preload" href="fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261031-2">
+  <link rel="stylesheet" href="css/style.css?v=20261031-4">
 
-  <script src="js/intro-glyphs.js?v=20261031-2" defer></script>
-  <script src="js/intro.js?v=20261031-2" defer></script>
-  <script src="js/lightbox.js?v=20261031-2" defer></script>
-  <script src="js/terminal.js?v=20261031-2" defer></script>
+  <script src="js/intro-glyphs.js?v=20261031-4" defer></script>
+  <script src="js/intro.js?v=20261031-4" defer></script>
+  <script src="js/lightbox.js?v=20261031-4" defer></script>
+  <script src="js/terminal.js?v=20261031-4" defer></script>
   <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
-  <script type="module" src="js/chrome.js?v=20261031-2"></script>
+  <script type="module" src="js/chrome.js?v=20261031-4"></script>
 </head>
 <body>
 
@@ -76,6 +76,7 @@
     <button type="button" data-run="interests">interests</button>
     <button type="button" data-run="art">art</button>
     <button type="button" data-run="help">help</button>
+    <button type="button" data-run="clear">clear</button>
   </nav>
 
   <!--
@@ -93,8 +94,7 @@
       <div>
         <h1>Daniel Zhang</h1>
         <p class="dim">Mechatronics Engineering, McMaster University</p>
-        <p class="dim js-only">Type a command, or pick one from the bar below. Try <button type="button" class="cmd" data-run="help">help</button>.</p>
-        <p class="dim js-only">Lines hard on the eyes? <button type="button" class="cmd" data-run="retro">retro</button> toggles the screen effect.</p>
+        <p class="dim js-only">Lost? Try <button type="button" class="cmd" data-run="help">help</button>. Hard on the eyes? <button type="button" class="cmd" data-run="retro">retro</button>. Too much clutter? <button type="button" class="cmd" data-run="clear">clear</button>.</p>
       </div>
     </header>
 
