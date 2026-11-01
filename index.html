@@ -33,7 +33,7 @@
   <link rel="preload" href="fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261031-5">
+  <link rel="stylesheet" href="css/style.css?v=20261101-1">
 
   <script src="js/intro-glyphs.js?v=20261031-5" defer></script>
   <script src="js/intro.js?v=20261031-5" defer></script>
@@ -47,7 +47,7 @@
   <!-- Intro screen. js/intro.js animates it and removes it when done. -->
   <div id="gate" aria-hidden="true">
     <pre class="gate-art"></pre>
-    <div class="gate-hint">esc to skip</div>
+    <div class="gate-hint"><span class="hint-keys">esc to skip</span><span class="hint-touch">press here to skip</span></div>
   </div>
 
   <!-- The console. js/terminal.js prints sections from #content into #screen. -->
@@ -191,6 +191,17 @@
           <img src="images/spoofer.webp" width="1502" height="912" loading="lazy" data-lightbox
                alt="Globe Ghost desktop app: connection and location controls, a scenario script walking from Times Square to Central Park, a run log, and an OpenStreetMap view of Manhattan with the simulated iPhone position" data-title="Globe Ghost — iOS GPS Simulator"
                data-caption="A scripted walk through Manhattan on the live map, logged step by step">
+        </figure>
+      </article>
+
+      <article data-id="resume-sync">
+        <h3>Résumé Sync Pipeline</h3>
+        <p>I don't mind using AI to polish my résumé, but I don't want it exaggerating my work. With several projects on the go, keeping everything updated gets tedious. So I did the sensible thing: spent far too much time automating it. Every Sunday, a Python script checks my repositories for changes, and an AI agent proposes source-backed résumé edits through pull requests. GitHub Actions checks that everything compiles and fits on one page, and I approve every change. To test it, I planted an inaccurate claim, which the pipeline caught and traced back to a supporting commit before proposing a correction.</p>
+        <p class="tags">Python, GitHub Actions, LaTeX, Claude Code <a href="https://github.com/danielzhang122/resume" target="_blank" rel="noopener noreferrer">Repo</a> <a href="https://github.com/danielzhang122/resume/blob/main/docs/PIPELINE.md" target="_blank" rel="noopener noreferrer">Write-up</a></p>
+        <figure class="thumb">
+          <img src="images/resume-sync-diagram.svg" width="1200" height="520" class="fit-whole" loading="lazy" data-lightbox
+               alt="Pipeline diagram: a weekly schedule runs check.py, which stops if nothing changed; otherwise an agent reviews the diffs, edits resume.tex on a new branch, a GitHub Action builds the PDF and, if it runs over one page, sends it back to the agent to rewrite and retry; once it passes, a pull request shows each edit with its source commit, I review and merge, and the next run opens a website PR with the new PDF, which I merge. My project work during the week becomes the next Sunday's input" data-title="Résumé Sync Pipeline"
+               data-caption="Grey steps run on their own. Red ones are me: nothing reaches the résumé or this site until I merge.">
         </figure>
       </article>
 

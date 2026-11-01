@@ -1,0 +1,85 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520" width="1200" height="520" font-family="'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace">
+  <title>Résumé sync pipeline: weekly change detection, agent review, CI build that sends over-length résumés back for a rewrite, pull requests that I merge, and my week of project work feeding the next run</title>
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0L10 5L0 10z" fill="#7a7a7a"/>
+    </marker>
+  </defs>
+  <rect width="1200" height="520" fill="#0b0b0b"/>
+
+  <!-- automated steps (grey) -->
+  <g fill="#0b0b0b" stroke="#7a7a7a" stroke-width="1.5">
+    <rect x="40" y="50" width="250" height="100" rx="4"/>
+    <rect x="330" y="50" width="250" height="100" rx="4"/>
+    <rect x="620" y="50" width="250" height="100" rx="4"/>
+    <rect x="910" y="50" width="250" height="100" rx="4"/>
+    <rect x="910" y="340" width="250" height="100" rx="4"/>
+    <rect x="620" y="340" width="250" height="100" rx="4"/>
+    <rect x="40" y="340" width="250" height="100" rx="4"/>
+  </g>
+  <!-- human steps (red) -->
+  <g fill="#0b0b0b" stroke="#e5484d" stroke-width="2">
+    <rect x="330" y="340" width="250" height="100" rx="4"/>
+    <rect x="40" y="180" width="250" height="120" rx="4"/>
+  </g>
+
+  <!-- main flow -->
+  <g stroke="#7a7a7a" stroke-width="1.5" fill="none" marker-end="url(#a)">
+    <path d="M290 100H326"/>
+    <path d="M580 100H616"/>
+    <path d="M870 100H906"/>
+    <path d="M1100 150V336"/>
+    <path d="M910 390H874"/>
+    <path d="M620 390H584"/>
+    <path d="M330 390H294"/>
+    <path d="M165 340V304"/>
+    <path d="M165 180V154"/>
+  </g>
+  <!-- retry loop: GitHub Action back to Edit resume.tex -->
+  <path d="M970 340V154" stroke="#7a7a7a" stroke-width="1.5" fill="none" marker-end="url(#a)"/>
+  <path d="M455 150V196" stroke="#7a7a7a" stroke-width="1.5" stroke-dasharray="4 4" fill="none" marker-end="url(#a)"/>
+
+  <g text-anchor="middle" font-size="17" fill="#f2f2f2" font-weight="600">
+    <text x="165" y="85">Weekly schedule</text>
+    <text x="455" y="85">check.py</text>
+    <text x="745" y="85">Agent review</text>
+    <text x="1035" y="85">Edit resume.tex</text>
+    <text x="1035" y="375">GitHub Action</text>
+    <text x="745" y="375">Pull request</text>
+    <text x="455" y="375" fill="#e5484d">I review + merge</text>
+    <text x="165" y="375">Website PDF PR</text>
+    <text x="165" y="212" fill="#e5484d">I work on projects</text>
+    <text x="165" y="234" fill="#e5484d">throughout the week</text>
+  </g>
+  <g text-anchor="middle" font-size="13.5" fill="#a8a8a8">
+    <text x="165" y="110">Sundays 06:00,</text>
+    <text x="165" y="130">cloud agent</text>
+    <text x="455" y="110">diff repos since last</text>
+    <text x="455" y="130">review, skip own files</text>
+    <text x="745" y="110">rules in SYNC.md,</text>
+    <text x="745" y="130">every claim needs a source</text>
+    <text x="1035" y="110">on a new branch,</text>
+    <text x="1035" y="130">never on main</text>
+    <text x="1035" y="400">compile LaTeX, check</text>
+    <text x="1035" y="420">1-page limit, build PDF</text>
+    <text x="745" y="400">before → after,</text>
+    <text x="745" y="420">with source commits</text>
+    <text x="455" y="400">nothing goes live</text>
+    <text x="455" y="420">without this step</text>
+    <text x="165" y="400">opened next run;</text>
+    <text x="165" y="420" fill="#e5484d">I merge, site updates</text>
+    <text x="165" y="262">New commits become</text>
+    <text x="165" y="281">next Sunday's inputs.</text>
+    <text x="455" y="222">nothing changed: stop, no commits</text>
+  </g>
+
+  <!-- retry loop label -->
+  <g text-anchor="end">
+    <text x="958" y="232" font-size="14" font-weight="600" fill="#f2f2f2">Over 1 page → rewrite and retry</text>
+    <text x="958" y="254" font-size="13" fill="#a8a8a8">agent revises, reruns validation</text>
+    <text x="958" y="273" font-size="13" fill="#a8a8a8">until it compiles on one page</text>
+  </g>
+  <text x="890" y="381" text-anchor="middle" font-size="11" fill="#a8a8a8">pass</text>
+
+  <text x="600" y="490" text-anchor="middle" font-size="13" fill="#7a7a7a">grey = automated · red = human step</text>
+</svg>
