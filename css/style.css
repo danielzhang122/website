@@ -527,6 +527,13 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   font-size: .75rem;
 }
 
+/* Touchscreens have no Esc key: show the tap wording instead. */
+.gate-hint .hint-touch { display: none; }
+@media (hover: none) and (pointer: coarse) {
+  .gate-hint .hint-keys { display: none; }
+  .gate-hint .hint-touch { display: inline; }
+}
+
 
 /* ==========================================================================
    Lightbox (js/lightbox.js)

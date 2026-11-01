@@ -33,7 +33,7 @@
   <link rel="preload" href="fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261031-5">
+  <link rel="stylesheet" href="css/style.css?v=20261101-1">
 
   <script src="js/intro-glyphs.js?v=20261031-5" defer></script>
   <script src="js/intro.js?v=20261031-5" defer></script>
@@ -47,7 +47,7 @@
   <!-- Intro screen. js/intro.js animates it and removes it when done. -->
   <div id="gate" aria-hidden="true">
     <pre class="gate-art"></pre>
-    <div class="gate-hint">esc to skip</div>
+    <div class="gate-hint"><span class="hint-keys">esc to skip</span><span class="hint-touch">press here to skip</span></div>
   </div>
 
   <!-- The console. js/terminal.js prints sections from #content into #screen. -->
