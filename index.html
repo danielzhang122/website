@@ -196,7 +196,7 @@
 
       <article data-id="resume-sync">
         <h3>Résumé Sync Pipeline</h3>
-        <p>I don't mind using AI to polish my résumé, but I don't want it exaggerating my work. With several projects on the go, keeping everything updated gets tedious. So I did the sensible thing: spent far too much time automating it. Every Sunday, a Python script checks my repositories for changes, and an AI agent proposes source-backed résumé edits through pull requests. GitHub Actions checks that everything compiles and fits on one page, and I approve every change, then reword it in a way that suits me so my résumé doesn't read like AI slop. To test it, I planted an inaccurate claim, which the pipeline caught and traced back to a supporting commit before proposing a correction.</p>
+        <p>Keeping my résumé updated across several projects gets tedious, so I did the sensible thing: spent far too much time automating it. Every Sunday, a Python script checks my repositories, and an AI agent proposes source-backed edits. GitHub Actions checks compilation and the one-page limit; I review and reword changes before merging. In a test, it caught a planted inaccurate claim and proposed a correction backed by a GitHub commit.</p>
         <p class="tags">Python, GitHub Actions, LaTeX, Claude Code <a href="https://github.com/danielzhang122/resume" target="_blank" rel="noopener noreferrer">Repo</a> <a href="https://github.com/danielzhang122/resume/blob/main/docs/PIPELINE.md" target="_blank" rel="noopener noreferrer">Write-up</a></p>
         <figure class="thumb">
           <img src="images/resume-sync-diagram.svg" width="1200" height="520" class="fit-whole" loading="lazy" data-lightbox
