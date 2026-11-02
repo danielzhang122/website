@@ -147,7 +147,7 @@ button,
 input { text-shadow: inherit; }
 
 html:not(.no-retro) body {
-  text-shadow: -.75px 0 rgba(255, 40, 80, .4), .75px 0 rgba(40, 200, 255, .4);
+  text-shadow: -.75px 0 rgba(255, 40, 80, .45), .75px 0 rgba(40, 200, 255, .45);
 }
 
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
@@ -157,7 +157,7 @@ html:not(.no-retro) body {
   }
 
   html:not(.no-retro) body {
-    text-shadow: -1px 0 rgba(255, 40, 80, .5), 1px 0 rgba(40, 200, 255, .5);
+    text-shadow: -1px 0 rgba(255, 40, 80, .55), 1px 0 rgba(40, 200, 255, .55);
   }
 }
 
@@ -168,7 +168,7 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
 
 /* Grey text is thin enough that the full fringe swamps it; give it a lighter one. */
 html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
-  text-shadow: -.75px 0 rgba(255, 40, 80, .4), .75px 0 rgba(40, 200, 255, .4);
+  text-shadow: -.75px 0 rgba(255, 40, 80, .45), .75px 0 rgba(40, 200, 255, .45);
 }
 
 @keyframes crt-flicker {
