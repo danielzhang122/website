@@ -96,8 +96,9 @@ h3 {
 b { font-weight: 600; color: var(--bright); }
 
 .dim { color: var(--dim); }
-/* Paragraphs and list items justified, like a Word document; the last line of each stays left. Tag lines stay ragged. */
-p:not(.tags), li { text-align: justify; }
+/* Paragraphs and list items justified, like a Word document; the last line of each stays left. Tag lines stay ragged,
+   and the lightbox caption stays centred under the photo. */
+p:not(.tags, .lightbox-caption), li { text-align: justify; }
 
 /* The subtitle sits tight under the name. */
 h1 + p { margin-top: 0 !important; }
@@ -294,7 +295,8 @@ html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figca
   z-index: 50;
   display: flex;
   justify-content: center;
-  gap: .25rem 1.5ch;
+  --bar-gap: 1.7rem;
+  gap: .25rem var(--bar-gap);
   overflow-x: auto;
   padding: .7rem var(--gutter);
   border-top: 1px solid var(--line);
@@ -317,6 +319,24 @@ button.cmd {
 #shortcuts button:hover,
 button.cmd:hover { color: var(--accent); }
 
+/* help and clear are utilities, not sections: a thin rule and extra room set them apart.
+   The rule sits centred in the space before the first one. */
+#shortcuts :not(.util) + .util {
+  position: relative;
+  margin-left: 1rem;
+}
+
+#shortcuts :not(.util) + .util::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: calc(-1 * (var(--bar-gap) + 1rem) / 2);
+  width: 2px;
+  height: 1em;
+  background: var(--line);
+  transform: translateY(-50%);
+}
+
 
 /* ==========================================================================
    Printed content
@@ -334,7 +354,6 @@ button.cmd:hover { color: var(--accent); }
   margin: 0 auto 1.5rem;
   font: 400 13px/1 var(--mono);
   color: var(--ink);
-  opacity: .85;
   contain: content;
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
@@ -342,14 +361,16 @@ button.cmd:hover { color: var(--accent); }
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
    are no per-character spans: mid tones rose, the faint glyphs inside the shape
-   red, everything else (including the dotted backdrop) the text colour. */
+   red, everything else (including the dotted backdrop) the text colour. Only the text-colour
+   layer is dimmed, so the red layer is exactly the prompt's --accent. */
 .chrome-art > pre {
   grid-area: 1 / 1;
   margin: 0;
   font: inherit;
 }
 
-.chrome-mid { color: color-mix(in srgb, var(--accent) 50%, var(--ink)); }
+.chrome-art > pre:first-child { opacity: .85; }
+.chrome-mid { color: color-mix(in srgb, var(--accent) 70%, var(--ink)); }
 .chrome-red { color: var(--accent); }
 
 .banner > div > * + * { margin-top: .9rem; }

@@ -66,17 +66,14 @@
 
   <nav id="shortcuts" aria-label="Commands">
     <button type="button" data-run="whoami">whoami</button>
-    <button type="button" data-run="resume">resume</button>
     <button type="button" data-run="projects">projects</button>
-    <button type="button" data-run="experience">experience</button>
+    <button type="button" data-run="resume">resume</button>
     <button type="button" data-run="contact">contact</button>
-    <button type="button" data-run="skills">skills</button>
-    <button type="button" data-run="certs">certs</button>
-    <button type="button" data-run="misc">misc</button>
-    <button type="button" data-run="interests">interests</button>
+    <button type="button" data-run="experience">experience</button>
     <button type="button" data-run="art">art</button>
-    <button type="button" data-run="help">help</button>
-    <button type="button" data-run="clear">clear</button>
+    <button type="button" data-run="misc">misc</button>
+    <button type="button" class="util" data-run="help">help</button>
+    <button type="button" class="util" data-run="clear">clear</button>
   </nav>
 
   <!--
@@ -123,7 +120,7 @@
           <figcaption>WheelSafe, top 3 of 200+</figcaption>
         </figure>
       </div>
-      <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="misc">misc</button> <button type="button" class="cmd" data-run="resume">resume</button> <button type="button" class="cmd" data-run="contact">contact</button></p>
+      <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="resume">resume</button> <button type="button" class="cmd" data-run="contact">contact</button> <button type="button" class="cmd" data-run="misc">misc</button></p>
     </section>
 
     <section data-cmd="projects" data-gallery>
@@ -373,45 +370,39 @@
       <p class="dim">Painting, drawing, printmaking and carving. Click any piece to enlarge.</p>
 
       <div class="thumbs whole" data-gallery>
-        <video disablepictureinpicture src="images/blender.mp4" width="720" height="1160" muted loop playsinline preload="none" data-lightbox
-               aria-label="Hang In There"
-               data-caption="Blender animation. A reminder to save before you render."></video>
+        <img src="images/self-portrait-3.webp" width="1122" height="1454" loading="lazy" data-lightbox
+             alt="Acrylic self-portrait on a green background: half the face is exposed skull with a staring eye, and the neck shows spine and muscle above an orange hoodie" data-title="Half Dead Portrait"
+             data-caption="Acrylic self-portrait. About how fixing CAD constraints at 2 AM feels.">
+        <img src="images/skull.webp" width="938" height="693" loading="lazy" data-lightbox
+             alt="Painting of a skull and upper body with red facial and neck muscles partly peeled away and the tongue out, against a torn black-and-white background" data-title="Flayed Skull"
+             data-caption="Anatomical study of facial musculature, and a good excuse to use up the red paint.">
         <img src="images/sketch-2.webp" width="1078" height="1333" loading="lazy" data-lightbox
              alt="Charcoal and white chalk drawing of a figure seen from behind, arms raised overhead and drapery at the hips, on a purple background" data-title="Toned Back Study"
              data-caption="Charcoal on paper. I still find black dust from this on my desk.">
         <img src="images/painting.webp" width="1094" height="861" loading="lazy" data-lightbox
              alt="Painting of two people sitting cross-legged on a dark floor in front of red curtains, their faces covered by pink poppies, with candles and bowls of fruit before them" data-title="Floral Heads"
              data-caption="Painting faces requires perfect symmetry. Painting flowers over them does not.">
-        <img src="images/sketch.webp" width="930" height="1010" loading="lazy" data-lightbox
-             alt="Pencil drawing of a seated figure seen from behind, with a long braid and both arms raised holding a frame overhead" data-title="Live Figure Drawing"
-             data-caption="An hour-long live pose, carefully avoiding the hands.">
-        <img src="images/self-portrait-3.webp" width="1122" height="1454" loading="lazy" data-lightbox
-             alt="Acrylic self-portrait on a green background: half the face is exposed skull with a staring eye, and the neck shows spine and muscle above an orange hoodie" data-title="Half Dead Portrait"
-             data-caption="Acrylic self-portrait. About how fixing CAD constraints at 2 AM feels.">
-        <img src="images/digital-teeth.webp" width="469" height="294" loading="lazy" data-lightbox
-             alt="Digital painting of a close-up of teeth and gums, with loose purple sketch lines around the edges" data-title="Dental Study"
-             data-caption="Digital study of teeth. A reminder to floss.">
-        <img src="images/skull.webp" width="938" height="693" loading="lazy" data-lightbox
-             alt="Painting of a skull and upper body with red facial and neck muscles partly peeled away and the tongue out, against a torn black-and-white background" data-title="Flayed Skull"
-             data-caption="Anatomical study of facial musculature, and a good excuse to use up the red paint.">
-        <img src="images/skull2.webp" width="1016" height="768" loading="lazy" data-lightbox
-             alt="Black-and-white linocut print of a skull, signed and numbered 1/1" data-title="Block Print Skull"
-             data-caption="Linocut print. The hard part was not carving my thumb.">
-        <img src="images/flower.webp" width="670" height="988" loading="lazy" data-lightbox
-             alt="Painting of a single pink rose with green leaves against loose grey, green and blue brushwork" data-title="Pink Rose"
-             data-caption="The mandatory flower painting, to prove to my mom I can paint nice things.">
         <img src="images/self-portrait-1.webp" width="924" height="768" loading="lazy" data-lightbox
              alt="Oil self-portrait with a calm expression in front of a burning house" data-title="Everything Is Fine"
              data-caption="Self-portrait with zero underlying metaphors.">
-        <img src="images/chameleon.webp" width="1620" height="890" loading="lazy" data-lightbox
-             alt="Hand-carved wooden chameleon on a grey surface" data-title="Wood Lizard"
-             data-caption="Carved from a single block of wood. The chisel slipped once; it cost me 11 stitches.">
         <img src="images/lake-reflection.webp" width="800" height="613" loading="lazy" data-lightbox
              alt="Flat-colour digital landscape of pine trees and a boardwalk reflected in still lake water" data-title="Lake Reflection"
              data-caption="Digital landscape that won a local contest and was printed on a municipal utility box.">
         <img src="images/utility-box-install.webp" width="600" height="800" loading="lazy" data-lightbox
              alt="The lake reflection artwork printed on a roadside utility box, photographed at night" data-title="Utility Box Install"
              data-caption="In the wild, 2022. Technically a public infrastructure install.">
+        <img src="images/skull2.webp" width="1016" height="768" loading="lazy" data-lightbox
+             alt="Black-and-white linocut print of a skull, signed and numbered 1/1" data-title="Block Print Skull"
+             data-caption="Linocut print. The hard part was not carving my thumb.">
+        <img src="images/sketch.webp" width="930" height="1010" loading="lazy" data-lightbox
+             alt="Pencil drawing of a seated figure seen from behind, with a long braid and both arms raised holding a frame overhead" data-title="Live Figure Drawing"
+             data-caption="A 10-minute live pose, carefully avoiding the hands.">
+        <img src="images/digital-teeth.webp" width="469" height="294" loading="lazy" data-lightbox
+             alt="Digital painting of a close-up of teeth and gums, with loose purple sketch lines around the edges" data-title="Dental Study"
+             data-caption="Digital study of teeth. A reminder to floss.">
+        <img src="images/chameleon.webp" width="1620" height="890" loading="lazy" data-lightbox
+             alt="Hand-carved wooden chameleon on a grey surface" data-title="Wood Lizard"
+             data-caption="Carved from a single block of wood. The chisel slipped once; it cost me 11 stitches.">
       </div>
     </section>
 
