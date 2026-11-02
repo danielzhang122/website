@@ -48,7 +48,20 @@
     zhuoyuan: printNameArt,
     '张卓远': printNameArt,
     og: printOg,
+    mercury: (line) => printPiece(line, 'liquid-chrome'),
+    klein: (line) => printPiece(line, 'klein-bottle'),
+    torus: (line) => printPiece(line, 'torus-knot'),
+    history: printHistory,
+    sudo: (line, text) => (/^sudo\s+rm\s/i.test(text) ? rm(line, text) : printLine('nice try.', 'dim')),
+    rm,
+    exit,
+    logout: exit,
+    coffee: () => mailMe('coffee?', "i'm in. "),
+    hire: () => mailMe('hiring', "let's talk: "),
   };
+  // Not re-run when a refresh restores the session: clear and rm reset it themselves,
+  // and retro would flip the saved setting back.
+  const UNSAVED = ['clear', 'retro', 'rm', 'sudo'];
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -326,8 +339,110 @@
     });
   }
 
+  // Easter egg: prints one of the banner's ASCII Magic pieces (js/chrome.js), which
+  // builds itself in like the name art and then keeps playing.
+  const stopPieces = [];
+  // chrome.js is a module, so it runs after this (deferred) script but before
+  // DOMContentLoaded; a restored session can get here before it.
+  const chromeArtLoaded = new Promise((resolve) => document.addEventListener('DOMContentLoaded', resolve, { once: true }));
+  async function printPiece(line, piece) {
+    await chromeArtLoaded;
+    if (!window.ChromeArt) return printLine('that art is unavailable.', 'dim');
+    const art = document.createElement('div');
+    art.className = 'chrome-art egg';
+    art.setAttribute('role', 'img');
+    art.setAttribute('aria-label', `${piece.replace('-', ' ')} in ASCII`);
+    for (const layer of ['', 'chrome-mid', 'chrome-red']) {
+      const pre = document.createElement('pre');
+      pre.className = layer;
+      art.appendChild(pre);
+    }
+    screen.appendChild(art);
+    try {
+      stopPieces.push(await window.ChromeArt.playPiece(art, piece, {
+        build: !restoring && !reduceMotion,
+        skip: () => fastForward,
+        // Scroll once the art has its full height, so the build plays in view.
+        ready: () => { if (line && !restoring) scrollAfter(line); },
+      }));
+    } catch {
+      art.remove();   // the piece didn't load
+      await printLine('that art is unavailable.', 'dim');
+    }
+  }
+
+  // Easter egg: the commands typed this session, numbered like bash.
+  function printHistory() {
+    const list = document.createElement('p');
+    list.className = 'dim';
+    list.style.whiteSpace = 'pre';
+    const width = String(past.length).length + 2;
+    list.textContent = past.map((text, i) => `${String(i + 1).padStart(width)}  ${text}`).join('\n');
+    return reveal(list);
+  }
+
+  // Easter egg: rm -rf / crumbles the whole screen, then whoami comes back.
+  function rm(line, text) {
+    return /^(sudo\s+)?rm\s+-(rf|fr)\s+\/\*?$/i.test(text) ? crumble() : printLine('rm: permission denied', 'dim');
+  }
+
+  const CRUMBLE = 600;        // ms over which characters start crumbling, in random order
+  const CRUMBLE_CELL = 100;   // ms each shows a dot before it's gone
+
+  async function crumble() {
+    stopPieces.splice(0).forEach((stop) => stop());
+    if (!restoring && !reduceMotion) {
+      screen.querySelectorAll(MEDIA).forEach((media) => media.classList.add('pending'));
+      const nodes = [];
+      const walker = document.createTreeWalker(screen, NodeFilter.SHOW_TEXT);
+      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+        const full = [...n.data];
+        nodes.push({ n, full, at: full.map(() => Math.random() * CRUMBLE) });
+      }
+      const startedAt = performance.now();
+      for (let t = 0; t < CRUMBLE + CRUMBLE_CELL && !fastForward; t = performance.now() - startedAt) {
+        for (const { n, full, at } of nodes) {
+          n.data = full.map((c, i) => (!c.trim() || t < at[i] ? c : t < at[i] + CRUMBLE_CELL ? '·' : ' ')).join('');
+        }
+        await nextFrame();
+      }
+    }
+    screen.replaceChildren();
+    setHash('');
+    ran = ['whoami'];
+    saveSession();
+    await printWhoami();
+    await printLine('just kidding.', 'dim');
+  }
+
+  // Easter egg: a fresh visit, intro and all.
+  function exit() {
+    try {
+      sessionStorage.removeItem('gate');
+      sessionStorage.removeItem(SESSION_KEY);
+    } catch {
+      // storage blocked: the reload starts fresh anyway
+    }
+    location.reload();
+    // Never resolves, so run() can't save the session again before the page goes.
+    return new Promise(() => {});
+  }
+
+  // Easter egg: a ready-made email. Not opened again when a refresh re-prints it.
+  function mailMe(subject, lead) {
+    const address = content.querySelector('a[href^="mailto:"]').getAttribute('href').slice('mailto:'.length);
+    const link = document.createElement('a');
+    link.href = `mailto:${address}?subject=${encodeURIComponent(subject)}`;
+    link.textContent = address;
+    const line = document.createElement('p');
+    line.append(lead, link);
+    if (!restoring) location.href = link.href;
+    return reveal(line);
+  }
+
   // Erases everything below the first whoami, which stays put, so the page never goes blank.
   async function clear() {
+    stopPieces.splice(0).forEach((stop) => stop());
     setHash('');
     ran = ['whoami'];
     saveSession();
@@ -425,7 +540,7 @@
     const name = COMMANDS[exact] || HIDDEN[exact] ? exact : closest(word) || exact;
     const command = COMMANDS[name];
     if (HIDDEN[name]) {
-      await HIDDEN[name](line);
+      await HIDDEN[name](line, text);
     } else if (command) {
       await command.run();
       if (SECTIONS.includes(name)) setHash(name);
@@ -433,8 +548,7 @@
       await printLine(`'${word}' is not recognized as a command. type help for the list.`, 'dim');
     }
     if (restoring) return;
-    // retro isn't re-run on refresh, or it would flip the saved setting back.
-    if (name !== 'clear' && name !== 'retro') ran.push(text);
+    if (!UNSAVED.includes(name)) ran.push(text);
     saveSession();
     scrollAfter(line);
   }

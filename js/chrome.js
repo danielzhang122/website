@@ -2,8 +2,9 @@
 // page text at the top of the console: their player in dom mode rewrites a <pre> each
 // frame instead of painting a canvas, so it uses the page font and is selectable like
 // everything else. The art is part of the page, not printed output, so it stays
-// through whoami and clear.
-import { play } from 'https://www.ascii-magic.com/ascii/player.js';
+// through whoami and clear. The hidden mercury, klein and torus commands print the same
+// pieces into the console through window.ChromeArt.
+import { play, frameText } from 'https://www.ascii-magic.com/ascii/player.js';
 
 const BASE = 'https://www.ascii-magic.com/ascii/pieces/';
 const PIECES = ['liquid-chrome', 'torus-knot', 'klein-bottle'];
@@ -18,6 +19,8 @@ const MID = new Set('><~+_-?][}{1)(|/tfjrxnuvcz');
 // Gaps in the shape up to about twice this many cells wide are treated as closed when
 // telling the inside of the shape from the backdrop.
 const GAP = 2;
+// Marks a cell still building in (shown as a red dot); no piece draws this character.
+const BUILDING = '\u0001';
 
 // A copy of the w x h mask with every set cell grown into a square of radius r.
 function grow(mask, w, h, r) {
@@ -50,6 +53,7 @@ function split(frame, keepBackdrop) {
     for (let x = 0; x < r.length; x++) {
       const c = r[x];
       if (MID.has(c)) { l += ' '; m += c; d += ' '; }
+      else if (c === BUILDING) { l += ' '; m += ' '; d += '·'; }
       else if (DARK.has(c) && inside(x, y)) { l += ' '; m += ' '; d += c; }
       else { l += c; m += ' '; d += ' '; }
     }
@@ -93,19 +97,49 @@ function insideShape(rows) {
   return (x, y) => !outside[y * w + x];
 }
 
-const art = document.querySelector('#console > .chrome-art');
-if (art) {
+// The build-in, timed like the name art: cells start top to bottom, left to right, over
+// BUILD ms (plus JITTER), show a red dot for SETTLE ms, then their glyph.
+const BUILD = 900;
+const JITTER = 90;
+const SETTLE = 220;
+
+// Waits for the next animation frame, or 50 ms if a background tab pauses frames.
+const nextFrame = () => new Promise((resolve) => {
+  const fallback = setTimeout(resolve, 50);
+  requestAnimationFrame(() => { clearTimeout(fallback); resolve(); });
+});
+
+// Plays piece in art (a .chrome-art with its three <pre> layers). With build, the first
+// frame assembles itself before the animation starts from that same frame; skip()
+// returning true finishes the build at once, and ready() runs once the art has its full
+// size. Resolves to the player's stop function.
+async function playPiece(art, piece, { build = false, skip = () => false, ready = () => {} } = {}) {
   const layers = [...art.children];
-  const name = PIECES[Math.floor(Math.random() * PIECES.length)];
   // Only liquid-chrome's dotted backdrop is kept out of the red; the other two read
   // better with every faint glyph red.
-  const keepBackdrop = name === 'liquid-chrome';
-  play(layers[0], await import(`${BASE}${name}.js`), {
-    dom: true,
-    look: LOOK,
-    maxFps: 24,
-    onFrame: (f) => {
-      split(f, keepBackdrop).forEach((text, i) => { layers[i].textContent = text; });
-    },
-  });
+  const keepBackdrop = piece === 'liquid-chrome';
+  const mod = await import(`${BASE}${piece}.js`);
+  const draw = (text) => split(text, keepBackdrop).forEach((t, i) => { layers[i].textContent = t; });
+  const opts = { dom: true, look: LOOK, maxFps: 24, onFrame: (f) => draw(frameText(f)) };
+  if (build) {
+    let first = '';
+    play(layers[0], mod, { ...opts, still: true, onFrame: (f) => { first = frameText(f); } });
+    const rows = first.split('\n');
+    const cols = Math.max(...rows.map((r) => r.length));
+    const starts = rows.map((r, y) => [...r].map((_, x) => ((y + x / cols) / rows.length) * BUILD + Math.random() * JITTER));
+    ready();   // the still frame already gives the art its full size
+    const startedAt = performance.now();
+    for (let t = 0; t < BUILD + JITTER + SETTLE && !skip(); t = performance.now() - startedAt) {
+      draw(rows.map((r, y) => [...r].map((c, x) => (c === ' ' || t >= starts[y][x] + SETTLE ? c : t >= starts[y][x] ? BUILDING : ' ')).join('')).join('\n'));
+      await nextFrame();
+    }
+  }
+  const stop = play(layers[0], mod, opts);
+  if (!build) ready();
+  return stop;
 }
+
+window.ChromeArt = { playPiece };
+
+const art = document.querySelector('#console > .chrome-art');
+if (art) playPiece(art, PIECES[Math.floor(Math.random() * PIECES.length)]);

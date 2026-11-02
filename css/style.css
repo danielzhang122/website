@@ -618,8 +618,8 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 
   #shortcuts { justify-content: flex-start; }
 
-  /* 72 characters at 13px is wider than a phone; the art is decoration only. */
-  .chrome-art { display: none; }
+  /* 72 characters at 13px is wider than a phone; the banner art is decoration only (typed eggs still show, clipped). */
+  #console > .chrome-art { display: none; }
 
   .thumbs { gap: .6rem; }
 
