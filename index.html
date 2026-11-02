@@ -197,7 +197,7 @@
       <article data-id="resume-sync">
         <h3>Résumé Sync Pipeline</h3>
         <p>Keeping my résumé updated across several projects gets tedious, so I did the sensible thing: spent far too much time automating it. Every Sunday, a Python script checks my repositories, and an AI agent proposes source-backed edits. GitHub Actions checks compilation and the one-page limit; I review and reword changes before merging. In a test, it caught a planted inaccurate claim and proposed a correction backed by a GitHub commit.</p>
-        <p class="tags">Python, GitHub Actions, LaTeX, Claude Code <a href="https://github.com/danielzhang122/resume" target="_blank" rel="noopener noreferrer">Repo</a> <a href="https://github.com/danielzhang122/resume/blob/main/docs/PIPELINE.md" target="_blank" rel="noopener noreferrer">Write-up</a></p>
+        <p class="tags">Python, GitHub Actions, LaTeX, Claude Code</p>
         <figure class="thumb">
           <img src="images/resume-sync-diagram.svg" width="1200" height="520" class="fit-whole" loading="lazy" data-lightbox
                alt="Pipeline diagram: a weekly schedule runs check.py, which stops if nothing changed; otherwise an agent reviews the diffs, edits resume.tex on a new branch, a GitHub Action builds the PDF and, if it runs over one page, sends it back to the agent to rewrite and retry; once it passes, a pull request shows each edit with its source commit, I review and merge, and the next run opens a website PR with the new PDF, which I merge. My project work during the week becomes the next Sunday's input" data-title="Résumé Sync Pipeline"
