@@ -96,6 +96,8 @@ h3 {
 b { font-weight: 600; color: var(--bright); }
 
 .dim { color: var(--dim); }
+/* Paragraphs and list items justified, like a Word document; the last line of each stays left. Tag lines stay ragged. */
+p:not(.tags), li { text-align: justify; }
 
 /* The subtitle sits tight under the name. */
 h1 + p { margin-top: 0 !important; }
