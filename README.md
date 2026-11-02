@@ -2,7 +2,7 @@
 
 you can tell i am still very actively in the process of learning web development if you look closely
 
-half the commit history is me changing one word and pushing it then changing it back
+half the commit history used to be me changing one word and pushing it then changing it back. i squashed it so you can't see
 
 ## credits
 
