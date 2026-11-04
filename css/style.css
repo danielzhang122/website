@@ -3,7 +3,7 @@
    and Px437 IBM VGA 8x16 (CC BY-SA 4.0, VileR) for retro mode; see fonts/px437-LICENSE.txt
    ========================================================================== */
 
-/* A pixel font: crisp only at multiples of 16px. */
+/* A pixel font, drawn on an 8x16 grid: sharpest at 16px. */
 @font-face {
   font-family: 'Px437 IBM VGA';
   font-weight: 400;
@@ -133,23 +133,24 @@ a:hover {
 
 
 /* ==========================================================================
-   CRT: scanlines, a faint flicker, a rolling streak and a hint of RGB fringe.
+   CRT: scanlines, a faint flicker, a rolling streak, a hint of RGB fringe and the IBM VGA pixel font.
    The `retro` command toggles .no-retro on <html> to turn it all off.
    ========================================================================== */
 
-/* Retro also swaps the page text to the IBM VGA pixel font, at its native 16px.
-   Turning retro off sweeps back to Plex block by block (see toggleRetro in js/terminal.js). */
+/* Retro also swaps the page text to the IBM VGA pixel font, a size up from its native 16px
+   so it reads at the same size as Plex. The font has no bold, and the browser's fake one
+   smears each glyph by a fraction of a pixel, which blurs under the fringe; bold text gets a
+   whole-pixel double strike instead (below).
+   Turning retro off regenerates the text in Plex block by block (see toggleRetro in js/terminal.js). */
 html:not(.no-retro) {
   --text: var(--px);
-  --fs: 16px;
+  --fs: 18px;
+  font-synthesis: none;
 }
 
-/* A highlight bar that fades as the sweep reaches a block. */
-.px-scan { animation: px-scan .35s ease-out; }
-
-@keyframes px-scan {
-  from { background: color-mix(in srgb, var(--accent) 22%, transparent); }
-  to { background: transparent; }
+/* Small grey text drops to the font's native 16px rather than a blurry 13-14px. */
+html:not(.no-retro) :is(.tags, #shortcuts button, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
+  font-size: 16px;
 }
 
 html:not(.no-retro) body::before,
@@ -187,8 +188,13 @@ html:not(.no-retro) body {
     background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .1) 0 1px, transparent 1px 3px);
   }
 
+  /* Whole-pixel offsets: half a pixel on the pixel font smudges every stroke. */
   html:not(.no-retro) body {
-    text-shadow: -1px 0 rgba(255, 40, 80, .55), 1px 0 rgba(40, 200, 255, .55);
+    text-shadow: -1px 0 rgba(255, 40, 80, .45), 1px 0 rgba(40, 200, 255, .45);
+  }
+
+  html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
+    text-shadow: -1px 0 rgba(255, 40, 80, .35), 1px 0 rgba(40, 200, 255, .35);
   }
 }
 
@@ -198,8 +204,17 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
 }
 
 /* Grey text is thin enough that the full fringe swamps it; give it a lighter one. */
-html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
-  text-shadow: -.75px 0 rgba(255, 40, 80, .45), .75px 0 rgba(40, 200, 255, .45);
+@media (max-width: 640px) {
+  html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
+    text-shadow: -.75px 0 rgba(255, 40, 80, .35), .75px 0 rgba(40, 200, 255, .35);
+  }
+}
+
+/* Bold in retro: the glyph struck twice a pixel apart, as on a DOS screen, with the fringe
+   moved out a pixel to match, and the letters spaced out so the strokes don't run together. */
+html:not(.no-retro) :is(b, strong, h1, h2, h3) {
+  letter-spacing: .1em;
+  text-shadow: 1px 0 currentColor, -1px 0 rgba(255, 40, 80, .4), 2px 0 rgba(40, 200, 255, .4);
 }
 
 @keyframes crt-flicker {
@@ -248,6 +263,9 @@ html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figca
   font: 400 13px/1.15 var(--mono);
   white-space: pre;
 }
+
+/* In retro: an 8x15 cell for Plex's 7.8x14.95 (see .chrome-art). */
+html:not(.no-retro) .name-art { font: 400 16px/15px var(--px); }
 
 .accent { color: var(--accent); }
 
@@ -386,6 +404,11 @@ button.cmd:hover { color: var(--accent); }
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
 }
+
+/* Retro draws the art in the pixel font too. Its characters are 0.5em wide to Plex's 0.6em,
+   so 16px (the font's native size, so it stays sharp) on a 13px line gives an 8x13 cell:
+   Plex's 7.8x13 within 3%, so the art keeps its shape. */
+html:not(.no-retro) .chrome-art { font: 400 16px/13px var(--px); }
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
    are no per-character spans: mid tones rose, the faint glyphs inside the shape
@@ -570,6 +593,9 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   white-space: pre;
 }
 
+/* In retro js/intro.js scales the font and sets the line height to keep the art's cells. */
+html:not(.no-retro) .gate-art { font-family: var(--px); }
+
 .gate-hint {
   position: absolute;
   right: 1.5rem;
@@ -663,6 +689,8 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   :root { --gutter: 1rem; }
 
   :root { --fs: 14px; }
+  /* Retro on a phone: the pixel font's native size, for more characters per line. */
+  html:not(.no-retro) { --fs: 16px; }
 
   .row {
     grid-template-columns: 1fr;
