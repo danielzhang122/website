@@ -192,6 +192,19 @@ html.vga .ps { margin-right: 0; }
 html.vga button.cmd + button.cmd { margin-left: 2ch; }
 html.vga .banner button.cmd + button.cmd { margin-left: 0; }
 
+/* The effect's strength. The VGA font's 1px strokes take only a faint fringe (see below);
+   Cascadia's smoother, heavier strokes hold up to a stronger one. */
+html {
+  --scan: .08;       /* scanline darkness */
+  --streak: .02;     /* rolling streak brightness */
+  --fringe: .12;     /* RGB fringe opacity */
+}
+html:not(.vga) { --fringe: .2; }
+/* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
+@media (min-width: 641px) {
+  html { --scan: .1; }
+}
+
 /* .crt-leaving keeps the overlay up while a sweep takes it away (see sweep in js/terminal.js). */
 :is(html:not(.no-retro), html.crt-leaving) body::before,
 :is(html:not(.no-retro), html.crt-leaving) body::after {
@@ -203,22 +216,15 @@ html.vga .banner button.cmd + button.cmd { margin-left: 0; }
 }
 
 :is(html:not(.no-retro), html.crt-leaving) body::before {
-  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .08) 0 1px, transparent 1px 3px);
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 1px, transparent 1px 3px);
   animation: crt-flicker 4s steps(1) infinite;
 }
 
 :is(html:not(.no-retro), html.crt-leaving) body::after {
   bottom: auto;
   height: 40vh;
-  background: linear-gradient(transparent, rgba(255, 255, 255, .015), transparent);
+  background: linear-gradient(transparent, rgba(255, 255, 255, var(--streak)), transparent);
   animation: crt-roll 12s linear infinite;
-}
-
-/* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
-@media (min-width: 641px) {
-  :is(html:not(.no-retro), html.crt-leaving) body::before {
-    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .1) 0 1px, transparent 1px 3px);
-  }
 }
 
 /* Buttons and inputs don't inherit text-shadow by default; the commands are buttons. */
@@ -226,10 +232,10 @@ button,
 input { text-shadow: inherit; }
 
 /* The RGB fringe: exactly one screen pixel (--dpx) each side, faint, so it tints the edges of
-   each stroke without smearing them. Kept at .12: stronger, it doubles the width of thin strokes
-   (the VGA font's are 1px) and grey text reads as smudged bold. */
+   each stroke without smearing them. On the VGA font it's kept at .12: stronger, it doubles the
+   width of the font's 1px strokes and grey text reads as smudged bold. */
 html:not(.no-retro) body {
-  text-shadow: calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, .12), var(--dpx) 0 rgba(40, 200, 255, .12);
+  text-shadow: calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)), var(--dpx) 0 rgba(40, 200, 255, var(--fringe));
 }
 
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
