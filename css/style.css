@@ -1,5 +1,6 @@
 /* ==========================================================================
    Fonts: Cascadia Mono (SIL Open Font License; see fonts/cascadia-mono-LICENSE.txt),
+   IBM Plex Mono, retro's default text font (SIL OFL; see fonts/ibm-plex-mono-LICENSE.txt),
    latin + latin-ext subsets via Fontsource,
    and, for retro mode, IBM VGA 9x16 (text) and 8x16 (ASCII art) from VileR's Ultimate
    Oldschool PC Font Pack, CC BY-SA 4.0; see fonts/px437-LICENSE.txt
@@ -51,6 +52,36 @@
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
+/* IBM Plex Mono: the page text in retro, by default (see html.plex). */
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/ibm-plex-mono-400-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/ibm-plex-mono-400-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-weight: 600;
+  font-display: swap;
+  src: url(../fonts/ibm-plex-mono-600-latin.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'IBM Plex Mono';
+  font-weight: 600;
+  font-display: swap;
+  src: url(../fonts/ibm-plex-mono-600-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
 /* ==========================================================================
    Tokens
    ========================================================================== */
@@ -68,6 +99,7 @@
   --mono: 'Cascadia Mono', ui-monospace, Menlo, Consolas, monospace;
   --px: 'Px437 IBM VGA', var(--mono);
   --px-text: 'IBM VGA 9x16', var(--px);
+  --plex: 'IBM Plex Mono', var(--mono);
   --text: var(--mono);
   /* A terminal's text grid: 9x19px cells, as in Windows Terminal. Cascadia Mono is 0.5859375em
      (1200/2048) wide, so 15.36px gives exactly 9px columns. */
@@ -163,8 +195,8 @@ a:hover {
 
 /* ==========================================================================
    CRT: scanlines, a faint flicker, a rolling streak and a hint of RGB fringe. The `retro`
-   command toggles .no-retro on <html> to turn them off. The DOS pixel fonts are separate:
-   the hidden `vga` command toggles .vga on <html> (off by default).
+   command toggles .no-retro on <html> to turn them off. Each mode also keeps its own page font
+   (.plex or .vga on <html>, or neither for Cascadia; see setFont in js/terminal.js).
    ========================================================================== */
 
 /* VGA swaps the page text to the IBM VGA 9x16 font. It's drawn on a 9x16
@@ -184,6 +216,14 @@ html.vga {
 html.vga { --text-line: calc(24 * var(--pxu)); }
 html.vga body { line-height: var(--text-line); }
 
+
+/* IBM Plex Mono for the page text: retro's default, or set by the hidden `plex` command (the
+   ASCII art stays in Cascadia). Plex is 0.6em wide, so 15px gives the same 9px columns, on the same 19px lines. */
+html.plex {
+  --text: var(--plex);
+  --fs: 15px;
+  --lh: calc(19 / 15);
+}
 
 /* The prompt's sliver of space after > would put the command between pixels. */
 html.vga .ps { margin-right: 0; }
