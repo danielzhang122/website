@@ -37,7 +37,7 @@
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
     contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
-    retro: { help: 'toggle the retro screen effect', run: toggleRetro },
+    retro: { help: 'toggle the crt screen effect', run: toggleRetro },
   };
   // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
   const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume', hardware: 'misc' };
@@ -58,10 +58,14 @@
     logout: exit,
     coffee: () => mailMe('coffee?', "i'm in. "),
     hire: () => mailMe('hiring', "let's talk: "),
+    vga: () => setFont('vga'),
+    plex: () => setFont('plex'),
+    cascadia: () => setFont('cascadia'),
+    default: resetFonts,
   };
   // Not re-run when a refresh restores the session: clear and rm reset it themselves,
-  // and retro would flip the saved setting back.
-  const UNSAVED = ['clear', 'retro', 'rm', 'sudo'];
+  // and the look commands would redo saved settings.
+  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'cascadia', 'default', 'rm', 'sudo'];
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -268,10 +272,11 @@
     }
   }
 
-  // Toggling retro doesn't swap the look in one go: an invisible sweep runs down the screen,
-  // and as it passes each block of text, the block switches font and its characters regenerate
-  // (each starts as a dot, flickers through scrambled glyphs and settles, in random order,
-  // like rm -rf / in reverse). The CRT scanlines wipe in or out along with it.
+  // Toggling retro or vga doesn't swap the look in one go: an invisible sweep runs down the
+  // screen, and each block of text takes the new look as it passes. For retro, the CRT
+  // scanlines wipe in or out with it; for vga, each block switches font and its characters
+  // regenerate (each starts as a dot, flickers through scrambled glyphs and settles, in random
+  // order, like rm -rf / in reverse).
   let sweepFrame = 0;
   let regenerating = [];     // { n, full, start, at }: text nodes mid-regeneration
   let regenFrame = 0;
@@ -358,7 +363,9 @@
     root.style.removeProperty('--sweep');
   }
 
-  function sweep(toRetro) {
+  // apply switches the classes on <html>; crt is 'crt-entering' or 'crt-leaving' when the
+  // scanlines change, and regen regenerates the text as the sweep passes it.
+  function sweep(apply, crt, regen) {
     const root = document.documentElement;
     // Hold the banner's label as it is, then pin every block to its current look.
     document.querySelectorAll('[data-retro-label]').forEach((label) => {
@@ -375,8 +382,8 @@
     });
 
     root.style.setProperty('--sweep', '0px');
-    root.classList.add(toRetro ? 'crt-entering' : 'crt-leaving');
-    root.classList.toggle('no-retro', !toRetro);
+    if (crt) root.classList.add(crt);
+    apply();
     window.snapPixels?.();
 
     // Blocks above the screen switch now, out of sight; the rest wait for the sweep.
@@ -393,7 +400,7 @@
       // In document order, so roughly top to bottom; re-measured as released blocks reflow.
       while (waiting.length && (p === 1 || waiting[0].getBoundingClientRect().top <= y)) {
         const el = waiting.shift();
-        release(el, el.getBoundingClientRect().top < innerHeight);
+        release(el, regen && el.getBoundingClientRect().top < innerHeight);
       }
       if (p < 1) sweepFrame = requestAnimationFrame(tick);
       else {
@@ -405,19 +412,79 @@
     sweepFrame = requestAnimationFrame(tick);
   }
 
-  function toggleRetro() {
-    endSweep();
-    const root = document.documentElement;
-    const off = !root.classList.contains('no-retro');
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) root.classList.toggle('no-retro', off);
-    else sweep(!off);
-    window.snapPixels?.();
+  // Retro and modern each keep their own page font: vga, plex or cascadia, set by the hidden
+  // command of the same name for whichever mode is on, and put back by the hidden default.
+  // index.html applies the saved choice before first paint, with the same defaults.
+  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'", cascadia: "15px 'Cascadia Mono'" };
+  const DEFAULT_FONT = { retro: 'plex', modern: 'cascadia' };
+  const modeName = (retro) => (retro ? 'retro' : 'modern');
+
+  function saved(key) {
+    try { return localStorage.getItem(key); } catch { return null; }
+  }
+  function save(key, value) {
     try {
-      localStorage.setItem('retro', off ? 'off' : 'on');
+      if (value === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, value);
     } catch {
       // storage blocked: the choice lasts until the page closes
     }
-    return printLine(off ? 'retro off' : 'retro on', 'dim');
+  }
+
+  const retroOn = () => !document.documentElement.classList.contains('no-retro');
+  function fontFor(retro) {
+    const font = saved(`font-${modeName(retro)}`);
+    return FONTS[font] ? font : DEFAULT_FONT[modeName(retro)];
+  }
+  function currentFont() {
+    const { classList } = document.documentElement;
+    return classList.contains('vga') ? 'vga' : classList.contains('plex') ? 'plex' : 'cascadia';
+  }
+
+  // Moves the page to a mode and font: the scanlines wipe in or out if the mode changes, and the
+  // text regenerates if the font does.
+  async function applyLook(retro, font) {
+    const crtChange = retro !== retroOn();
+    const fontChange = font !== currentFont();
+    if (!crtChange && !fontChange) return;
+    // Fetch the font first, so the sweep doesn't reveal a fallback.
+    if (fontChange) {
+      await Promise.race([Promise.all([document.fonts.load(FONTS[font]), document.fonts.load(`600 ${FONTS[font]}`)]), wait(1500)]).catch(() => {});
+    }
+    endSweep();
+    const root = document.documentElement;
+    const apply = () => {
+      root.classList.toggle('no-retro', !retro);
+      root.classList.toggle('vga', font === 'vga');
+      root.classList.toggle('plex', font === 'plex');
+    };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) apply();
+    else sweep(apply, crtChange ? (retro ? 'crt-entering' : 'crt-leaving') : '', fontChange);
+    window.snapPixels?.();
+  }
+
+  // The CRT screen effect, on by default.
+  async function toggleRetro() {
+    const on = !retroOn();
+    save('retro', on ? 'on' : 'off');
+    await applyLook(on, fontFor(on));
+    return printLine(`retro ${on ? 'on' : 'off'}`, 'dim');
+  }
+
+  // Easter eggs: vga, plex and cascadia set the font for the mode that's on.
+  async function setFont(font) {
+    const retro = retroOn();
+    save(`font-${modeName(retro)}`, font);
+    await applyLook(retro, font);
+    return printLine(`${font} in ${modeName(retro)}`, 'dim');
+  }
+
+  // Easter egg: default puts both modes' fonts back.
+  async function resetFonts() {
+    save('font-retro', null);
+    save('font-modern', null);
+    await applyLook(retroOn(), fontFor(retroOn()));
+    return printLine(`default fonts: ${DEFAULT_FONT.retro} in retro, ${DEFAULT_FONT.modern} in modern`, 'dim');
   }
 
   // Easter egg: a link to the archived first version of the site.
@@ -439,9 +506,9 @@
 
     // The art is drawn for 13px characters; when the console is too narrow for the
     // row of three (phones), the glyphs stack vertically.
-    // JetBrains Mono's advance width at 13px, or the pixel font's at 16px in retro (see .name-art).
+    // Cascadia Mono's advance width at 13px, or the pixel font's at 16px in vga (see .name-art).
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
-    const charW = document.documentElement.classList.contains('no-retro') ? 13 * 0.6 : 8 * pxu;
+    const charW = document.documentElement.classList.contains('vga') ? 8 * pxu : 13 * (1200 / 2048);
     const vertical = screen.clientWidth < art.nameArt().cols * charW;
     const { cols, rows, cells, fillEnd } = art.nameArt({ vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));

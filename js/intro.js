@@ -177,6 +177,7 @@
   const ART_GLYPH_COLS = 31;
   const ART_GAP = 4;
   const ART_ASPECT = 0.6 / 1.15;   // character width / line height
+  const MONO_W = 1200 / 2048;      // Cascadia Mono's advance width, in em
 
   // The hand-drawn art as { cols, rows, cells, fillEnd }, like rasterize() returns, so it
   // animates the same way. Each cell takes its fill time from the rasterized strokes at
@@ -238,7 +239,7 @@
   }
 
   const pre = gate.querySelector('.gate-art');
-  const retro = () => !document.documentElement.classList.contains('no-retro');
+  const vga = () => document.documentElement.classList.contains('vga');
 
   let art = null;          // the name art, rebuilt on resize
   let labelPad = '';
@@ -250,19 +251,19 @@
     const height = innerHeight;
     const narrow = width < 600;
     art = nameArt({ vertical: narrow });
-    // Characters are 0.6em wide and 1.15em tall; leave room for the label below.
-    const fit = Math.min((width * (narrow ? 0.9 : 0.8)) / (art.cols * 0.6), (height * 0.8) / ((art.rows + 3) * 1.15));
+    // Cascadia Mono's characters are 0.586em (1200/2048) wide and 1.15em tall; leave room for the label below.
+    const fit = Math.min((width * (narrow ? 0.9 : 0.8)) / (art.cols * MONO_W), (height * 0.8) / ((art.rows + 3) * 1.15));
     const fontSize = Math.max(6, Math.min(16, Math.floor(fit)));
     labelPad = ' '.repeat(Math.max(0, Math.floor((art.cols - LABEL.length) / 2)));
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
-    if (retro() && fit * 0.6 >= 8 * pxu) {
+    if (vga() && fit * MONO_W >= 8 * pxu) {
       // The pixel font is only sharp at its own size (--pxu, see index.html), on an 8x15
       // cell: the art's 0.6:1.15 within 2%.
       pre.style.fontSize = `${16 * pxu}px`;
       pre.style.lineHeight = `${15 * pxu}px`;
-    } else if (retro()) {
-      // Too small a screen for that: scale it, keeping the cell (0.5em wide, so 1.2x).
-      pre.style.fontSize = `${fontSize * 1.2}px`;
+    } else if (vga()) {
+      // Too small a screen for that: scale it, keeping the cell width (the pixel font is 0.5em wide).
+      pre.style.fontSize = `${fontSize * MONO_W / 0.5}px`;
       pre.style.lineHeight = `${fontSize * 1.15}px`;
     } else {
       pre.style.fontSize = `${fontSize}px`;
@@ -324,7 +325,7 @@
 
   // Wait for the mono font so the characters measure right; don't hang if it never comes.
   Promise.race([
-    document.fonts.load(retro() ? "16px 'Px437 IBM VGA'" : "14px 'JetBrains Mono'"),
+    document.fonts.load(vga() ? "16px 'Px437 IBM VGA'" : "14px 'Cascadia Mono'"),
     new Promise((resolve) => setTimeout(resolve, 600)),
   ]).finally(() => {
     build();
