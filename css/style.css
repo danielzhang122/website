@@ -199,7 +199,7 @@ html {
   --streak: .02;     /* rolling streak brightness */
   --fringe: .12;     /* RGB fringe opacity */
 }
-html:not(.vga) { --fringe: .2; }
+html:not(.vga) { --fringe: .25; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
   html { --scan: .1; }
