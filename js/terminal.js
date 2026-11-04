@@ -343,7 +343,7 @@
     const sizes = blocks.map((el) => getComputedStyle(el).fontSize);
     blocks.forEach((el, i) => {
       el.dataset.px = '';
-      el.style.fontFamily = 'var(--px)';
+      el.style.fontFamily = 'var(--px-text)';
       el.style.fontSize = sizes[i];
     });
     document.documentElement.classList.add('no-retro');
