@@ -343,10 +343,11 @@
     const sizes = blocks.map((el) => getComputedStyle(el).fontSize);
     blocks.forEach((el, i) => {
       el.dataset.px = '';
-      el.style.fontFamily = 'var(--px)';
+      el.style.fontFamily = 'var(--px-text)';
       el.style.fontSize = sizes[i];
     });
     document.documentElement.classList.add('no-retro');
+    window.snapPixels?.();
 
     // Only blocks on screen regenerate; the rest just switch, above the screen at once
     // and below it when the sweep gets there.
@@ -375,6 +376,7 @@
     const off = !root.classList.contains('no-retro');
     if (off && !matchMedia('(prefers-reduced-motion: reduce)').matches) sweepToPlex();
     else root.classList.toggle('no-retro', off);
+    window.snapPixels?.();
     try {
       localStorage.setItem('retro', off ? 'off' : 'on');
     } catch {
@@ -403,7 +405,8 @@
     // The art is drawn for 13px characters; when the console is too narrow for the
     // row of three (phones), the glyphs stack vertically.
     // IBM Plex Mono's advance width at 13px, or the pixel font's at 16px in retro (see .name-art).
-    const charW = document.documentElement.classList.contains('no-retro') ? 13 * 0.6 : 8;
+    const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
+    const charW = document.documentElement.classList.contains('no-retro') ? 13 * 0.6 : 8 * pxu;
     const vertical = screen.clientWidth < art.nameArt().cols * charW;
     const { cols, rows, cells, fillEnd } = art.nameArt({ vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));
