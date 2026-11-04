@@ -257,7 +257,7 @@
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
     if (retro() && fit * 0.6 >= 8 * pxu) {
       // The pixel font is only sharp at its own size (--pxu, see index.html), on an 8x15
-      // cell: Plex's 0.6:1.15 within 2%.
+      // cell: the art's 0.6:1.15 within 2%.
       pre.style.fontSize = `${16 * pxu}px`;
       pre.style.lineHeight = `${15 * pxu}px`;
     } else if (retro()) {
@@ -324,7 +324,7 @@
 
   // Wait for the mono font so the characters measure right; don't hang if it never comes.
   Promise.race([
-    document.fonts.load(retro() ? "16px 'Px437 IBM VGA'" : "14px 'IBM Plex Mono'"),
+    document.fonts.load(retro() ? "16px 'Px437 IBM VGA'" : "14px 'JetBrains Mono'"),
     new Promise((resolve) => setTimeout(resolve, 600)),
   ]).finally(() => {
     build();
