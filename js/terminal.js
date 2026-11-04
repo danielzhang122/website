@@ -268,18 +268,18 @@
     }
   }
 
-  // Toggling retro doesn't swap the look in one go: a scan beam runs down the screen, and
-  // as it passes each block of text, the block switches font and its characters regenerate
+  // Toggling retro doesn't swap the look in one go: an invisible sweep runs down the screen,
+  // and as it passes each block of text, the block switches font and its characters regenerate
   // (each starts as a dot, flickers through scrambled glyphs and settles, in random order,
-  // like rm -rf / in reverse). The CRT scanlines wipe in or out along the beam.
+  // like rm -rf / in reverse). The CRT scanlines wipe in or out along with it.
   let sweepFrame = 0;
   let regenerating = [];     // { n, full, start, at }: text nodes mid-regeneration
   let regenFrame = 0;
-  const SWEEP_MS = 900;      // the beam's trip down the screen
+  const SWEEP_MS = 900;      // the sweep's trip down the screen
   const REGEN = 380;         // ms over which a block's characters start settling
   const REGEN_CELL = 110;    // ms each flickers before it settles
   const SCRAMBLE = '·:=+*#%@';
-  // The look a block keeps until the beam reaches it.
+  // The look a block keeps until the sweep reaches it.
   const PINNED = ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'textAlign', 'textShadow', 'fontSynthesis'];
 
   // The block-level element a text node sits in.
@@ -339,7 +339,7 @@
     if (!el.hasAttribute('data-px')) return;
     el.removeAttribute('data-px');
     for (const prop of PINNED) el.style[prop] = '';
-    // The banner's "Hard on the eyes?" / "Miss the glow?" changes as the beam passes too.
+    // The banner's "Hard on the eyes?" / "Miss the glow?" changes as the sweep passes too.
     el.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
     if (animate) regenerate(ownText(el));
   }
@@ -353,10 +353,9 @@
     regenerating = [];
     document.querySelectorAll('[data-px]').forEach((el) => release(el, false));
     document.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
-    document.querySelector('.beam')?.remove();
     const root = document.documentElement;
     root.classList.remove('crt-entering', 'crt-leaving');
-    root.style.removeProperty('--beam');
+    root.style.removeProperty('--sweep');
   }
 
   function sweep(toRetro) {
@@ -375,16 +374,12 @@
       Object.assign(el.style, looks[i]);
     });
 
-    root.style.setProperty('--beam', '0px');
+    root.style.setProperty('--sweep', '0px');
     root.classList.add(toRetro ? 'crt-entering' : 'crt-leaving');
     root.classList.toggle('no-retro', !toRetro);
     window.snapPixels?.();
-    const beam = document.createElement('div');
-    beam.className = 'beam';
-    beam.setAttribute('aria-hidden', 'true');
-    document.body.appendChild(beam);
 
-    // Blocks above the screen switch now, out of sight; the rest wait for the beam.
+    // Blocks above the screen switch now, out of sight; the rest wait for the sweep.
     const waiting = blocks.filter((el) => {
       if (el.getBoundingClientRect().bottom > 0) return true;
       release(el, false);
@@ -394,8 +389,7 @@
     const tick = (now) => {
       const p = Math.min(1, (now - startedAt) / SWEEP_MS);
       const y = (1 - Math.cos(p * Math.PI)) / 2 * innerHeight;   // eases in and out
-      root.style.setProperty('--beam', `${y}px`);
-      beam.style.transform = `translateY(${y}px)`;
+      root.style.setProperty('--sweep', `${y}px`);
       // In document order, so roughly top to bottom; re-measured as released blocks reflow.
       while (waiting.length && (p === 1 || waiting[0].getBoundingClientRect().top <= y)) {
         const el = waiting.shift();
@@ -404,9 +398,8 @@
       if (p < 1) sweepFrame = requestAnimationFrame(tick);
       else {
         sweepFrame = 0;
-        beam.remove();
         root.classList.remove('crt-entering', 'crt-leaving');
-        root.style.removeProperty('--beam');
+        root.style.removeProperty('--sweep');
       }
     };
     sweepFrame = requestAnimationFrame(tick);

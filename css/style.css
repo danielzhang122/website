@@ -230,35 +230,11 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
   background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 1px, transparent 1px 3px);
 }
 
-/* Mid-sweep, the scanlines cover only what the beam has passed (turning on) or not yet
+/* Mid-sweep, the scanlines cover only what the sweep has passed (turning on) or not yet
    reached (turning off); the rolling streak sits it out. */
-html.crt-entering body::before { clip-path: inset(0 0 calc(100% - var(--beam, 0px)) 0); }
-html.crt-leaving body::before { clip-path: inset(var(--beam, 0px) 0 0 0); }
+html.crt-entering body::before { clip-path: inset(0 0 calc(100% - var(--sweep, 0px)) 0); }
+html.crt-leaving body::before { clip-path: inset(var(--sweep, 0px) 0 0 0); }
 html:is(.crt-entering, .crt-leaving) body::after { display: none; }
-
-/* The scan beam: a thin bright line with a faint glow and a short fading trail. */
-.beam {
-  position: fixed;
-  top: 0;
-  right: 0;
-  left: 0;
-  z-index: 201;
-  height: 1px;
-  background: color-mix(in srgb, var(--bright) 70%, transparent);
-  box-shadow: 0 0 6px 1px color-mix(in srgb, var(--accent) 45%, transparent);
-  pointer-events: none;
-  will-change: transform;
-}
-
-.beam::before {
-  content: '';
-  position: absolute;
-  right: 0;
-  bottom: 1px;
-  left: 0;
-  height: 40px;
-  background: linear-gradient(transparent, rgba(255, 255, 255, .035));
-}
 
 /* The banner's lead-in to the retro command fits the mode it would switch to. */
 html.no-retro [data-retro-label="on"],
