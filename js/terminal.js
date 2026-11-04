@@ -269,7 +269,7 @@
   }
 
   // Turning retro off doesn't swap the font in one go: a sweep runs down the page, and as
-  // it reaches each block of text, the block switches to Plex and its characters regenerate,
+  // it reaches each block of text, the block switches to Cascadia and its characters regenerate,
   // like rm -rf / in reverse: each one starts as a dot, flickers through scrambled glyphs and
   // settles, in random order.
   let pxTimers = [];
@@ -285,6 +285,8 @@
     el.removeAttribute('data-px');
     el.style.fontFamily = '';
     el.style.fontSize = '';
+    el.style.lineHeight = '';
+    el.style.letterSpacing = '';
   }
 
   function endSweep() {
@@ -336,15 +338,18 @@
     return found;
   }
 
-  function sweepToPlex() {
+  function sweepFromRetro() {
     const found = textBlocks();
     const blocks = [...found.keys()];
-    // Pin every block to the pixel font at its current size, then let the page switch.
-    const sizes = blocks.map((el) => getComputedStyle(el).fontSize);
+    // Pin every block to the pixel font at its current size and spacing, then let the page switch.
+    const styles = blocks.map((el) => {
+      const cs = getComputedStyle(el);
+      return { fontSize: cs.fontSize, lineHeight: cs.lineHeight, letterSpacing: cs.letterSpacing };
+    });
     blocks.forEach((el, i) => {
       el.dataset.px = '';
       el.style.fontFamily = 'var(--px-text)';
-      el.style.fontSize = sizes[i];
+      Object.assign(el.style, styles[i]);
     });
     document.documentElement.classList.add('no-retro');
     window.snapPixels?.();
@@ -374,7 +379,7 @@
     endSweep();
     const root = document.documentElement;
     const off = !root.classList.contains('no-retro');
-    if (off && !matchMedia('(prefers-reduced-motion: reduce)').matches) sweepToPlex();
+    if (off && !matchMedia('(prefers-reduced-motion: reduce)').matches) sweepFromRetro();
     else root.classList.toggle('no-retro', off);
     window.snapPixels?.();
     try {
@@ -404,7 +409,7 @@
 
     // The art is drawn for 13px characters; when the console is too narrow for the
     // row of three (phones), the glyphs stack vertically.
-    // IBM Plex Mono's advance width at 13px, or the pixel font's at 16px in retro (see .name-art).
+    // The art's cell width at 13px (Cascadia plus --art-ls), or the pixel font's at 16px in retro (see .name-art).
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
     const charW = document.documentElement.classList.contains('no-retro') ? 13 * 0.6 : 8 * pxu;
     const vertical = screen.clientWidth < art.nameArt().cols * charW;

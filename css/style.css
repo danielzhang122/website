@@ -1,5 +1,6 @@
 /* ==========================================================================
-   Fonts: IBM Plex Mono (SIL Open Font License), latin + latin-ext subsets from Google Fonts,
+   Fonts: Cascadia Mono, Windows Terminal's font (Microsoft, SIL Open Font License; see
+   fonts/cascadia-mono-LICENSE.txt), latin + latin-ext subsets via Fontsource,
    and, for retro mode, IBM VGA 9x16 (text) and 8x16 (ASCII art) from VileR's Ultimate
    Oldschool PC Font Pack, CC BY-SA 4.0; see fonts/px437-LICENSE.txt
    ========================================================================== */
@@ -12,7 +13,7 @@
   src: url(../fonts/px437-ibm-vga-9x16.woff) format('woff');
 }
 
-/* Retro ASCII art: its 8x16 grid is close to Plex's character shape, so the art keeps its proportions. */
+/* Retro ASCII art: its 8x16 grid is close to the art's 0.6em-wide cells, so the art keeps its proportions. */
 @font-face {
   font-family: 'Px437 IBM VGA';
   font-weight: 400;
@@ -21,32 +22,32 @@
 }
 
 @font-face {
-  font-family: 'IBM Plex Mono';
+  font-family: 'Cascadia Mono';
   font-weight: 400;
   font-display: swap;
-  src: url(../fonts/plex-mono-400-latin.woff2) format('woff2');
+  src: url(../fonts/cascadia-mono-400-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'IBM Plex Mono';
+  font-family: 'Cascadia Mono';
   font-weight: 400;
   font-display: swap;
-  src: url(../fonts/plex-mono-400-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(../fonts/cascadia-mono-400-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: 'IBM Plex Mono';
-  font-weight: 600;
+  font-family: 'Cascadia Mono';
+  font-weight: 700;
   font-display: swap;
-  src: url(../fonts/plex-mono-600-latin.woff2) format('woff2');
+  src: url(../fonts/cascadia-mono-700-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'IBM Plex Mono';
-  font-weight: 600;
+  font-family: 'Cascadia Mono';
+  font-weight: 700;
   font-display: swap;
-  src: url(../fonts/plex-mono-600-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(../fonts/cascadia-mono-700-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 /* ==========================================================================
@@ -61,16 +62,22 @@
   --line: #262626;
   --accent: #e5484d;
 
-  --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  --mono: 'Cascadia Mono', Consolas, ui-monospace, Menlo, monospace;
   --px: 'Px437 IBM VGA', var(--mono);
   --px-text: 'IBM VGA 9x16', var(--px);
-  /* Page text. The ASCII art keeps --mono: its grids are built for Plex's character width. */
   --text: var(--mono);
-  --fs: 15px;
+  /* Windows Terminal's default text grid: Cascadia Mono at 16px in 9x19px cells. The font's own
+     advance is 9.375px, so letter-spacing trims it to the terminal's whole-pixel 9. */
+  --fs: 16px;
+  --lh: 1.1875;               /* 19px at 16px */
+  --ls: -0.0234375em;         /* 9.375px -> 9px at 16px */
+  /* The ASCII art's grids are built for 0.6em-wide characters (7.8px at 13px): Cascadia is
+     0.5859em, so the art gets the difference back. The retro font needs none. */
+  --art-ls: 0.0140625em;
   --pxu: 1px;   /* one pixel of the retro font; see index.html */
   --dpx: 1px;   /* one screen pixel */
 
-  --column: 90ch;
+  --column: 810px;   /* 90 characters */
   --gutter: 1.5rem;
 }
 
@@ -90,7 +97,8 @@
 body {
   background: var(--bg);
   color: var(--ink);
-  font: 400 var(--fs)/1.6 var(--text);
+  font: 400 var(--fs)/var(--lh) var(--text);
+  letter-spacing: var(--ls);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -156,12 +164,12 @@ a:hover {
    - no fake bold (the browser smears glyphs by a fraction of a pixel) and no justified text
      (stretched spaces put words between pixels): bold reads by colour, as on a DOS screen;
    - the script also nudges the page column onto whole screen pixels.
-   Turning retro off regenerates the text in Plex block by block (see toggleRetro in js/terminal.js). */
+   Turning retro off regenerates the text in Cascadia block by block (see toggleRetro in js/terminal.js). */
 html:not(.no-retro) {
   --text: var(--px-text);
   --fs: calc(16 * var(--pxu));
-  /* 90 characters on a 1x screen; fixed so the column doesn't narrow where the font is set smaller. */
-  --column: 810px;
+  --ls: 0;
+  --art-ls: 0;
   font-synthesis: none;
 }
 
@@ -268,10 +276,11 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
   margin: 0;
   color: var(--ink);
   font: 400 13px/1.15 var(--mono);
+  letter-spacing: var(--art-ls);
   white-space: pre;
 }
 
-/* In retro: an 8x15 cell for Plex's 7.8x14.95 (see .chrome-art). */
+/* In retro: an 8x15 cell for the usual 7.8x14.95 (see .chrome-art). */
 html:not(.no-retro) .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(--px); }
 
 .accent { color: var(--accent); }
@@ -406,15 +415,16 @@ button.cmd:hover { color: var(--accent); }
   max-width: 100%;
   margin: 0 auto 1.5rem;
   font: 400 13px/1 var(--mono);
+  letter-spacing: var(--art-ls);
   color: var(--ink);
   contain: content;
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
 }
 
-/* Retro draws the art in the pixel font too. Its characters are 0.5em wide to Plex's 0.6em,
+/* Retro draws the art in the pixel font too. Its characters are 0.5em wide to the art's 0.6em,
    so 16px (the font's native size, so it stays sharp) on a 13px line gives an 8x13 cell:
-   Plex's 7.8x13 within 3%, so the art keeps its shape. */
+   the usual 7.8x13 within 3%, so the art keeps its shape. */
 html:not(.no-retro) .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--px); }
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
@@ -597,6 +607,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   color: var(--ink);
   font-family: var(--mono);
   line-height: 1.15;
+  letter-spacing: var(--art-ls);
   white-space: pre;
 }
 
