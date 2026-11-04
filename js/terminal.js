@@ -269,8 +269,80 @@
   }
 
   // Easter egg: a link to the archived first version of the site.
+  // Turning retro off doesn't swap the font in one go: each block of text keeps the
+  // pixel font until a sweep reaches it, top to bottom.
+  let pxTimers = [];
+  const SWEEP_MS = 1400;
+  const SWEEP_STEP_MS = 70;
+
+  function endSweep() {
+    pxTimers.forEach(clearTimeout);
+    pxTimers = [];
+    for (const el of document.querySelectorAll('[data-px]')) {
+      el.removeAttribute('data-px');
+      el.style.fontFamily = '';
+      el.style.fontSize = '';
+    }
+  }
+
+  // The block-level element each piece of page text sits in, in document order.
+  function textBlocks() {
+    const found = new Set();
+    const walker = document.createTreeWalker(screen.closest('main') || document.body, NodeFilter.SHOW_TEXT);
+    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+      if (!node.nodeValue.trim()) continue;
+      let el = node.parentElement;
+      while (el && getComputedStyle(el).display.startsWith('inline')) el = el.parentElement;
+      // The ASCII art measures itself in Plex and never changes font.
+      if (el && !el.closest('.chrome-art, .name-art, .gate-art')) found.add(el);
+    }
+    return [...found];
+  }
+
+  function sweepToPlex() {
+    const blocks = textBlocks();
+    // Pin every block to the pixel font at its current size, then let the page switch.
+    const sizes = blocks.map((el) => getComputedStyle(el).fontSize);
+    blocks.forEach((el, i) => {
+      el.dataset.px = '';
+      el.style.fontFamily = 'var(--px)';
+      el.style.fontSize = sizes[i];
+    });
+    document.documentElement.classList.add('no-retro');
+
+    const release = (el) => {
+      el.removeAttribute('data-px');
+      el.style.fontFamily = '';
+      el.style.fontSize = '';
+      el.classList.add('px-scan');
+      el.addEventListener('animationend', () => el.classList.remove('px-scan'), { once: true });
+    };
+    // Blocks above the screen go straight away; the ones on it step down in order;
+    // everything below the fold follows when the sweep gets there.
+    const onScreen = blocks.filter((el) => {
+      const r = el.getBoundingClientRect();
+      return r.bottom > 0 && r.top < innerHeight;
+    });
+    const step = Math.min(SWEEP_STEP_MS, SWEEP_MS / Math.max(1, onScreen.length));
+    let n = 0;
+    for (const el of blocks) {
+      if (onScreen.includes(el)) {
+        pxTimers.push(setTimeout(() => release(el), n++ * step));
+      } else if (el.getBoundingClientRect().bottom <= 0) {
+        release(el);
+      } else {
+        pxTimers.push(setTimeout(() => release(el), n * step));
+      }
+    }
+    pxTimers.push(setTimeout(endSweep, n * step + 500));
+  }
+
   function toggleRetro() {
-    const off = document.documentElement.classList.toggle('no-retro');
+    endSweep();
+    const root = document.documentElement;
+    const off = !root.classList.contains('no-retro');
+    if (off && !matchMedia('(prefers-reduced-motion: reduce)').matches) sweepToPlex();
+    else root.classList.toggle('no-retro', off);
     try {
       localStorage.setItem('retro', off ? 'off' : 'on');
     } catch {
