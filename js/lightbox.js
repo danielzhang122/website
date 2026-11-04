@@ -51,6 +51,11 @@
     heading.textContent = title;
     const description = media.dataset.caption;
     caption.replaceChildren(heading, description ? Object.assign(document.createElement('span'), { textContent: description }) : '');
+    if (media.dataset.repo) {
+      caption.append(Object.assign(document.createElement('a'), {
+        href: media.dataset.repo, target: '_blank', rel: 'noopener noreferrer', textContent: 'Repo',
+      }));
+    }
 
     const multiple = group.length > 1;
     counter.textContent = multiple ? `${index + 1} / ${group.length}` : '';
@@ -84,7 +89,7 @@
   nextButton.addEventListener('click', () => show(index + 1));
 
   document.addEventListener('click', (e) => {
-    if (e.target.closest('.lightbox-nav')) return;
+    if (e.target.closest('.lightbox-nav, .lightbox-caption a')) return;
     if (isOpen()) {
       close();
       return;

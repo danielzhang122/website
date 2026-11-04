@@ -82,7 +82,7 @@
 
     Lightbox convention: any <img>/<video> with data-lightbox opens in the viewer.
     Its data-title (else alt / aria-label) is the title, data-caption the description,
-    alt the full description for screen readers, and the
+    data-repo adds a Repo link after the description, alt the full description for screen readers, and the
     arrows cycle through the other media inside the same [data-gallery].
   -->
   <div id="content">
@@ -237,13 +237,13 @@
         </figure>
         <figure>
           <img src="images/quadruped-cad-v2.webp" class="fit-whole" loading="lazy" data-lightbox
-               alt="Fusion 360 render of the 12-servo quadruped: four three-joint legs around a central body plate carrying a Raspberry Pi and a PCA9685 servo driver board" data-title="Quadruped CAD Assembly"
+               alt="Fusion 360 render of the 12-servo quadruped: four three-joint legs around a central body plate carrying a Raspberry Pi and a PCA9685 servo driver board" data-title="Quadruped CAD Assembly" data-repo="https://github.com/danielzhang122/quadruped-robot"
                data-caption="Full 12-DOF quadruped assembly with the Raspberry Pi and PCA9685 servo driver mounted. Twelve servos, twelve chances for a mate error.">
           <figcaption>Quadruped assembly</figcaption>
         </figure>
         <figure>
           <img src="images/quadruped-leg.webp" loading="lazy" data-lightbox
-               alt="Fusion 360 render of one quadruped leg: a Tower Pro micro servo in the hip bracket, a two-link linkage and a rounded foot" data-title="Leg Linkage"
+               alt="Fusion 360 render of one quadruped leg: a Tower Pro micro servo in the hip bracket, a two-link linkage and a rounded foot" data-title="Leg Linkage" data-repo="https://github.com/danielzhang122/quadruped-robot"
                data-caption="Kinematic linkage for one leg. There are four, so every problem comes in fours.">
           <figcaption>Leg linkage</figcaption>
         </figure>
@@ -261,7 +261,7 @@
         </figure>
         <figure>
           <img src="images/spoofer-apple-park.webp" loading="lazy" data-lightbox
-               alt="iPhone Find My map placing the phone at Apple Park in Cupertino, California, a location set by Globe Ghost" data-title="Globe Ghost Field Test"
+               alt="iPhone Find My map placing the phone at Apple Park in Cupertino, California, a location set by Globe Ghost" data-title="Globe Ghost Field Test" data-repo="https://github.com/danielzhang122/globe-ghost"
                data-caption="Find My placing me at Apple Park. I have never been to California.">
           <figcaption>Globe Ghost field test</figcaption>
         </figure>
@@ -279,9 +279,9 @@
         </figure>
         <figure>
           <img src="images/subtitle-sync.webp" loading="lazy" data-lightbox
-               alt="A scene from the open movie Tears of Steel, two people arguing on a canal bridge, with a subtitle line timed to the dialogue" data-title="subtitle-sync"
+               alt="A scene from the open movie Tears of Steel, two people arguing on a canal bridge, with a subtitle line timed to the dialogue" data-title="subtitle-sync" data-repo="https://github.com/danielzhang122/subtitle-sync"
                data-caption="I got fed up watching Breaking Bad because the subtitles were either wrong or misaligned, so I built a Firefox extension that finds the right ones and syncs them to the audio. Film: Tears of Steel, (CC) Blender Foundation, CC BY 3.0.">
-          <figcaption><a href="https://github.com/danielzhang122/subtitle-sync">subtitle-sync</a></figcaption>
+          <figcaption>subtitle-sync</figcaption>
         </figure>
       </div>
     </section>
