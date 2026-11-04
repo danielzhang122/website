@@ -192,23 +192,20 @@ html.vga .ps { margin-right: 0; }
 html.vga button.cmd + button.cmd { margin-left: 2ch; }
 html.vga .banner button.cmd + button.cmd { margin-left: 0; }
 
-/* The effect's strength. The VGA font's 1px strokes take only a faint fringe (see below), and
-   scanlines only a little darker than that before its thin text breaks up; Cascadia's smoother,
-   heavier strokes hold up to a stronger effect. */
+/* The effect's strength. The VGA font's 1px strokes take only a faint fringe (see below);
+   Cascadia's smoother, heavier strokes hold up to a stronger one, and a brighter streak. */
 html {
   --scan: .08;       /* scanline darkness */
   --streak: .015;    /* rolling streak brightness */
   --fringe: .12;     /* RGB fringe opacity */
 }
 html:not(.vga) {
-  --scan: .14;
   --streak: .03;
   --fringe: .2;
 }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
   html { --scan: .1; }
-  html:not(.vga) { --scan: .17; }
 }
 
 /* .crt-leaving keeps the overlay up while a sweep takes it away (see sweep in js/terminal.js). */
