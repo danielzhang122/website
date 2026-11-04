@@ -33,11 +33,11 @@
   <link rel="preload" href="fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261101-3">
+  <link rel="stylesheet" href="css/style.css?v=20261104-3">
 
   <script src="js/intro-glyphs.js?v=20261031-5" defer></script>
   <script src="js/intro.js?v=20261031-5" defer></script>
-  <script src="js/lightbox.js?v=20261031-5" defer></script>
+  <script src="js/lightbox.js?v=20261104-1" defer></script>
   <script src="js/terminal.js?v=20261101-2" defer></script>
   <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
   <script type="module" src="js/chrome.js?v=20261102-1"></script>
@@ -66,17 +66,14 @@
 
   <nav id="shortcuts" aria-label="Commands">
     <button type="button" data-run="whoami">whoami</button>
-    <button type="button" data-run="resume">resume</button>
     <button type="button" data-run="projects">projects</button>
-    <button type="button" data-run="experience">experience</button>
+    <button type="button" data-run="resume">resume</button>
     <button type="button" data-run="contact">contact</button>
-    <button type="button" data-run="skills">skills</button>
-    <button type="button" data-run="certs">certs</button>
-    <button type="button" data-run="misc">misc</button>
-    <button type="button" data-run="interests">interests</button>
+    <button type="button" data-run="experience">experience</button>
     <button type="button" data-run="art">art</button>
-    <button type="button" data-run="help">help</button>
-    <button type="button" data-run="clear">clear</button>
+    <button type="button" data-run="misc">misc</button>
+    <button type="button" class="util" data-run="help">help</button>
+    <button type="button" class="util" data-run="clear">clear</button>
   </nav>
 
   <!--
@@ -85,7 +82,7 @@
 
     Lightbox convention: any <img>/<video> with data-lightbox opens in the viewer.
     Its data-title (else alt / aria-label) is the title, data-caption the description,
-    alt the full description for screen readers, and the
+    data-repo adds a Repo link after the description, alt the full description for screen readers, and the
     arrows cycle through the other media inside the same [data-gallery].
   -->
   <div id="content">
@@ -93,14 +90,13 @@
     <header data-cmd="banner" class="banner">
       <div>
         <h1>Daniel Zhang</h1>
-        <p class="dim">Mechatronics Engineering, McMaster University</p>
+        <p class="dim">Mechatronics Engineering Co-op III, McMaster University</p>
         <p class="dim js-only">Lost? Try <button type="button" class="cmd" data-run="help">help</button>. Hard on the eyes? <button type="button" class="cmd" data-run="retro">retro</button>. Too much clutter? <button type="button" class="cmd" data-run="clear">clear</button>.</p>
       </div>
     </header>
 
     <section data-cmd="whoami">
       <p>I build robots, design mechanical parts, and work on nuclear tooling, ranked in ascending order of paperwork.</p>
-      <p class="dim">B.Eng. Mechatronics Engineering Co-op (Level III), McMaster University</p>
       <p>Available for a Spring 2027 co-op.</p>
 
       <p class="dim">Featured:</p>
@@ -123,7 +119,7 @@
           <figcaption>WheelSafe, top 3 of 200+</figcaption>
         </figure>
       </div>
-      <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="misc">misc</button> <button type="button" class="cmd" data-run="resume">resume</button> <button type="button" class="cmd" data-run="contact">contact</button></p>
+      <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="resume">resume</button> <button type="button" class="cmd" data-run="contact">contact</button> <button type="button" class="cmd" data-run="misc">misc</button></p>
     </section>
 
     <section data-cmd="projects" data-gallery>
@@ -196,8 +192,8 @@
 
       <article data-id="resume-sync">
         <h3>Résumé Sync Pipeline</h3>
-        <p>Keeping my résumé updated across several projects gets tedious, so I did the sensible thing: spent far too much time automating it. Every Sunday, a Python script checks my repositories, and an AI agent proposes source-backed edits. GitHub Actions checks compilation and the one-page limit; I review and reword changes before merging. In a test, it caught a planted inaccurate claim and proposed a correction backed by a GitHub commit.</p>
-        <p class="tags">Python, GitHub Actions, LaTeX, Claude Code <a href="https://github.com/danielzhang122/resume" target="_blank" rel="noopener noreferrer">Repo</a> <a href="https://github.com/danielzhang122/resume/blob/main/docs/PIPELINE.md" target="_blank" rel="noopener noreferrer">Write-up</a></p>
+        <p>Updating my résumé got tedious, so I spent far too long automating it. Every Sunday a script checks my repos, an AI agent proposes source-backed edits, and GitHub Actions makes sure it still compiles on one page. I review everything before merging. The repo's private, mostly so nobody watches me reword the same bullet eleven times.</p>
+        <p class="tags">Python, GitHub Actions, LaTeX, Claude Code</p>
         <figure class="thumb">
           <img src="images/resume-sync-diagram.svg" width="1200" height="520" class="fit-whole" loading="lazy" data-lightbox
                alt="Pipeline diagram: a weekly schedule runs check.py, which stops if nothing changed; otherwise an agent reviews the diffs, edits resume.tex on a new branch, a GitHub Action builds the PDF and, if it runs over one page, sends it back to the agent to rewrite and retry; once it passes, a pull request shows each edit with its source commit, I review and merge, and the next run opens a website PR with the new PDF, which I merge. My project work during the week becomes the next Sunday's input" data-title="Résumé Sync Pipeline"
@@ -241,13 +237,13 @@
         </figure>
         <figure>
           <img src="images/quadruped-cad-v2.webp" class="fit-whole" loading="lazy" data-lightbox
-               alt="Fusion 360 render of the 12-servo quadruped: four three-joint legs around a central body plate carrying a Raspberry Pi and a PCA9685 servo driver board" data-title="Quadruped CAD Assembly"
+               alt="Fusion 360 render of the 12-servo quadruped: four three-joint legs around a central body plate carrying a Raspberry Pi and a PCA9685 servo driver board" data-title="Quadruped CAD Assembly" data-repo="https://github.com/danielzhang122/quadruped-robot"
                data-caption="Full 12-DOF quadruped assembly with the Raspberry Pi and PCA9685 servo driver mounted. Twelve servos, twelve chances for a mate error.">
           <figcaption>Quadruped assembly</figcaption>
         </figure>
         <figure>
           <img src="images/quadruped-leg.webp" loading="lazy" data-lightbox
-               alt="Fusion 360 render of one quadruped leg: a Tower Pro micro servo in the hip bracket, a two-link linkage and a rounded foot" data-title="Leg Linkage"
+               alt="Fusion 360 render of one quadruped leg: a Tower Pro micro servo in the hip bracket, a two-link linkage and a rounded foot" data-title="Leg Linkage" data-repo="https://github.com/danielzhang122/quadruped-robot"
                data-caption="Kinematic linkage for one leg. There are four, so every problem comes in fours.">
           <figcaption>Leg linkage</figcaption>
         </figure>
@@ -265,7 +261,7 @@
         </figure>
         <figure>
           <img src="images/spoofer-apple-park.webp" loading="lazy" data-lightbox
-               alt="iPhone Find My map placing the phone at Apple Park in Cupertino, California, a location set by Globe Ghost" data-title="Globe Ghost Field Test"
+               alt="iPhone Find My map placing the phone at Apple Park in Cupertino, California, a location set by Globe Ghost" data-title="Globe Ghost Field Test" data-repo="https://github.com/danielzhang122/globe-ghost"
                data-caption="Find My placing me at Apple Park. I have never been to California.">
           <figcaption>Globe Ghost field test</figcaption>
         </figure>
@@ -280,6 +276,12 @@
                alt="New PC build with an RGB liquid cooler and a Gigabyte GeForce graphics card beside a monitor showing the ASUS UEFI BIOS, which detects an Intel Core i7-13700KF and 32 GB of RAM" data-title="First POST"
                data-caption="New build, first boot. Everything worked on the first try, which almost never happens.">
           <figcaption>New build, first boot</figcaption>
+        </figure>
+        <figure>
+          <img src="images/subtitle-sync.webp" loading="lazy" data-lightbox
+               alt="A scene from the open movie Tears of Steel, two people arguing on a canal bridge, with a subtitle line timed to the dialogue" data-title="subtitle-sync" data-repo="https://github.com/danielzhang122/subtitle-sync"
+               data-caption="I got fed up watching Breaking Bad because the subtitles were either wrong or misaligned, so I built a Firefox extension that finds the right ones and syncs them to the audio. Film: Tears of Steel, (CC) Blender Foundation, CC BY 3.0.">
+          <figcaption>subtitle-sync</figcaption>
         </figure>
       </div>
     </section>
@@ -343,11 +345,11 @@
 
       <div class="row">
         <span class="key">Oct 2026</span>
-        <p><b>Certified SOLIDWORKS Associate (CSWA)</b>, Dassault Systèmes <span class="dim">ID C-TVPDAF78ML</span> <a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener noreferrer">Verify</a></p>
+        <p><b>Certified SOLIDWORKS Associate (CSWA)</b>, Dassault Systèmes <a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener noreferrer">Verify</a></p>
       </div>
       <div class="row">
-        <span class="key">Oct 2026</span>
-        <p><b>Claude Code 101</b>, Anthropic Academy <a href="https://academy.claude.com/verify/66dcad03033df581fcda7c09f68d719d" target="_blank" rel="noopener noreferrer">Verify</a></p>
+        <span class="key">Nov 2026</span>
+        <p><b>Claude Code in Action</b>, Anthropic Academy <a href="https://academy.claude.com/verify/cc8a4bd6e37218505c49c953be80d28a" target="_blank" rel="noopener noreferrer">Verify</a></p>
       </div>
     </section>
 
@@ -373,45 +375,39 @@
       <p class="dim">Painting, drawing, printmaking and carving. Click any piece to enlarge.</p>
 
       <div class="thumbs whole" data-gallery>
-        <video disablepictureinpicture src="images/blender.mp4" width="720" height="1160" muted loop playsinline preload="none" data-lightbox
-               aria-label="Hang In There"
-               data-caption="Blender animation. A reminder to save before you render."></video>
+        <img src="images/self-portrait-3.webp" width="1122" height="1454" loading="lazy" data-lightbox
+             alt="Acrylic self-portrait on a green background: half the face is exposed skull with a staring eye, and the neck shows spine and muscle above an orange hoodie" data-title="Half Dead Portrait"
+             data-caption="Acrylic self-portrait. About how fixing CAD constraints at 2 AM feels.">
+        <img src="images/skull.webp" width="938" height="693" loading="lazy" data-lightbox
+             alt="Painting of a skull and upper body with red facial and neck muscles partly peeled away and the tongue out, against a torn black-and-white background" data-title="Flayed Skull"
+             data-caption="Anatomical study of facial musculature, and a good excuse to use up the red paint.">
         <img src="images/sketch-2.webp" width="1078" height="1333" loading="lazy" data-lightbox
              alt="Charcoal and white chalk drawing of a figure seen from behind, arms raised overhead and drapery at the hips, on a purple background" data-title="Toned Back Study"
              data-caption="Charcoal on paper. I still find black dust from this on my desk.">
         <img src="images/painting.webp" width="1094" height="861" loading="lazy" data-lightbox
              alt="Painting of two people sitting cross-legged on a dark floor in front of red curtains, their faces covered by pink poppies, with candles and bowls of fruit before them" data-title="Floral Heads"
              data-caption="Painting faces requires perfect symmetry. Painting flowers over them does not.">
-        <img src="images/sketch.webp" width="930" height="1010" loading="lazy" data-lightbox
-             alt="Pencil drawing of a seated figure seen from behind, with a long braid and both arms raised holding a frame overhead" data-title="Live Figure Drawing"
-             data-caption="An hour-long live pose, carefully avoiding the hands.">
-        <img src="images/self-portrait-3.webp" width="1122" height="1454" loading="lazy" data-lightbox
-             alt="Acrylic self-portrait on a green background: half the face is exposed skull with a staring eye, and the neck shows spine and muscle above an orange hoodie" data-title="Half Dead Portrait"
-             data-caption="Acrylic self-portrait. About how fixing CAD constraints at 2 AM feels.">
-        <img src="images/digital-teeth.webp" width="469" height="294" loading="lazy" data-lightbox
-             alt="Digital painting of a close-up of teeth and gums, with loose purple sketch lines around the edges" data-title="Dental Study"
-             data-caption="Digital study of teeth. A reminder to floss.">
-        <img src="images/skull.webp" width="938" height="693" loading="lazy" data-lightbox
-             alt="Painting of a skull and upper body with red facial and neck muscles partly peeled away and the tongue out, against a torn black-and-white background" data-title="Flayed Skull"
-             data-caption="Anatomical study of facial musculature, and a good excuse to use up the red paint.">
-        <img src="images/skull2.webp" width="1016" height="768" loading="lazy" data-lightbox
-             alt="Black-and-white linocut print of a skull, signed and numbered 1/1" data-title="Block Print Skull"
-             data-caption="Linocut print. The hard part was not carving my thumb.">
-        <img src="images/flower.webp" width="670" height="988" loading="lazy" data-lightbox
-             alt="Painting of a single pink rose with green leaves against loose grey, green and blue brushwork" data-title="Pink Rose"
-             data-caption="The mandatory flower painting, to prove to my mom I can paint nice things.">
         <img src="images/self-portrait-1.webp" width="924" height="768" loading="lazy" data-lightbox
              alt="Oil self-portrait with a calm expression in front of a burning house" data-title="Everything Is Fine"
              data-caption="Self-portrait with zero underlying metaphors.">
-        <img src="images/chameleon.webp" width="1620" height="890" loading="lazy" data-lightbox
-             alt="Hand-carved wooden chameleon on a grey surface" data-title="Wood Lizard"
-             data-caption="Carved from a single block of wood. The chisel slipped once; it cost me 11 stitches.">
         <img src="images/lake-reflection.webp" width="800" height="613" loading="lazy" data-lightbox
              alt="Flat-colour digital landscape of pine trees and a boardwalk reflected in still lake water" data-title="Lake Reflection"
              data-caption="Digital landscape that won a local contest and was printed on a municipal utility box.">
         <img src="images/utility-box-install.webp" width="600" height="800" loading="lazy" data-lightbox
              alt="The lake reflection artwork printed on a roadside utility box, photographed at night" data-title="Utility Box Install"
              data-caption="In the wild, 2022. Technically a public infrastructure install.">
+        <img src="images/skull2.webp" width="1016" height="768" loading="lazy" data-lightbox
+             alt="Black-and-white linocut print of a skull, signed and numbered 1/1" data-title="Block Print Skull"
+             data-caption="Linocut print. The hard part was not carving my thumb.">
+        <img src="images/sketch.webp" width="930" height="1010" loading="lazy" data-lightbox
+             alt="Pencil drawing of a seated figure seen from behind, with a long braid and both arms raised holding a frame overhead" data-title="Live Figure Drawing"
+             data-caption="A 10-minute live pose, carefully avoiding the hands.">
+        <img src="images/digital-teeth.webp" width="469" height="294" loading="lazy" data-lightbox
+             alt="Digital painting of a close-up of teeth and gums, with loose purple sketch lines around the edges" data-title="Dental Study"
+             data-caption="Digital study of teeth. A reminder to floss.">
+        <img src="images/chameleon.webp" width="1620" height="890" loading="lazy" data-lightbox
+             alt="Hand-carved wooden chameleon on a grey surface" data-title="Wood Lizard"
+             data-caption="Carved from a single block of wood. The chisel slipped once; it cost me 11 stitches.">
       </div>
     </section>
 
