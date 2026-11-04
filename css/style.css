@@ -224,9 +224,10 @@ button,
 input { text-shadow: inherit; }
 
 /* The RGB fringe: exactly one screen pixel (--dpx) each side, faint, so it tints the edges of
-   each stroke without smearing them. */
+   each stroke without smearing them. Kept at .12: stronger, it doubles the width of the font's
+   1px strokes and grey text reads as smudged bold. */
 html:not(.no-retro) body {
-  text-shadow: calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, .3), var(--dpx) 0 rgba(40, 200, 255, .3);
+  text-shadow: calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, .12), var(--dpx) 0 rgba(40, 200, 255, .12);
 }
 
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
