@@ -244,6 +244,11 @@ html:not(.vga) { --fringe: .3; }
 @media (min-width: 641px) {
   html { --scan: .1; }
 }
+/* The fringe is one screen pixel, a third as wide on a 3x phone as on a desktop; make it bolder there. */
+@media (max-width: 640px) {
+  html { --fringe: .3; }
+  html:not(.vga) { --fringe: .45; }
+}
 
 /* .crt-leaving keeps the overlay up while a sweep takes it away (see sweep in js/terminal.js). */
 :is(html:not(.no-retro), html.crt-leaving) body::before,
