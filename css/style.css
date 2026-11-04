@@ -1,6 +1,6 @@
 /* ==========================================================================
    Fonts: Cascadia Mono (SIL Open Font License; see fonts/cascadia-mono-LICENSE.txt),
-   IBM Plex Mono for the hidden `plex` command (SIL OFL; see fonts/ibm-plex-mono-LICENSE.txt),
+   IBM Plex Mono, retro's default text font (SIL OFL; see fonts/ibm-plex-mono-LICENSE.txt),
    latin + latin-ext subsets via Fontsource,
    and, for retro mode, IBM VGA 9x16 (text) and 8x16 (ASCII art) from VileR's Ultimate
    Oldschool PC Font Pack, CC BY-SA 4.0; see fonts/px437-LICENSE.txt
@@ -52,7 +52,7 @@
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
-/* The hidden `plex` command's font. Only downloaded once something uses it. */
+/* IBM Plex Mono: the page text in retro, by default (see html.plex). */
 @font-face {
   font-family: 'IBM Plex Mono';
   font-weight: 400;
@@ -195,8 +195,8 @@ a:hover {
 
 /* ==========================================================================
    CRT: scanlines, a faint flicker, a rolling streak and a hint of RGB fringe. The `retro`
-   command toggles .no-retro on <html> to turn them off. The DOS pixel fonts are separate:
-   the hidden `vga` command toggles .vga on <html> (off by default).
+   command toggles .no-retro on <html> to turn them off. Each mode also keeps its own page font
+   (.plex or .vga on <html>, or neither for Cascadia; see setFont in js/terminal.js).
    ========================================================================== */
 
 /* VGA swaps the page text to the IBM VGA 9x16 font. It's drawn on a 9x16
@@ -217,8 +217,8 @@ html.vga { --text-line: calc(24 * var(--pxu)); }
 html.vga body { line-height: var(--text-line); }
 
 
-/* Easter egg: the `plex` command swaps the page text to IBM Plex Mono (the ASCII art stays in
-   Cascadia). Plex is 0.6em wide, so 15px gives the same 9px columns, on the same 19px lines. */
+/* IBM Plex Mono for the page text: retro's default, or set by the hidden `plex` command (the
+   ASCII art stays in Cascadia). Plex is 0.6em wide, so 15px gives the same 9px columns, on the same 19px lines. */
 html.plex {
   --text: var(--plex);
   --fs: 15px;

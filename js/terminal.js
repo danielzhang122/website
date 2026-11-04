@@ -58,12 +58,14 @@
     logout: exit,
     coffee: () => mailMe('coffee?', "i'm in. "),
     hire: () => mailMe('hiring', "let's talk: "),
-    vga: () => toggleFont('vga'),
-    plex: () => toggleFont('plex'),
+    vga: () => setFont('vga'),
+    plex: () => setFont('plex'),
+    cascadia: () => setFont('cascadia'),
+    default: resetFonts,
   };
   // Not re-run when a refresh restores the session: clear and rm reset it themselves,
-  // and retro, vga and plex would flip the saved setting back.
-  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'rm', 'sudo'];
+  // and the look commands would redo saved settings.
+  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'cascadia', 'default', 'rm', 'sudo'];
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -410,44 +412,79 @@
     sweepFrame = requestAnimationFrame(tick);
   }
 
-  // Flips one look (retro, vga or plex), saves the choice, and reports it.
-  function toggleLook(name, isOn, setOn, crt) {
-    endSweep();
-    const on = !isOn();
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) setOn(on);
-    else sweep(() => setOn(on), crt ? (on ? 'crt-entering' : 'crt-leaving') : '', !crt);
-    window.snapPixels?.();
+  // Retro and modern each keep their own page font: vga, plex or cascadia, set by the hidden
+  // command of the same name for whichever mode is on, and put back by the hidden default.
+  // index.html applies the saved choice before first paint, with the same defaults.
+  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'", cascadia: "15px 'Cascadia Mono'" };
+  const DEFAULT_FONT = { retro: 'plex', modern: 'cascadia' };
+  const modeName = (retro) => (retro ? 'retro' : 'modern');
+
+  function saved(key) {
+    try { return localStorage.getItem(key); } catch { return null; }
+  }
+  function save(key, value) {
     try {
-      localStorage.setItem(name, on ? 'on' : 'off');
+      if (value === null) localStorage.removeItem(key);
+      else localStorage.setItem(key, value);
     } catch {
       // storage blocked: the choice lasts until the page closes
     }
-    return printLine(`${name} ${on ? 'on' : 'off'}`, 'dim');
+  }
+
+  const retroOn = () => !document.documentElement.classList.contains('no-retro');
+  function fontFor(retro) {
+    const font = saved(`font-${modeName(retro)}`);
+    return FONTS[font] ? font : DEFAULT_FONT[modeName(retro)];
+  }
+  function currentFont() {
+    const { classList } = document.documentElement;
+    return classList.contains('vga') ? 'vga' : classList.contains('plex') ? 'plex' : 'cascadia';
+  }
+
+  // Moves the page to a mode and font: the scanlines wipe in or out if the mode changes, and the
+  // text regenerates if the font does.
+  async function applyLook(retro, font) {
+    const crtChange = retro !== retroOn();
+    const fontChange = font !== currentFont();
+    if (!crtChange && !fontChange) return;
+    // Fetch the font first, so the sweep doesn't reveal a fallback.
+    if (fontChange) {
+      await Promise.race([Promise.all([document.fonts.load(FONTS[font]), document.fonts.load(`600 ${FONTS[font]}`)]), wait(1500)]).catch(() => {});
+    }
+    endSweep();
+    const root = document.documentElement;
+    const apply = () => {
+      root.classList.toggle('no-retro', !retro);
+      root.classList.toggle('vga', font === 'vga');
+      root.classList.toggle('plex', font === 'plex');
+    };
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) apply();
+    else sweep(apply, crtChange ? (retro ? 'crt-entering' : 'crt-leaving') : '', fontChange);
+    window.snapPixels?.();
   }
 
   // The CRT screen effect, on by default.
-  function toggleRetro() {
-    const root = document.documentElement;
-    return toggleLook('retro', () => !root.classList.contains('no-retro'), (on) => root.classList.toggle('no-retro', !on), true);
+  async function toggleRetro() {
+    const on = !retroOn();
+    save('retro', on ? 'on' : 'off');
+    await applyLook(on, fontFor(on));
+    return printLine(`retro ${on ? 'on' : 'off'}`, 'dim');
   }
 
-  // Easter eggs: the IBM VGA pixel font (vga) or IBM Plex Mono (plex) for the page text, both
-  // off by default. Turning one on turns the other off.
-  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'" };
-  async function toggleFont(name) {
-    const root = document.documentElement;
-    const other = name === 'vga' ? 'plex' : 'vga';
-    const on = !root.classList.contains(name);
-    // Plex isn't preloaded: fetch it first so the sweep doesn't reveal a fallback font.
-    if (on) await Promise.race([document.fonts.load(FONTS[name]), document.fonts.load(`600 ${FONTS[name]}`), wait(1500)]).catch(() => {});
-    const printed = toggleLook(name, () => !on, (o) => {
-      root.classList.toggle(name, o);
-      if (o) root.classList.remove(other);
-    }, false);
-    if (on) {
-      try { localStorage.setItem(other, 'off'); } catch {}
-    }
-    return printed;
+  // Easter eggs: vga, plex and cascadia set the font for the mode that's on.
+  async function setFont(font) {
+    const retro = retroOn();
+    save(`font-${modeName(retro)}`, font);
+    await applyLook(retro, font);
+    return printLine(`${font} in ${modeName(retro)}`, 'dim');
+  }
+
+  // Easter egg: default puts both modes' fonts back.
+  async function resetFonts() {
+    save('font-retro', null);
+    save('font-modern', null);
+    await applyLook(retroOn(), fontFor(retroOn()));
+    return printLine(`default fonts: ${DEFAULT_FONT.retro} in retro, ${DEFAULT_FONT.modern} in modern`, 'dim');
   }
 
   // Easter egg: a link to the archived first version of the site.
