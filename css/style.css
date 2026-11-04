@@ -162,34 +162,35 @@ a:hover {
 
 
 /* ==========================================================================
-   CRT: scanlines, a faint flicker, a rolling streak, a hint of RGB fringe and DOS pixel fonts.
-   The `retro` command toggles .no-retro on <html> to turn it all off.
+   CRT: scanlines, a faint flicker, a rolling streak and a hint of RGB fringe. The `retro`
+   command toggles .no-retro on <html> to turn them off. The DOS pixel fonts are separate:
+   the hidden `vga` command toggles .vga on <html> (off by default).
    ========================================================================== */
 
-/* Retro also swaps the page text to the IBM VGA 9x16 font. It's drawn on a 9x16
+/* VGA swaps the page text to the IBM VGA 9x16 font. It's drawn on a 9x16
    pixel grid and only looks sharp when each of its pixels lands on whole screen pixels, so:
    - its size is 16 screen pixels, or 32 on a 2x screen (--pxu is one font pixel, set by the
      script in index.html from the screen's pixel ratio; 1px if that script never ran);
    - no fake bold (the browser smears glyphs by a fraction of a pixel): bold reads by colour,
      as on a DOS screen;
    - the script also nudges the page column onto whole screen pixels.
-   Turning retro off regenerates the text in Cascadia Mono block by block (see toggleRetro in js/terminal.js). */
-html:not(.no-retro) {
+   Toggling vga regenerates the text in the other font block by block (see sweep in js/terminal.js). */
+html.vga {
   --text: var(--px-text);
   --fs: calc(16 * var(--pxu));
   font-synthesis: none;
 }
 
-html:not(.no-retro) { --text-line: calc(24 * var(--pxu)); }
-html:not(.no-retro) body { line-height: var(--text-line); }
+html.vga { --text-line: calc(24 * var(--pxu)); }
+html.vga body { line-height: var(--text-line); }
 
 
 /* The prompt's sliver of space after > would put the command between pixels. */
-html:not(.no-retro) .ps { margin-right: 0; }
+html.vga .ps { margin-right: 0; }
 
 /* 1.5ch between command buttons is half a pixel on the 9px-wide font; round it to 2ch. */
-html:not(.no-retro) button.cmd + button.cmd { margin-left: 2ch; }
-html:not(.no-retro) .banner button.cmd + button.cmd { margin-left: 0; }
+html.vga button.cmd + button.cmd { margin-left: 2ch; }
+html.vga .banner button.cmd + button.cmd { margin-left: 0; }
 
 /* .crt-leaving keeps the overlay up while a sweep takes it away (see sweep in js/terminal.js). */
 :is(html:not(.no-retro), html.crt-leaving) body::before,
@@ -225,8 +226,8 @@ button,
 input { text-shadow: inherit; }
 
 /* The RGB fringe: exactly one screen pixel (--dpx) each side, faint, so it tints the edges of
-   each stroke without smearing them. Kept at .12: stronger, it doubles the width of the font's
-   1px strokes and grey text reads as smudged bold. */
+   each stroke without smearing them. Kept at .12: stronger, it doubles the width of thin strokes
+   (the VGA font's are 1px) and grey text reads as smudged bold. */
 html:not(.no-retro) body {
   text-shadow: calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, .12), var(--dpx) 0 rgba(40, 200, 255, .12);
 }
@@ -293,8 +294,8 @@ html:not(.no-retro) [data-retro-label="off"] { display: none; }
   white-space: pre;
 }
 
-/* In retro: an 8x15 cell for the usual 7.8x14.95 (see .chrome-art). */
-html:not(.no-retro) .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(--px); }
+/* In vga: an 8x15 cell for the usual 7.8x14.95 (see .chrome-art). */
+html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(--px); }
 
 .accent { color: var(--accent); }
 
@@ -434,10 +435,10 @@ button.cmd:hover { color: var(--accent); }
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
 }
 
-/* Retro draws the art in the pixel font too. Its characters are 0.5em wide to the art's 0.6em,
+/* VGA draws the art in the pixel font too. Its characters are 0.5em wide to the art's 0.6em,
    so 16px (the font's native size, so it stays sharp) on a 13px line gives an 8x13 cell:
    the usual 7.8x13 within 3%, so the art keeps its shape. */
-html:not(.no-retro) .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--px); }
+html.vga .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--px); }
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
    are no per-character spans: mid tones rose, the faint glyphs inside the shape
@@ -627,8 +628,8 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   white-space: pre;
 }
 
-/* In retro js/intro.js scales the font and sets the line height to keep the art's cells. */
-html:not(.no-retro) .gate-art { font-family: var(--px); }
+/* In vga js/intro.js scales the font and sets the line height to keep the art's cells. */
+html.vga .gate-art { font-family: var(--px); }
 
 .gate-hint {
   position: absolute;
