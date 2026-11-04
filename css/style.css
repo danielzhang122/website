@@ -1,16 +1,15 @@
 /* ==========================================================================
    Fonts: IBM Plex Mono (SIL Open Font License), latin + latin-ext subsets from Google Fonts,
-   and, for retro mode, Px437 Apricot Mono (text) and Px437 IBM VGA 8x16 (ASCII art), both from
-   VileR's Ultimate Oldschool PC Font Pack, CC BY-SA 4.0; see fonts/px437-LICENSE.txt
+   and, for retro mode, IBM VGA 9x16 (text) and 8x16 (ASCII art) from VileR's Ultimate
+   Oldschool PC Font Pack, CC BY-SA 4.0; see fonts/px437-LICENSE.txt
    ========================================================================== */
 
-/* Retro text. A pixel font on a 10x16 grid: sharp only at 16 screen pixels (see --pxu).
-   Outlines only: the pack's embedded bitmaps were dropped, as browsers don't use them. */
+/* Retro text: the IBM VGA's 9x16 text-mode font. Sharp only at 16 screen pixels (see --pxu). */
 @font-face {
-  font-family: 'Px437 Apricot Mono';
+  font-family: 'IBM VGA 9x16';
   font-weight: 400;
   font-display: swap;
-  src: url(../fonts/px437-apricot-mono.woff2) format('woff2');
+  src: url(../fonts/px437-ibm-vga-9x16.woff) format('woff');
 }
 
 /* Retro ASCII art: its 8x16 grid is close to Plex's character shape, so the art keeps its proportions. */
@@ -64,8 +63,7 @@
 
   --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
   --px: 'Px437 IBM VGA', var(--mono);
-  /* Apricot Mono lacks a few characters (dashes, ©, ‹ ›); VGA fills them in. */
-  --px-text: 'Px437 Apricot Mono', var(--px);
+  --px-text: 'IBM VGA 9x16', var(--px);
   /* Page text. The ASCII art keeps --mono: its grids are built for Plex's character width. */
   --text: var(--mono);
   --fs: 15px;
@@ -151,7 +149,7 @@ a:hover {
    The `retro` command toggles .no-retro on <html> to turn it all off.
    ========================================================================== */
 
-/* Retro also swaps the page text to Apricot Mono, a DOS pixel font. It's drawn on a 10x16
+/* Retro also swaps the page text to the IBM VGA 9x16 font. It's drawn on a 9x16
    pixel grid and only looks sharp when each of its pixels lands on whole screen pixels, so:
    - its size is 16 screen pixels, or 32 on a 2x screen (--pxu is one font pixel, set by the
      script in index.html from the screen's pixel ratio; 1px if that script never ran);
@@ -162,8 +160,8 @@ a:hover {
 html:not(.no-retro) {
   --text: var(--px-text);
   --fs: calc(16 * var(--pxu));
-  /* 80 characters on a 1x screen; fixed so the column doesn't narrow where the font is set smaller. */
-  --column: 800px;
+  /* 90 characters on a 1x screen; fixed so the column doesn't narrow where the font is set smaller. */
+  --column: 810px;
   font-synthesis: none;
 }
 
@@ -173,6 +171,10 @@ html:not(.no-retro) :is(p, li) { text-align: start; }
 
 /* The prompt's sliver of space after > would put the command between pixels. */
 html:not(.no-retro) .ps { margin-right: 0; }
+
+/* 1.5ch between command buttons is half a pixel on the 9px-wide font; round it to 2ch. */
+html:not(.no-retro) button.cmd + button.cmd { margin-left: 2ch; }
+html:not(.no-retro) .banner button.cmd + button.cmd { margin-left: 0; }
 
 /* Small grey text stays at the full size: smaller would land between pixels. */
 html:not(.no-retro) :is(.tags, #shortcuts button, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
