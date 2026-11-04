@@ -268,38 +268,77 @@
     }
   }
 
-  // Turning retro off doesn't swap the font in one go: each block of text keeps the
-  // pixel font until a sweep reaches it, top to bottom.
+  // Turning retro off doesn't swap the font in one go: a sweep runs down the page, and as
+  // it reaches each block of text, the block switches to Plex and its characters regenerate,
+  // like rm -rf / in reverse: each one starts as a dot, flickers through scrambled glyphs and
+  // settles, in random order.
   let pxTimers = [];
-  const SWEEP_MS = 1400;
-  const SWEEP_STEP_MS = 70;
+  let regenerating = [];     // { n, full, at }: text nodes mid-regeneration
+  let regenFrame = 0;
+  const SWEEP_MS = 1400;     // the longest the sweep takes to cross the screen
+  const SWEEP_STEP_MS = 70;  // ...or this long per block, if that's quicker
+  const REGEN = 450;         // ms over which a block's characters start settling
+  const REGEN_CELL = 120;    // ms each flickers before it settles
+  const SCRAMBLE = '·:=+*#%@';
+
+  function unpin(el) {
+    el.removeAttribute('data-px');
+    el.style.fontFamily = '';
+    el.style.fontSize = '';
+  }
 
   function endSweep() {
     pxTimers.forEach(clearTimeout);
     pxTimers = [];
-    for (const el of document.querySelectorAll('[data-px]')) {
-      el.removeAttribute('data-px');
-      el.style.fontFamily = '';
-      el.style.fontSize = '';
-    }
+    cancelAnimationFrame(regenFrame);
+    regenFrame = 0;
+    for (const { n, full } of regenerating) n.data = full.join('');
+    regenerating = [];
+    document.querySelectorAll('[data-px]').forEach(unpin);
   }
 
-  // The block-level element each piece of page text sits in, in document order.
+  function regenTick(now) {
+    regenerating = regenerating.filter((cell) => {
+      const t = now - cell.start;
+      cell.n.data = cell.full.map((c, i) => {
+        if (!c.trim() || t >= cell.at[i] + REGEN_CELL) return c;
+        if (t < cell.at[i]) return '·';
+        return SCRAMBLE[Math.floor(Math.random() * SCRAMBLE.length)];
+      }).join('');
+      return t < REGEN + REGEN_CELL;
+    });
+    regenFrame = regenerating.length ? requestAnimationFrame(regenTick) : 0;
+  }
+
+  function regenerate(nodes) {
+    const start = performance.now();
+    for (const n of nodes) {
+      if (!n.isConnected) continue;
+      const full = [...n.data];
+      regenerating.push({ n, full, start, at: full.map(() => Math.random() * REGEN) });
+    }
+    if (!regenFrame && regenerating.length) regenFrame = requestAnimationFrame(regenTick);
+  }
+
+  // Each block-level element holding page text, with its own text nodes, in document order.
   function textBlocks() {
-    const found = new Set();
+    const found = new Map();
     const walker = document.createTreeWalker(screen.closest('main') || document.body, NodeFilter.SHOW_TEXT);
     for (let node = walker.nextNode(); node; node = walker.nextNode()) {
       if (!node.nodeValue.trim()) continue;
       let el = node.parentElement;
       while (el && getComputedStyle(el).display.startsWith('inline')) el = el.parentElement;
-      // The ASCII art measures itself in Plex and never changes font.
-      if (el && !el.closest('.chrome-art, .name-art, .gate-art')) found.add(el);
+      // The ASCII art has its own font rules and animation; it switches with the page.
+      if (!el || el.closest('.chrome-art, .name-art, .gate-art')) continue;
+      if (!found.has(el)) found.set(el, []);
+      found.get(el).push(node);
     }
-    return [...found];
+    return found;
   }
 
   function sweepToPlex() {
-    const blocks = textBlocks();
+    const found = textBlocks();
+    const blocks = [...found.keys()];
     // Pin every block to the pixel font at its current size, then let the page switch.
     const sizes = blocks.map((el) => getComputedStyle(el).fontSize);
     blocks.forEach((el, i) => {
@@ -309,35 +348,25 @@
     });
     document.documentElement.classList.add('no-retro');
 
-    const release = (el, scan) => {
-      el.removeAttribute('data-px');
-      el.style.fontFamily = '';
-      el.style.fontSize = '';
-      // Only flash blocks on screen: a hidden one would hold the class and flash when shown.
-      if (!scan) return;
-      el.classList.add('px-scan');
-      el.addEventListener('animationend', () => el.classList.remove('px-scan'), { once: true });
-    };
-    // Blocks above the screen go straight away; the ones on it step down in order;
-    // everything below the fold follows when the sweep gets there.
-    const onScreen = blocks.filter((el) => {
+    // Only blocks on screen regenerate; the rest just switch, above the screen at once
+    // and below it when the sweep gets there.
+    const onScreen = new Set(blocks.filter((el) => {
       const r = el.getBoundingClientRect();
       return r.bottom > 0 && r.top < innerHeight;
-    });
-    const step = Math.min(SWEEP_STEP_MS, SWEEP_MS / Math.max(1, onScreen.length));
+    }));
+    const step = Math.min(SWEEP_STEP_MS, SWEEP_MS / Math.max(1, onScreen.size));
     let n = 0;
     const below = [];
     for (const el of blocks) {
-      if (onScreen.includes(el)) {
-        pxTimers.push(setTimeout(() => release(el, true), n++ * step));
+      if (onScreen.has(el)) {
+        pxTimers.push(setTimeout(() => { unpin(el); regenerate(found.get(el)); }, n++ * step));
       } else if (el.getBoundingClientRect().bottom <= 0) {
-        release(el, false);
+        unpin(el);
       } else {
         below.push(el);
       }
     }
-    pxTimers.push(setTimeout(() => below.forEach((el) => release(el, false)), n * step));
-    pxTimers.push(setTimeout(endSweep, n * step + 500));
+    pxTimers.push(setTimeout(() => below.forEach(unpin), n * step));
   }
 
   function toggleRetro() {
@@ -468,6 +497,7 @@
 
   async function crumble() {
     stopPieces.splice(0).forEach((stop) => stop());
+    endSweep();   // so it crumbles the real text, not a half-regenerated one
     if (!restoring && !reduceMotion) {
       screen.querySelectorAll(MEDIA).forEach((media) => media.classList.add('pending'));
       const nodes = [];

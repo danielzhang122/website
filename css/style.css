@@ -133,15 +133,15 @@ a:hover {
 
 
 /* ==========================================================================
-   CRT: scanlines, a faint flicker, a rolling streak and the IBM VGA pixel font.
+   CRT: scanlines, a faint flicker, a rolling streak, a hint of RGB fringe and the IBM VGA pixel font.
    The `retro` command toggles .no-retro on <html> to turn it all off.
    ========================================================================== */
 
 /* Retro also swaps the page text to the IBM VGA pixel font, a size up from its native 16px
-   so it reads at the same size as Plex. The font has no bold: browsers fake one by smearing
-   each glyph sideways, which turns its 1px strokes to mush, so bold text keeps the regular
-   weight and stands out by colour (b and headings are already --bright).
-   Turning retro off sweeps back to Plex block by block (see toggleRetro in js/terminal.js). */
+   so it reads at the same size as Plex. The font has no bold, and the browser's fake one
+   smears each glyph by a fraction of a pixel, which blurs under the fringe; bold text gets a
+   whole-pixel double strike instead (below).
+   Turning retro off regenerates the text in Plex block by block (see toggleRetro in js/terminal.js). */
 html:not(.no-retro) {
   --text: var(--px);
   --fs: 18px;
@@ -151,14 +151,6 @@ html:not(.no-retro) {
 /* Small grey text drops to the font's native 16px rather than a blurry 13-14px. */
 html:not(.no-retro) :is(.tags, #shortcuts button, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
   font-size: 16px;
-}
-
-/* A highlight bar that fades as the sweep reaches a block. */
-.px-scan { animation: px-scan .35s ease-out; }
-
-@keyframes px-scan {
-  from { background: color-mix(in srgb, var(--accent) 22%, transparent); }
-  to { background: transparent; }
 }
 
 html:not(.no-retro) body::before,
@@ -182,18 +174,47 @@ html:not(.no-retro) body::after {
   animation: crt-roll 12s linear infinite;
 }
 
-/* No RGB fringe on the text: on the pixel font it blurs every 1px stroke. */
+/* Buttons and inputs don't inherit text-shadow by default; the commands are buttons. */
+button,
+input { text-shadow: inherit; }
+
+html:not(.no-retro) body {
+  text-shadow: -.75px 0 rgba(255, 40, 80, .45), .75px 0 rgba(40, 200, 255, .45);
+}
 
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
   html:not(.no-retro) body::before {
     background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .1) 0 1px, transparent 1px 3px);
   }
+
+  /* Whole-pixel offsets: half a pixel on the pixel font smudges every stroke. */
+  html:not(.no-retro) body {
+    text-shadow: -1px 0 rgba(255, 40, 80, .45), 1px 0 rgba(40, 200, 255, .45);
+  }
+
+  html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
+    text-shadow: -1px 0 rgba(255, 40, 80, .35), 1px 0 rgba(40, 200, 255, .35);
+  }
 }
 
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
 html:not(.no-retro) body:has(#lightbox.is-open)::before {
   background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 1px, transparent 1px 3px);
+}
+
+/* Grey text is thin enough that the full fringe swamps it; give it a lighter one. */
+@media (max-width: 640px) {
+  html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
+    text-shadow: -.75px 0 rgba(255, 40, 80, .35), .75px 0 rgba(40, 200, 255, .35);
+  }
+}
+
+/* Bold in retro: the glyph struck twice a pixel apart, as on a DOS screen, with the fringe
+   moved out a pixel to match, and the letters spaced out so the strokes don't run together. */
+html:not(.no-retro) :is(b, strong, h1, h2, h3) {
+  letter-spacing: .1em;
+  text-shadow: 1px 0 currentColor, -1px 0 rgba(255, 40, 80, .4), 2px 0 rgba(40, 200, 255, .4);
 }
 
 @keyframes crt-flicker {
