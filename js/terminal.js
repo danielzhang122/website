@@ -268,35 +268,48 @@
     }
   }
 
-  // Turning retro off doesn't swap the font in one go: a sweep runs down the page, and as
-  // it reaches each block of text, the block switches to JetBrains Mono and its characters regenerate,
-  // like rm -rf / in reverse: each one starts as a dot, flickers through scrambled glyphs and
-  // settles, in random order.
-  let pxTimers = [];
-  let regenerating = [];     // { n, full, at }: text nodes mid-regeneration
+  // Toggling retro doesn't swap the look in one go: a scan beam runs down the screen, and
+  // as it passes each block of text, the block switches font and its characters regenerate
+  // (each starts as a dot, flickers through scrambled glyphs and settles, in random order,
+  // like rm -rf / in reverse). The CRT scanlines wipe in or out along the beam.
+  let sweepFrame = 0;
+  let regenerating = [];     // { n, full, start, at }: text nodes mid-regeneration
   let regenFrame = 0;
-  const SWEEP_MS = 1400;     // the longest the sweep takes to cross the screen
-  const SWEEP_STEP_MS = 70;  // ...or this long per block, if that's quicker
-  const REGEN = 450;         // ms over which a block's characters start settling
-  const REGEN_CELL = 120;    // ms each flickers before it settles
+  const SWEEP_MS = 900;      // the beam's trip down the screen
+  const REGEN = 380;         // ms over which a block's characters start settling
+  const REGEN_CELL = 110;    // ms each flickers before it settles
   const SCRAMBLE = '·:=+*#%@';
+  // The look a block keeps until the beam reaches it.
+  const PINNED = ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'textAlign', 'textShadow', 'fontSynthesis'];
 
-  function unpin(el) {
-    el.removeAttribute('data-px');
-    el.style.fontFamily = '';
-    el.style.fontSize = '';
-    el.style.lineHeight = '';
-    el.style.letterSpacing = '';
+  // The block-level element a text node sits in.
+  function blockOf(node) {
+    let el = node.parentElement;
+    while (el && getComputedStyle(el).display.startsWith('inline')) el = el.parentElement;
+    return el;
   }
 
-  function endSweep() {
-    pxTimers.forEach(clearTimeout);
-    pxTimers = [];
-    cancelAnimationFrame(regenFrame);
-    regenFrame = 0;
-    for (const { n, full } of regenerating) n.data = full.join('');
-    regenerating = [];
-    document.querySelectorAll('[data-px]').forEach(unpin);
+  // The visible text nodes whose block is el.
+  function ownText(el) {
+    const nodes = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (n.data.trim() && n.parentElement.getClientRects().length && blockOf(n) === el) nodes.push(n);
+    }
+    return nodes;
+  }
+
+  // Each visible block of page text (the console and the command bar), in document order.
+  // The ASCII art has its own font rules and animation, so it just switches with the page.
+  function textBlocks() {
+    const found = new Set();
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (!n.data.trim() || !n.parentElement.getClientRects().length) continue;
+      const el = blockOf(n);
+      if (el && !el.closest('.chrome-art, .name-art, .gate-art, #gate, #lightbox, script')) found.add(el);
+    }
+    return [...found];
   }
 
   function regenTick(now) {
@@ -315,72 +328,96 @@
   function regenerate(nodes) {
     const start = performance.now();
     for (const n of nodes) {
-      if (!n.isConnected) continue;
       const full = [...n.data];
       regenerating.push({ n, full, start, at: full.map(() => Math.random() * REGEN) });
     }
     if (!regenFrame && regenerating.length) regenFrame = requestAnimationFrame(regenTick);
   }
 
-  // Each block-level element holding page text, with its own text nodes, in document order.
-  function textBlocks() {
-    const found = new Map();
-    const walker = document.createTreeWalker(screen.closest('main') || document.body, NodeFilter.SHOW_TEXT);
-    for (let node = walker.nextNode(); node; node = walker.nextNode()) {
-      if (!node.nodeValue.trim()) continue;
-      let el = node.parentElement;
-      while (el && getComputedStyle(el).display.startsWith('inline')) el = el.parentElement;
-      // The ASCII art has its own font rules and animation; it switches with the page.
-      if (!el || el.closest('.chrome-art, .name-art, .gate-art')) continue;
-      if (!found.has(el)) found.set(el, []);
-      found.get(el).push(node);
-    }
-    return found;
+  // Lets a block take the new look; with animate, its text regenerates into it.
+  function release(el, animate) {
+    if (!el.hasAttribute('data-px')) return;
+    el.removeAttribute('data-px');
+    for (const prop of PINNED) el.style[prop] = '';
+    // The banner's "Hard on the eyes?" / "Miss the glow?" changes as the beam passes too.
+    el.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
+    if (animate) regenerate(ownText(el));
   }
 
-  function sweepFromRetro() {
-    const found = textBlocks();
-    const blocks = [...found.keys()];
-    // Pin every block to the pixel font at its current size and spacing, then let the page switch.
-    const styles = blocks.map((el) => {
+  function endSweep() {
+    cancelAnimationFrame(sweepFrame);
+    sweepFrame = 0;
+    cancelAnimationFrame(regenFrame);
+    regenFrame = 0;
+    for (const { n, full } of regenerating) n.data = full.join('');
+    regenerating = [];
+    document.querySelectorAll('[data-px]').forEach((el) => release(el, false));
+    document.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
+    document.querySelector('.beam')?.remove();
+    const root = document.documentElement;
+    root.classList.remove('crt-entering', 'crt-leaving');
+    root.style.removeProperty('--beam');
+  }
+
+  function sweep(toRetro) {
+    const root = document.documentElement;
+    // Hold the banner's label as it is, then pin every block to its current look.
+    document.querySelectorAll('[data-retro-label]').forEach((label) => {
+      label.style.display = getComputedStyle(label).display;
+    });
+    const blocks = textBlocks();
+    const looks = blocks.map((el) => {
       const cs = getComputedStyle(el);
-      return { fontSize: cs.fontSize, lineHeight: cs.lineHeight, letterSpacing: cs.letterSpacing };
+      return Object.fromEntries(PINNED.map((prop) => [prop, cs[prop]]));
     });
     blocks.forEach((el, i) => {
       el.dataset.px = '';
-      el.style.fontFamily = 'var(--px-text)';
-      Object.assign(el.style, styles[i]);
+      Object.assign(el.style, looks[i]);
     });
-    document.documentElement.classList.add('no-retro');
-    window.snapPixels?.();
 
-    // Only blocks on screen regenerate; the rest just switch, above the screen at once
-    // and below it when the sweep gets there.
-    const onScreen = new Set(blocks.filter((el) => {
-      const r = el.getBoundingClientRect();
-      return r.bottom > 0 && r.top < innerHeight;
-    }));
-    const step = Math.min(SWEEP_STEP_MS, SWEEP_MS / Math.max(1, onScreen.size));
-    let n = 0;
-    const below = [];
-    for (const el of blocks) {
-      if (onScreen.has(el)) {
-        pxTimers.push(setTimeout(() => { unpin(el); regenerate(found.get(el)); }, n++ * step));
-      } else if (el.getBoundingClientRect().bottom <= 0) {
-        unpin(el);
-      } else {
-        below.push(el);
+    root.style.setProperty('--beam', '0px');
+    root.classList.add(toRetro ? 'crt-entering' : 'crt-leaving');
+    root.classList.toggle('no-retro', !toRetro);
+    window.snapPixels?.();
+    const beam = document.createElement('div');
+    beam.className = 'beam';
+    beam.setAttribute('aria-hidden', 'true');
+    document.body.appendChild(beam);
+
+    // Blocks above the screen switch now, out of sight; the rest wait for the beam.
+    const waiting = blocks.filter((el) => {
+      if (el.getBoundingClientRect().bottom > 0) return true;
+      release(el, false);
+      return false;
+    });
+    const startedAt = performance.now();
+    const tick = (now) => {
+      const p = Math.min(1, (now - startedAt) / SWEEP_MS);
+      const y = (1 - Math.cos(p * Math.PI)) / 2 * innerHeight;   // eases in and out
+      root.style.setProperty('--beam', `${y}px`);
+      beam.style.transform = `translateY(${y}px)`;
+      // In document order, so roughly top to bottom; re-measured as released blocks reflow.
+      while (waiting.length && (p === 1 || waiting[0].getBoundingClientRect().top <= y)) {
+        const el = waiting.shift();
+        release(el, el.getBoundingClientRect().top < innerHeight);
       }
-    }
-    pxTimers.push(setTimeout(() => below.forEach(unpin), n * step));
+      if (p < 1) sweepFrame = requestAnimationFrame(tick);
+      else {
+        sweepFrame = 0;
+        beam.remove();
+        root.classList.remove('crt-entering', 'crt-leaving');
+        root.style.removeProperty('--beam');
+      }
+    };
+    sweepFrame = requestAnimationFrame(tick);
   }
 
   function toggleRetro() {
     endSweep();
     const root = document.documentElement;
     const off = !root.classList.contains('no-retro');
-    if (off && !matchMedia('(prefers-reduced-motion: reduce)').matches) sweepFromRetro();
-    else root.classList.toggle('no-retro', off);
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) root.classList.toggle('no-retro', off);
+    else sweep(!off);
     window.snapPixels?.();
     try {
       localStorage.setItem('retro', off ? 'off' : 'on');
