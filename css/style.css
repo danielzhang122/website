@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Fonts: JetBrains Mono (SIL Open Font License; see fonts/jetbrains-mono-LICENSE.txt),
+   Fonts: Cascadia Mono (SIL Open Font License; see fonts/cascadia-mono-LICENSE.txt),
    latin + latin-ext subsets via Fontsource,
    and, for retro mode, IBM VGA 9x16 (text) and 8x16 (ASCII art) from VileR's Ultimate
    Oldschool PC Font Pack, CC BY-SA 4.0; see fonts/px437-LICENSE.txt
@@ -13,7 +13,8 @@
   src: url(../fonts/px437-ibm-vga-9x16.woff) format('woff');
 }
 
-/* Retro ASCII art: its 8x16 grid is close to the art's 0.6em-wide cells, so the art keeps its proportions. */
+/* Retro ASCII art: its 8x16 grid is close to the art's 0.6em-wide cells, so the art keeps its proportions.
+   (The art was drawn for 0.6em cells; Cascadia Mono's 0.586em draws it 2% narrower, which doesn't show.) */
 @font-face {
   font-family: 'Px437 IBM VGA';
   font-weight: 400;
@@ -22,31 +23,31 @@
 }
 
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'Cascadia Mono';
   font-weight: 400;
   font-display: swap;
-  src: url(../fonts/jetbrains-mono-400-latin.woff2) format('woff2');
+  src: url(../fonts/cascadia-mono-400-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'Cascadia Mono';
   font-weight: 400;
   font-display: swap;
-  src: url(../fonts/jetbrains-mono-400-latin-ext.woff2) format('woff2');
+  src: url(../fonts/cascadia-mono-400-latin-ext.woff2) format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'Cascadia Mono';
   font-weight: 700;
   font-display: swap;
-  src: url(../fonts/jetbrains-mono-700-latin.woff2) format('woff2');
+  src: url(../fonts/cascadia-mono-700-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'JetBrains Mono';
+  font-family: 'Cascadia Mono';
   font-weight: 700;
   font-display: swap;
-  src: url(../fonts/jetbrains-mono-700-latin-ext.woff2) format('woff2');
+  src: url(../fonts/cascadia-mono-700-latin-ext.woff2) format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -64,14 +65,14 @@
   --line: #262626;
   --accent: #e5484d;
 
-  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --mono: 'Cascadia Mono', ui-monospace, Menlo, Consolas, monospace;
   --px: 'Px437 IBM VGA', var(--mono);
   --px-text: 'IBM VGA 9x16', var(--px);
   --text: var(--mono);
-  /* A terminal's text grid: 9x19px cells, as in Windows Terminal. JetBrains Mono is 0.6em
-     wide, so 15px gives the 9px columns on its own. */
-  --fs: 15px;
-  --lh: calc(19 / 15);        /* 19px at 15px */
+  /* A terminal's text grid: 9x19px cells, as in Windows Terminal. Cascadia Mono is 0.5859375em
+     (1200/2048) wide, so 15.36px gives exactly 9px columns. */
+  --fs: 15.36px;
+  --lh: calc(19 / 15.36);     /* 19px at 15.36px */
   /* Spacing: whole lines of text, so everything sits on the same line grid, as in a terminal.
   /* One size and one line height for all text, as in a terminal: nothing sets its own
      (only the ASCII art, whose grids need theirs). */
@@ -100,8 +101,8 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  /* JetBrains Mono's code ligatures would merge => and == into single glyphs, the ASCII art's
-     included. Important, as any font shorthand (the art uses them) resets these. */
+  /* No code ligatures (in case a fallback font has them): they would merge => and == into
+     single glyphs, the ASCII art's included. Important, as any font shorthand (the art uses them) resets these. */
   font-variant-ligatures: none !important;
   font-feature-settings: 'calt' 0 !important;
 }
@@ -172,7 +173,7 @@ a:hover {
    - no fake bold (the browser smears glyphs by a fraction of a pixel): bold reads by colour,
      as on a DOS screen;
    - the script also nudges the page column onto whole screen pixels.
-   Turning retro off regenerates the text in JetBrains Mono block by block (see toggleRetro in js/terminal.js). */
+   Turning retro off regenerates the text in Cascadia Mono block by block (see toggleRetro in js/terminal.js). */
 html:not(.no-retro) {
   --text: var(--px-text);
   --fs: calc(16 * var(--pxu));

@@ -439,9 +439,9 @@
 
     // The art is drawn for 13px characters; when the console is too narrow for the
     // row of three (phones), the glyphs stack vertically.
-    // JetBrains Mono's advance width at 13px, or the pixel font's at 16px in retro (see .name-art).
+    // Cascadia Mono's advance width at 13px, or the pixel font's at 16px in retro (see .name-art).
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
-    const charW = document.documentElement.classList.contains('no-retro') ? 13 * 0.6 : 8 * pxu;
+    const charW = document.documentElement.classList.contains('no-retro') ? 13 * (1200 / 2048) : 8 * pxu;
     const vertical = screen.clientWidth < art.nameArt().cols * charW;
     const { cols, rows, cells, fillEnd } = art.nameArt({ vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));
