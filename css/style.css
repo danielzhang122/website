@@ -601,6 +601,8 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   font-weight: 600;
 }
 
+.lightbox-caption a { margin-left: 1ch; }
+
 .lightbox-count {
   color: var(--dim);
   font-size: .75rem;
