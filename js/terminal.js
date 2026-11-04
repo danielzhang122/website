@@ -268,7 +268,6 @@
     }
   }
 
-  // Easter egg: a link to the archived first version of the site.
   // Turning retro off doesn't swap the font in one go: each block of text keeps the
   // pixel font until a sweep reaches it, top to bottom.
   let pxTimers = [];
@@ -310,10 +309,12 @@
     });
     document.documentElement.classList.add('no-retro');
 
-    const release = (el) => {
+    const release = (el, scan) => {
       el.removeAttribute('data-px');
       el.style.fontFamily = '';
       el.style.fontSize = '';
+      // Only flash blocks on screen: a hidden one would hold the class and flash when shown.
+      if (!scan) return;
       el.classList.add('px-scan');
       el.addEventListener('animationend', () => el.classList.remove('px-scan'), { once: true });
     };
@@ -325,15 +326,17 @@
     });
     const step = Math.min(SWEEP_STEP_MS, SWEEP_MS / Math.max(1, onScreen.length));
     let n = 0;
+    const below = [];
     for (const el of blocks) {
       if (onScreen.includes(el)) {
-        pxTimers.push(setTimeout(() => release(el), n++ * step));
+        pxTimers.push(setTimeout(() => release(el, true), n++ * step));
       } else if (el.getBoundingClientRect().bottom <= 0) {
-        release(el);
+        release(el, false);
       } else {
-        pxTimers.push(setTimeout(() => release(el), n * step));
+        below.push(el);
       }
     }
+    pxTimers.push(setTimeout(() => below.forEach((el) => release(el, false)), n * step));
     pxTimers.push(setTimeout(endSweep, n * step + 500));
   }
 
@@ -351,6 +354,7 @@
     return printLine(off ? 'retro off' : 'retro on', 'dim');
   }
 
+  // Easter egg: a link to the archived first version of the site.
   function printOg() {
     const line = document.createElement('p');
     const link = document.createElement('a');
