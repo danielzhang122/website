@@ -37,7 +37,7 @@
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
     contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
-    retro: { help: 'toggle the retro screen effect', run: toggleRetro },
+    retro: { help: 'toggle the crt screen effect', run: toggleRetro },
   };
   // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
   const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume', hardware: 'misc' };
@@ -58,10 +58,11 @@
     logout: exit,
     coffee: () => mailMe('coffee?', "i'm in. "),
     hire: () => mailMe('hiring', "let's talk: "),
+    vga: toggleVga,
   };
   // Not re-run when a refresh restores the session: clear and rm reset it themselves,
-  // and retro would flip the saved setting back.
-  const UNSAVED = ['clear', 'retro', 'rm', 'sudo'];
+  // and retro and vga would flip the saved setting back.
+  const UNSAVED = ['clear', 'retro', 'vga', 'rm', 'sudo'];
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -268,10 +269,11 @@
     }
   }
 
-  // Toggling retro doesn't swap the look in one go: an invisible sweep runs down the screen,
-  // and as it passes each block of text, the block switches font and its characters regenerate
-  // (each starts as a dot, flickers through scrambled glyphs and settles, in random order,
-  // like rm -rf / in reverse). The CRT scanlines wipe in or out along with it.
+  // Toggling retro or vga doesn't swap the look in one go: an invisible sweep runs down the
+  // screen, and each block of text takes the new look as it passes. For retro, the CRT
+  // scanlines wipe in or out with it; for vga, each block switches font and its characters
+  // regenerate (each starts as a dot, flickers through scrambled glyphs and settles, in random
+  // order, like rm -rf / in reverse).
   let sweepFrame = 0;
   let regenerating = [];     // { n, full, start, at }: text nodes mid-regeneration
   let regenFrame = 0;
@@ -358,7 +360,9 @@
     root.style.removeProperty('--sweep');
   }
 
-  function sweep(toRetro) {
+  // apply switches the classes on <html>; crt is 'crt-entering' or 'crt-leaving' when the
+  // scanlines change, and regen regenerates the text as the sweep passes it.
+  function sweep(apply, crt, regen) {
     const root = document.documentElement;
     // Hold the banner's label as it is, then pin every block to its current look.
     document.querySelectorAll('[data-retro-label]').forEach((label) => {
@@ -375,8 +379,8 @@
     });
 
     root.style.setProperty('--sweep', '0px');
-    root.classList.add(toRetro ? 'crt-entering' : 'crt-leaving');
-    root.classList.toggle('no-retro', !toRetro);
+    if (crt) root.classList.add(crt);
+    apply();
     window.snapPixels?.();
 
     // Blocks above the screen switch now, out of sight; the rest wait for the sweep.
@@ -393,7 +397,7 @@
       // In document order, so roughly top to bottom; re-measured as released blocks reflow.
       while (waiting.length && (p === 1 || waiting[0].getBoundingClientRect().top <= y)) {
         const el = waiting.shift();
-        release(el, el.getBoundingClientRect().top < innerHeight);
+        release(el, regen && el.getBoundingClientRect().top < innerHeight);
       }
       if (p < 1) sweepFrame = requestAnimationFrame(tick);
       else {
@@ -405,19 +409,31 @@
     sweepFrame = requestAnimationFrame(tick);
   }
 
-  function toggleRetro() {
+  // Flips one look (retro or vga), saves the choice, and reports it.
+  function toggleLook(name, isOn, setOn, crt) {
     endSweep();
-    const root = document.documentElement;
-    const off = !root.classList.contains('no-retro');
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) root.classList.toggle('no-retro', off);
-    else sweep(!off);
+    const on = !isOn();
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) setOn(on);
+    else sweep(() => setOn(on), crt ? (on ? 'crt-entering' : 'crt-leaving') : '', !crt);
     window.snapPixels?.();
     try {
-      localStorage.setItem('retro', off ? 'off' : 'on');
+      localStorage.setItem(name, on ? 'on' : 'off');
     } catch {
       // storage blocked: the choice lasts until the page closes
     }
-    return printLine(off ? 'retro off' : 'retro on', 'dim');
+    return printLine(`${name} ${on ? 'on' : 'off'}`, 'dim');
+  }
+
+  // The CRT screen effect, on by default.
+  function toggleRetro() {
+    const root = document.documentElement;
+    return toggleLook('retro', () => !root.classList.contains('no-retro'), (on) => root.classList.toggle('no-retro', !on), true);
+  }
+
+  // Easter egg: the IBM VGA pixel font, off by default.
+  function toggleVga() {
+    const root = document.documentElement;
+    return toggleLook('vga', () => root.classList.contains('vga'), (on) => root.classList.toggle('vga', on), false);
   }
 
   // Easter egg: a link to the archived first version of the site.
@@ -439,9 +455,9 @@
 
     // The art is drawn for 13px characters; when the console is too narrow for the
     // row of three (phones), the glyphs stack vertically.
-    // Cascadia Mono's advance width at 13px, or the pixel font's at 16px in retro (see .name-art).
+    // Cascadia Mono's advance width at 13px, or the pixel font's at 16px in vga (see .name-art).
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
-    const charW = document.documentElement.classList.contains('no-retro') ? 13 * (1200 / 2048) : 8 * pxu;
+    const charW = document.documentElement.classList.contains('vga') ? 8 * pxu : 13 * (1200 / 2048);
     const vertical = screen.clientWidth < art.nameArt().cols * charW;
     const { cols, rows, cells, fillEnd } = art.nameArt({ vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));

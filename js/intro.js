@@ -239,7 +239,7 @@
   }
 
   const pre = gate.querySelector('.gate-art');
-  const retro = () => !document.documentElement.classList.contains('no-retro');
+  const vga = () => document.documentElement.classList.contains('vga');
 
   let art = null;          // the name art, rebuilt on resize
   let labelPad = '';
@@ -256,12 +256,12 @@
     const fontSize = Math.max(6, Math.min(16, Math.floor(fit)));
     labelPad = ' '.repeat(Math.max(0, Math.floor((art.cols - LABEL.length) / 2)));
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
-    if (retro() && fit * MONO_W >= 8 * pxu) {
+    if (vga() && fit * MONO_W >= 8 * pxu) {
       // The pixel font is only sharp at its own size (--pxu, see index.html), on an 8x15
       // cell: the art's 0.6:1.15 within 2%.
       pre.style.fontSize = `${16 * pxu}px`;
       pre.style.lineHeight = `${15 * pxu}px`;
-    } else if (retro()) {
+    } else if (vga()) {
       // Too small a screen for that: scale it, keeping the cell width (the pixel font is 0.5em wide).
       pre.style.fontSize = `${fontSize * MONO_W / 0.5}px`;
       pre.style.lineHeight = `${fontSize * 1.15}px`;
@@ -325,7 +325,7 @@
 
   // Wait for the mono font so the characters measure right; don't hang if it never comes.
   Promise.race([
-    document.fonts.load(retro() ? "16px 'Px437 IBM VGA'" : "14px 'Cascadia Mono'"),
+    document.fonts.load(vga() ? "16px 'Px437 IBM VGA'" : "14px 'Cascadia Mono'"),
     new Promise((resolve) => setTimeout(resolve, 600)),
   ]).finally(() => {
     build();
