@@ -37,9 +37,9 @@
 
 :root {
   --bg: #0b0b0b;
-  --ink: #d6d6d6;   /* all text is this one colour */
-  --bright: var(--ink);
-  --dim: var(--ink);
+  --ink: #d6d6d6;
+  --bright: #f2f2f2;
+  --dim: #858585;   /* 5.3:1 on --bg, above the WCAG AA minimum of 4.5:1 for body text */
   --line: #262626;
   --accent: #e5484d;
 
@@ -108,7 +108,7 @@ code { font: inherit; color: var(--ink); }
 a {
   color: var(--ink);
   text-decoration: underline;
-  text-decoration-color: #858585;
+  text-decoration-color: var(--dim);
   text-underline-offset: 3px;
   transition: color .15s, text-decoration-color .15s;
 }
@@ -167,6 +167,11 @@ html:not(.no-retro) body {
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
 html:not(.no-retro) body:has(#lightbox.is-open)::before {
   background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 1px, transparent 1px 3px);
+}
+
+/* Grey text is thin enough that the full fringe swamps it; give it a lighter one. */
+html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
+  text-shadow: -.75px 0 rgba(255, 40, 80, .45), .75px 0 rgba(40, 200, 255, .45);
 }
 
 @keyframes crt-flicker {
