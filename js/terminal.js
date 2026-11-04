@@ -58,11 +58,12 @@
     logout: exit,
     coffee: () => mailMe('coffee?', "i'm in. "),
     hire: () => mailMe('hiring', "let's talk: "),
-    vga: toggleVga,
+    vga: () => toggleFont('vga'),
+    plex: () => toggleFont('plex'),
   };
   // Not re-run when a refresh restores the session: clear and rm reset it themselves,
-  // and retro and vga would flip the saved setting back.
-  const UNSAVED = ['clear', 'retro', 'vga', 'rm', 'sudo'];
+  // and retro, vga and plex would flip the saved setting back.
+  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'rm', 'sudo'];
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -409,7 +410,7 @@
     sweepFrame = requestAnimationFrame(tick);
   }
 
-  // Flips one look (retro or vga), saves the choice, and reports it.
+  // Flips one look (retro, vga or plex), saves the choice, and reports it.
   function toggleLook(name, isOn, setOn, crt) {
     endSweep();
     const on = !isOn();
@@ -430,10 +431,23 @@
     return toggleLook('retro', () => !root.classList.contains('no-retro'), (on) => root.classList.toggle('no-retro', !on), true);
   }
 
-  // Easter egg: the IBM VGA pixel font, off by default.
-  function toggleVga() {
+  // Easter eggs: the IBM VGA pixel font (vga) or IBM Plex Mono (plex) for the page text, both
+  // off by default. Turning one on turns the other off.
+  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'" };
+  async function toggleFont(name) {
     const root = document.documentElement;
-    return toggleLook('vga', () => root.classList.contains('vga'), (on) => root.classList.toggle('vga', on), false);
+    const other = name === 'vga' ? 'plex' : 'vga';
+    const on = !root.classList.contains(name);
+    // Plex isn't preloaded: fetch it first so the sweep doesn't reveal a fallback font.
+    if (on) await Promise.race([document.fonts.load(FONTS[name]), document.fonts.load(`600 ${FONTS[name]}`), wait(1500)]).catch(() => {});
+    const printed = toggleLook(name, () => !on, (o) => {
+      root.classList.toggle(name, o);
+      if (o) root.classList.remove(other);
+    }, false);
+    if (on) {
+      try { localStorage.setItem(other, 'off'); } catch {}
+    }
+    return printed;
   }
 
   // Easter egg: a link to the archived first version of the site.
