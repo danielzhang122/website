@@ -1,34 +1,53 @@
 /* ==========================================================================
-   Fonts: IBM Plex Mono (SIL Open Font License), latin + latin-ext subsets from Google Fonts
+   Fonts: JetBrains Mono (SIL Open Font License; see fonts/jetbrains-mono-LICENSE.txt),
+   latin + latin-ext subsets via Fontsource,
+   and, for retro mode, IBM VGA 9x16 (text) and 8x16 (ASCII art) from VileR's Ultimate
+   Oldschool PC Font Pack, CC BY-SA 4.0; see fonts/px437-LICENSE.txt
    ========================================================================== */
 
+/* Retro text: the IBM VGA's 9x16 text-mode font. Sharp only at 16 screen pixels (see --pxu). */
 @font-face {
-  font-family: 'IBM Plex Mono';
+  font-family: 'IBM VGA 9x16';
   font-weight: 400;
   font-display: swap;
-  src: url(../fonts/plex-mono-400-latin.woff2) format('woff2');
+  src: url(../fonts/px437-ibm-vga-9x16.woff) format('woff');
+}
+
+/* Retro ASCII art: its 8x16 grid is close to the art's 0.6em-wide cells, so the art keeps its proportions. */
+@font-face {
+  font-family: 'Px437 IBM VGA';
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/px437-ibm-vga-8x16.woff) format('woff');
+}
+
+@font-face {
+  font-family: 'JetBrains Mono';
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/jetbrains-mono-400-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'IBM Plex Mono';
+  font-family: 'JetBrains Mono';
   font-weight: 400;
   font-display: swap;
-  src: url(../fonts/plex-mono-400-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(../fonts/jetbrains-mono-400-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: 'IBM Plex Mono';
-  font-weight: 600;
+  font-family: 'JetBrains Mono';
+  font-weight: 700;
   font-display: swap;
-  src: url(../fonts/plex-mono-600-latin.woff2) format('woff2');
+  src: url(../fonts/jetbrains-mono-700-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'IBM Plex Mono';
-  font-weight: 600;
+  font-family: 'JetBrains Mono';
+  font-weight: 700;
   font-display: swap;
-  src: url(../fonts/plex-mono-600-latin-ext.woff2) format('woff2');
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C4, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  src: url(../fonts/jetbrains-mono-700-latin-ext.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
 /* ==========================================================================
@@ -43,9 +62,18 @@
   --line: #262626;
   --accent: #e5484d;
 
-  --mono: 'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --px: 'Px437 IBM VGA', var(--mono);
+  --px-text: 'IBM VGA 9x16', var(--px);
+  --text: var(--mono);
+  /* A terminal's text grid: 9x19px cells, as in Windows Terminal. JetBrains Mono is 0.6em
+     wide, so 15px gives the 9px columns on its own. */
+  --fs: 15px;
+  --lh: calc(19 / 15);        /* 19px at 15px */
+  --pxu: 1px;   /* one pixel of the retro font; see index.html */
+  --dpx: 1px;   /* one screen pixel */
 
-  --column: 90ch;
+  --column: 810px;   /* 90 characters */
   --gutter: 1.5rem;
 }
 
@@ -60,12 +88,16 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* JetBrains Mono's code ligatures would merge => and == into single glyphs, the ASCII art's
+     included. Important, as any font shorthand (the art uses them) resets these. */
+  font-variant-ligatures: none !important;
+  font-feature-settings: 'calt' 0 !important;
 }
 
 body {
   background: var(--bg);
   color: var(--ink);
-  font: 400 15px/1.6 var(--mono);
+  font: 400 var(--fs)/var(--lh) var(--text);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -120,12 +152,43 @@ a:hover {
 
 
 /* ==========================================================================
-   CRT: scanlines, a faint flicker, a rolling streak and a hint of RGB fringe.
+   CRT: scanlines, a faint flicker, a rolling streak, a hint of RGB fringe and DOS pixel fonts.
    The `retro` command toggles .no-retro on <html> to turn it all off.
    ========================================================================== */
 
-html:not(.no-retro) body::before,
-html:not(.no-retro) body::after {
+/* Retro also swaps the page text to the IBM VGA 9x16 font. It's drawn on a 9x16
+   pixel grid and only looks sharp when each of its pixels lands on whole screen pixels, so:
+   - its size is 16 screen pixels, or 32 on a 2x screen (--pxu is one font pixel, set by the
+     script in index.html from the screen's pixel ratio; 1px if that script never ran);
+   - no fake bold (the browser smears glyphs by a fraction of a pixel) and no justified text
+     (stretched spaces put words between pixels): bold reads by colour, as on a DOS screen;
+   - the script also nudges the page column onto whole screen pixels.
+   Turning retro off regenerates the text in JetBrains Mono block by block (see toggleRetro in js/terminal.js). */
+html:not(.no-retro) {
+  --text: var(--px-text);
+  --fs: calc(16 * var(--pxu));
+  font-synthesis: none;
+}
+
+html:not(.no-retro) body { line-height: calc(24 * var(--pxu)); }
+
+html:not(.no-retro) :is(p, li) { text-align: start; }
+
+/* The prompt's sliver of space after > would put the command between pixels. */
+html:not(.no-retro) .ps { margin-right: 0; }
+
+/* 1.5ch between command buttons is half a pixel on the 9px-wide font; round it to 2ch. */
+html:not(.no-retro) button.cmd + button.cmd { margin-left: 2ch; }
+html:not(.no-retro) .banner button.cmd + button.cmd { margin-left: 0; }
+
+/* Small grey text stays at the full size: smaller would land between pixels. */
+html:not(.no-retro) :is(.tags, #shortcuts button, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
+  font-size: calc(16 * var(--pxu));
+}
+
+/* .crt-leaving keeps the overlay up while a sweep takes it away (see sweep in js/terminal.js). */
+:is(html:not(.no-retro), html.crt-leaving) body::before,
+:is(html:not(.no-retro), html.crt-leaving) body::after {
   content: '';
   position: fixed;
   inset: 0;
@@ -133,35 +196,33 @@ html:not(.no-retro) body::after {
   pointer-events: none;
 }
 
-html:not(.no-retro) body::before {
+:is(html:not(.no-retro), html.crt-leaving) body::before {
   background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .08) 0 1px, transparent 1px 3px);
   animation: crt-flicker 4s steps(1) infinite;
 }
 
-html:not(.no-retro) body::after {
+:is(html:not(.no-retro), html.crt-leaving) body::after {
   bottom: auto;
   height: 40vh;
   background: linear-gradient(transparent, rgba(255, 255, 255, .015), transparent);
   animation: crt-roll 12s linear infinite;
 }
 
+/* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
+@media (min-width: 641px) {
+  :is(html:not(.no-retro), html.crt-leaving) body::before {
+    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .1) 0 1px, transparent 1px 3px);
+  }
+}
+
 /* Buttons and inputs don't inherit text-shadow by default; the commands are buttons. */
 button,
 input { text-shadow: inherit; }
 
+/* The RGB fringe: exactly one screen pixel (--dpx) each side, faint, so it tints the edges of
+   each stroke without smearing them. */
 html:not(.no-retro) body {
-  text-shadow: -.75px 0 rgba(255, 40, 80, .45), .75px 0 rgba(40, 200, 255, .45);
-}
-
-/* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
-@media (min-width: 641px) {
-  html:not(.no-retro) body::before {
-    background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .1) 0 1px, transparent 1px 3px);
-  }
-
-  html:not(.no-retro) body {
-    text-shadow: -1px 0 rgba(255, 40, 80, .55), 1px 0 rgba(40, 200, 255, .55);
-  }
+  text-shadow: calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, .3), var(--dpx) 0 rgba(40, 200, 255, .3);
 }
 
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
@@ -169,10 +230,15 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
   background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 1px, transparent 1px 3px);
 }
 
-/* Grey text is thin enough that the full fringe swamps it; give it a lighter one. */
-html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
-  text-shadow: -.75px 0 rgba(255, 40, 80, .45), .75px 0 rgba(40, 200, 255, .45);
-}
+/* Mid-sweep, the scanlines cover only what the sweep has passed (turning on) or not yet
+   reached (turning off); the rolling streak sits it out. */
+html.crt-entering body::before { clip-path: inset(0 0 calc(100% - var(--sweep, 0px)) 0); }
+html.crt-leaving body::before { clip-path: inset(var(--sweep, 0px) 0 0 0); }
+html:is(.crt-entering, .crt-leaving) body::after { display: none; }
+
+/* The banner's lead-in to the retro command fits the mode it would switch to. */
+html.no-retro [data-retro-label="on"],
+html:not(.no-retro) [data-retro-label="off"] { display: none; }
 
 @keyframes crt-flicker {
   0%, 8%, 35%, 72% { opacity: 1; }
@@ -220,6 +286,9 @@ html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figca
   font: 400 13px/1.15 var(--mono);
   white-space: pre;
 }
+
+/* In retro: an 8x15 cell for the usual 7.8x14.95 (see .chrome-art). */
+html:not(.no-retro) .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(--px); }
 
 .accent { color: var(--accent); }
 
@@ -358,6 +427,11 @@ button.cmd:hover { color: var(--accent); }
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
   mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
 }
+
+/* Retro draws the art in the pixel font too. Its characters are 0.5em wide to the art's 0.6em,
+   so 16px (the font's native size, so it stays sharp) on a 13px line gives an 8x13 cell:
+   the usual 7.8x13 within 3%, so the art keeps its shape. */
+html:not(.no-retro) .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--px); }
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
    are no per-character spans: mid tones rose, the faint glyphs inside the shape
@@ -542,6 +616,9 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   white-space: pre;
 }
 
+/* In retro js/intro.js scales the font and sets the line height to keep the art's cells. */
+html:not(.no-retro) .gate-art { font-family: var(--px); }
+
 .gate-hint {
   position: absolute;
   right: 1.5rem;
@@ -634,7 +711,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 @media (max-width: 640px) {
   :root { --gutter: 1rem; }
 
-  body { font-size: 14px; }
+  :root { --fs: 14px; }
 
   .row {
     grid-template-columns: 1fr;

@@ -238,6 +238,7 @@
   }
 
   const pre = gate.querySelector('.gate-art');
+  const retro = () => !document.documentElement.classList.contains('no-retro');
 
   let art = null;          // the name art, rebuilt on resize
   let labelPad = '';
@@ -253,9 +254,23 @@
     const fit = Math.min((width * (narrow ? 0.9 : 0.8)) / (art.cols * 0.6), (height * 0.8) / ((art.rows + 3) * 1.15));
     const fontSize = Math.max(6, Math.min(16, Math.floor(fit)));
     labelPad = ' '.repeat(Math.max(0, Math.floor((art.cols - LABEL.length) / 2)));
-    pre.style.fontSize = `${fontSize}px`;
+    const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
+    if (retro() && fit * 0.6 >= 8 * pxu) {
+      // The pixel font is only sharp at its own size (--pxu, see index.html), on an 8x15
+      // cell: the art's 0.6:1.15 within 2%.
+      pre.style.fontSize = `${16 * pxu}px`;
+      pre.style.lineHeight = `${15 * pxu}px`;
+    } else if (retro()) {
+      // Too small a screen for that: scale it, keeping the cell (0.5em wide, so 1.2x).
+      pre.style.fontSize = `${fontSize * 1.2}px`;
+      pre.style.lineHeight = `${fontSize * 1.15}px`;
+    } else {
+      pre.style.fontSize = `${fontSize}px`;
+      pre.style.lineHeight = '';
+    }
     // Fixed to the full art width, so the drawing stays centred while it fills in.
     pre.style.width = `${art.cols}ch`;
+    window.snapPixels?.();
   }
 
   function draw(t, decay) {
@@ -309,7 +324,7 @@
 
   // Wait for the mono font so the characters measure right; don't hang if it never comes.
   Promise.race([
-    document.fonts.load("14px 'IBM Plex Mono'"),
+    document.fonts.load(retro() ? "16px 'Px437 IBM VGA'" : "14px 'JetBrains Mono'"),
     new Promise((resolve) => setTimeout(resolve, 600)),
   ]).finally(() => {
     build();

@@ -28,17 +28,44 @@
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
   <!-- The `retro` command's saved choice, applied before first paint so it covers the intro too. -->
   <script>try { if (localStorage.getItem('retro') === 'off') document.documentElement.classList.add('no-retro'); } catch {}</script>
+  <!-- Keeps the retro pixel font on whole screen pixels (see the CRT section of css/style.css):
+       --pxu is one font pixel, a whole number of screen pixels; snapping nudges centred
+       blocks that would otherwise start between two screen pixels. -->
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const SNAP = '#console, #shortcuts button, .gate-art';
+      function snap() {
+        const dpr = devicePixelRatio || 1;
+        root.style.setProperty('--pxu', `${Math.max(1, Math.round(dpr)) / dpr}px`);
+        root.style.setProperty('--dpx', `${1 / dpr}px`);
+        const els = [...document.querySelectorAll(SNAP)];
+        els.forEach((el) => { el.style.translate = ''; });
+        if (root.classList.contains('no-retro')) return;
+        for (const el of els) {
+          const off = (el.getBoundingClientRect().left * dpr) % 1;
+          if (off > 0.01 && off < 0.99) el.style.translate = `${-off / dpr}px 0`;
+        }
+      }
+      window.snapPixels = snap;
+      snap();
+      addEventListener('DOMContentLoaded', snap);
+      addEventListener('resize', snap);
+    })();
+  </script>
 
   <!-- Self-hosted (see @font-face in css/style.css) so no third-party server can block or break the first paint. -->
-  <link rel="preload" href="fonts/plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/jetbrains-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/px437-ibm-vga-9x16.woff" as="font" type="font/woff" crossorigin>
+  <link rel="preload" href="fonts/px437-ibm-vga-8x16.woff" as="font" type="font/woff" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261104-3">
+  <link rel="stylesheet" href="css/style.css?v=20261107-2">
 
   <script src="js/intro-glyphs.js?v=20261031-5" defer></script>
-  <script src="js/intro.js?v=20261031-5" defer></script>
+  <script src="js/intro.js?v=20261106-6" defer></script>
   <script src="js/lightbox.js?v=20261104-1" defer></script>
-  <script src="js/terminal.js?v=20261101-2" defer></script>
+  <script src="js/terminal.js?v=20261107-2" defer></script>
   <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
   <script type="module" src="js/chrome.js?v=20261102-1"></script>
 </head>
@@ -91,7 +118,7 @@
       <div>
         <h1>Daniel Zhang</h1>
         <p class="dim">Mechatronics Engineering Co-op III, McMaster University</p>
-        <p class="dim js-only">Lost? Try <button type="button" class="cmd" data-run="help">help</button>. Hard on the eyes? <button type="button" class="cmd" data-run="retro">retro</button>. Too much clutter? <button type="button" class="cmd" data-run="clear">clear</button>.</p>
+        <p class="dim js-only">Lost? Try <button type="button" class="cmd" data-run="help">help</button>. <span data-retro-label="on">Hard on the eyes?</span><span data-retro-label="off">Miss the glow?</span> <button type="button" class="cmd" data-run="retro">retro</button>. Too much clutter? <button type="button" class="cmd" data-run="clear">clear</button>.</p>
       </div>
     </header>
 
@@ -181,7 +208,7 @@
 
       <article>
         <h3>Globe Ghost — iOS GPS Simulator</h3>
-        <p>Sets an iPhone's actual GPS location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester.</p>
+        <p>Simulates an iPhone's reported location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester.</p>
         <p class="tags">Python, pymobiledevice3, OpenStreetMap <a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <figure class="thumb">
           <img src="images/spoofer.webp" width="1502" height="912" loading="lazy" data-lightbox
@@ -203,8 +230,8 @@
 
       <article data-id="wheelsafe">
         <h3>WheelSafe Storage</h3>
-        <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the McMaster Design Showcase.</p>
-        <p class="tags">Autodesk Inventor, client prototyping, carbon fiber <a href="https://www.youtube.com/watch?v=3dYv_6PoitU" target="_blank" rel="noopener noreferrer">Demo</a> <a href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:a0181878-fe27-42bb-92b6-26a483603809" target="_blank" rel="noopener noreferrer">Presentation</a></p>
+        <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the McMaster Design Showcase. My contributions focused on concept development and testing, with some prototyping.</p>
+        <p class="tags">Concept development, testing, prototyping, carbon fiber <a href="https://www.youtube.com/watch?v=3dYv_6PoitU" target="_blank" rel="noopener noreferrer">Demo</a> <a href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:a0181878-fe27-42bb-92b6-26a483603809" target="_blank" rel="noopener noreferrer">Presentation</a></p>
         <figure class="thumb">
           <img src="images/wheelsafe.webp" width="1280" height="1706" loading="lazy" data-lightbox
                alt="WheelSafe storage module, a black weatherproof fabric bag, next to two McMaster Engineering 3rd-place certificates of achievement" data-title="WheelSafe Storage"
@@ -214,7 +241,7 @@
 
       <article data-id="suspension">
         <h3>Double Wishbone Suspension (Concept)</h3>
-        <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how the linkage could control dynamic camber to keep a 500 mL sloshing payload stable over a 33 m run.</p>
+        <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how camber changes as the wheel moves through its travel. Whether any of that keeps a 500 mL payload from sloshing over a 33 m run is a question for the real car.</p>
         <p class="tags">SolidWorks, kinematics, vehicle dynamics</p>
         <figure class="thumb">
           <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="none" data-lightbox
@@ -300,7 +327,7 @@
         <span class="key">Sep 2026 – present</span>
         <div>
           <p><b>Mechanical Sub-team Member, Wheel Assembly</b>, McMaster Chem-E-Car</p>
-          <p class="dim">Designing custom wheel assemblies and suspension geometry for the 2026–2027 car, to keep 500 mL of water from sloshing over a 33 m run.</p>
+          <p class="dim">Designing custom wheel assemblies and suspension geometry for the 2026–2027 car, which carries 500 mL of water over a 33 m run.</p>
         </div>
       </div>
       <div class="row">
@@ -359,7 +386,7 @@
       <p class="dim">PDF, one page, updated Nov 2026. <a href="Daniel_Zhang_Resume.pdf" download>Download</a> or <a href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener noreferrer">open it in a new tab</a>.</p>
       <div class="thumbs whole">
         <img src="images/resume-preview.webp" width="1654" height="2339" class="resume-thumb" loading="lazy" data-lightbox
-             alt="Preview of Daniel Zhang's one-page resume" data-title="Resume" data-caption="One page, updated Oct 2026.">
+             alt="Preview of Daniel Zhang's one-page resume" data-title="Resume" data-caption="One page, updated Nov 2026.">
       </div>
 
     </section>

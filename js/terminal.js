@@ -268,9 +268,150 @@
     }
   }
 
-  // Easter egg: a link to the archived first version of the site.
+  // Toggling retro doesn't swap the look in one go: an invisible sweep runs down the screen,
+  // and as it passes each block of text, the block switches font and its characters regenerate
+  // (each starts as a dot, flickers through scrambled glyphs and settles, in random order,
+  // like rm -rf / in reverse). The CRT scanlines wipe in or out along with it.
+  let sweepFrame = 0;
+  let regenerating = [];     // { n, full, start, at }: text nodes mid-regeneration
+  let regenFrame = 0;
+  const SWEEP_MS = 900;      // the sweep's trip down the screen
+  const REGEN = 380;         // ms over which a block's characters start settling
+  const REGEN_CELL = 110;    // ms each flickers before it settles
+  const SCRAMBLE = '·:=+*#%@';
+  // The look a block keeps until the sweep reaches it.
+  const PINNED = ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'textAlign', 'textShadow', 'fontSynthesis'];
+
+  // The block-level element a text node sits in.
+  function blockOf(node) {
+    let el = node.parentElement;
+    while (el && getComputedStyle(el).display.startsWith('inline')) el = el.parentElement;
+    return el;
+  }
+
+  // The visible text nodes whose block is el.
+  function ownText(el) {
+    const nodes = [];
+    const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (n.data.trim() && n.parentElement.getClientRects().length && blockOf(n) === el) nodes.push(n);
+    }
+    return nodes;
+  }
+
+  // Each visible block of page text (the console and the command bar), in document order.
+  // The ASCII art has its own font rules and animation, so it just switches with the page.
+  function textBlocks() {
+    const found = new Set();
+    const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (!n.data.trim() || !n.parentElement.getClientRects().length) continue;
+      const el = blockOf(n);
+      if (el && !el.closest('.chrome-art, .name-art, .gate-art, #gate, #lightbox, script')) found.add(el);
+    }
+    return [...found];
+  }
+
+  function regenTick(now) {
+    regenerating = regenerating.filter((cell) => {
+      const t = now - cell.start;
+      cell.n.data = cell.full.map((c, i) => {
+        if (!c.trim() || t >= cell.at[i] + REGEN_CELL) return c;
+        if (t < cell.at[i]) return '·';
+        return SCRAMBLE[Math.floor(Math.random() * SCRAMBLE.length)];
+      }).join('');
+      return t < REGEN + REGEN_CELL;
+    });
+    regenFrame = regenerating.length ? requestAnimationFrame(regenTick) : 0;
+  }
+
+  function regenerate(nodes) {
+    const start = performance.now();
+    for (const n of nodes) {
+      const full = [...n.data];
+      regenerating.push({ n, full, start, at: full.map(() => Math.random() * REGEN) });
+    }
+    if (!regenFrame && regenerating.length) regenFrame = requestAnimationFrame(regenTick);
+  }
+
+  // Lets a block take the new look; with animate, its text regenerates into it.
+  function release(el, animate) {
+    if (!el.hasAttribute('data-px')) return;
+    el.removeAttribute('data-px');
+    for (const prop of PINNED) el.style[prop] = '';
+    // The banner's "Hard on the eyes?" / "Miss the glow?" changes as the sweep passes too.
+    el.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
+    if (animate) regenerate(ownText(el));
+  }
+
+  function endSweep() {
+    cancelAnimationFrame(sweepFrame);
+    sweepFrame = 0;
+    cancelAnimationFrame(regenFrame);
+    regenFrame = 0;
+    for (const { n, full } of regenerating) n.data = full.join('');
+    regenerating = [];
+    document.querySelectorAll('[data-px]').forEach((el) => release(el, false));
+    document.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
+    const root = document.documentElement;
+    root.classList.remove('crt-entering', 'crt-leaving');
+    root.style.removeProperty('--sweep');
+  }
+
+  function sweep(toRetro) {
+    const root = document.documentElement;
+    // Hold the banner's label as it is, then pin every block to its current look.
+    document.querySelectorAll('[data-retro-label]').forEach((label) => {
+      label.style.display = getComputedStyle(label).display;
+    });
+    const blocks = textBlocks();
+    const looks = blocks.map((el) => {
+      const cs = getComputedStyle(el);
+      return Object.fromEntries(PINNED.map((prop) => [prop, cs[prop]]));
+    });
+    blocks.forEach((el, i) => {
+      el.dataset.px = '';
+      Object.assign(el.style, looks[i]);
+    });
+
+    root.style.setProperty('--sweep', '0px');
+    root.classList.add(toRetro ? 'crt-entering' : 'crt-leaving');
+    root.classList.toggle('no-retro', !toRetro);
+    window.snapPixels?.();
+
+    // Blocks above the screen switch now, out of sight; the rest wait for the sweep.
+    const waiting = blocks.filter((el) => {
+      if (el.getBoundingClientRect().bottom > 0) return true;
+      release(el, false);
+      return false;
+    });
+    const startedAt = performance.now();
+    const tick = (now) => {
+      const p = Math.min(1, (now - startedAt) / SWEEP_MS);
+      const y = (1 - Math.cos(p * Math.PI)) / 2 * innerHeight;   // eases in and out
+      root.style.setProperty('--sweep', `${y}px`);
+      // In document order, so roughly top to bottom; re-measured as released blocks reflow.
+      while (waiting.length && (p === 1 || waiting[0].getBoundingClientRect().top <= y)) {
+        const el = waiting.shift();
+        release(el, el.getBoundingClientRect().top < innerHeight);
+      }
+      if (p < 1) sweepFrame = requestAnimationFrame(tick);
+      else {
+        sweepFrame = 0;
+        root.classList.remove('crt-entering', 'crt-leaving');
+        root.style.removeProperty('--sweep');
+      }
+    };
+    sweepFrame = requestAnimationFrame(tick);
+  }
+
   function toggleRetro() {
-    const off = document.documentElement.classList.toggle('no-retro');
+    endSweep();
+    const root = document.documentElement;
+    const off = !root.classList.contains('no-retro');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) root.classList.toggle('no-retro', off);
+    else sweep(!off);
+    window.snapPixels?.();
     try {
       localStorage.setItem('retro', off ? 'off' : 'on');
     } catch {
@@ -279,6 +420,7 @@
     return printLine(off ? 'retro off' : 'retro on', 'dim');
   }
 
+  // Easter egg: a link to the archived first version of the site.
   function printOg() {
     const line = document.createElement('p');
     const link = document.createElement('a');
@@ -297,7 +439,9 @@
 
     // The art is drawn for 13px characters; when the console is too narrow for the
     // row of three (phones), the glyphs stack vertically.
-    const charW = 13 * 0.6;     // IBM Plex Mono advance width at 13px
+    // JetBrains Mono's advance width at 13px, or the pixel font's at 16px in retro (see .name-art).
+    const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
+    const charW = document.documentElement.classList.contains('no-retro') ? 13 * 0.6 : 8 * pxu;
     const vertical = screen.clientWidth < art.nameArt().cols * charW;
     const { cols, rows, cells, fillEnd } = art.nameArt({ vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));
@@ -391,6 +535,7 @@
 
   async function crumble() {
     stopPieces.splice(0).forEach((stop) => stop());
+    endSweep();   // so it crumbles the real text, not a half-regenerated one
     if (!restoring && !reduceMotion) {
       screen.querySelectorAll(MEDIA).forEach((media) => media.classList.add('pending'));
       const nodes = [];
