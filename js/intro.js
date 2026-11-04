@@ -254,17 +254,23 @@
     const fit = Math.min((width * (narrow ? 0.9 : 0.8)) / (art.cols * 0.6), (height * 0.8) / ((art.rows + 3) * 1.15));
     const fontSize = Math.max(6, Math.min(16, Math.floor(fit)));
     labelPad = ' '.repeat(Math.max(0, Math.floor((art.cols - LABEL.length) / 2)));
-    if (retro()) {
-      // The pixel font's characters are 0.5em wide: 1.2x the size keeps Plex's cell
-      // width, and a line height set in px keeps its height.
-      pre.style.fontSize = `${Math.round(fontSize * 1.2)}px`;
-      pre.style.lineHeight = `${Math.round(fontSize * 1.15)}px`;
+    const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
+    if (retro() && fit * 0.6 >= 8 * pxu) {
+      // The pixel font is only sharp at its own size (--pxu, see index.html), on an 8x15
+      // cell: Plex's 0.6:1.15 within 2%.
+      pre.style.fontSize = `${16 * pxu}px`;
+      pre.style.lineHeight = `${15 * pxu}px`;
+    } else if (retro()) {
+      // Too small a screen for that: scale it, keeping the cell (0.5em wide, so 1.2x).
+      pre.style.fontSize = `${fontSize * 1.2}px`;
+      pre.style.lineHeight = `${fontSize * 1.15}px`;
     } else {
       pre.style.fontSize = `${fontSize}px`;
       pre.style.lineHeight = '';
     }
     // Fixed to the full art width, so the drawing stays centred while it fills in.
     pre.style.width = `${art.cols}ch`;
+    window.snapPixels?.();
   }
 
   function draw(t, decay) {

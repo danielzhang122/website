@@ -57,6 +57,8 @@
   /* Page text. The ASCII art keeps --mono: its grids are built for Plex's character width. */
   --text: var(--mono);
   --fs: 15px;
+  --pxu: 1px;   /* one pixel of the retro font; see index.html */
+  --dpx: 1px;   /* one screen pixel */
 
   --column: 90ch;
   --gutter: 1.5rem;
@@ -137,20 +139,32 @@ a:hover {
    The `retro` command toggles .no-retro on <html> to turn it all off.
    ========================================================================== */
 
-/* Retro also swaps the page text to the IBM VGA pixel font, a size up from its native 16px
-   so it reads at the same size as Plex. The font has no bold, and the browser's fake one
-   smears each glyph by a fraction of a pixel, which blurs under the fringe; bold text gets a
-   whole-pixel double strike instead (below).
+/* Retro also swaps the page text to the IBM VGA pixel font. It's drawn on an 8x16 pixel grid
+   and only looks sharp when each of its pixels lands on whole screen pixels, so:
+   - its size is 16 screen pixels, or 32 on a 2x screen (--pxu is one font pixel, set by the
+     script in index.html from the screen's pixel ratio; 1px if that script never ran);
+   - no fake bold (the browser smears glyphs by a fraction of a pixel) and no justified text
+     (stretched spaces put words between pixels): bold reads by colour, as on a DOS screen;
+   - the script also nudges the page column onto whole screen pixels.
    Turning retro off regenerates the text in Plex block by block (see toggleRetro in js/terminal.js). */
 html:not(.no-retro) {
   --text: var(--px);
-  --fs: 18px;
+  --fs: calc(16 * var(--pxu));
+  /* 90 characters on a 1x screen; fixed so the column doesn't narrow where the font is set smaller. */
+  --column: 720px;
   font-synthesis: none;
 }
 
-/* Small grey text drops to the font's native 16px rather than a blurry 13-14px. */
+html:not(.no-retro) body { line-height: calc(24 * var(--pxu)); }
+
+html:not(.no-retro) :is(p, li) { text-align: start; }
+
+/* The prompt's sliver of space after > would put the command between pixels. */
+html:not(.no-retro) .ps { margin-right: 0; }
+
+/* Small grey text stays at the full size: smaller would land between pixels. */
 html:not(.no-retro) :is(.tags, #shortcuts button, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
-  font-size: 16px;
+  font-size: calc(16 * var(--pxu));
 }
 
 html:not(.no-retro) body::before,
@@ -174,47 +188,26 @@ html:not(.no-retro) body::after {
   animation: crt-roll 12s linear infinite;
 }
 
-/* Buttons and inputs don't inherit text-shadow by default; the commands are buttons. */
-button,
-input { text-shadow: inherit; }
-
-html:not(.no-retro) body {
-  text-shadow: -.75px 0 rgba(255, 40, 80, .45), .75px 0 rgba(40, 200, 255, .45);
-}
-
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
   html:not(.no-retro) body::before {
     background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .1) 0 1px, transparent 1px 3px);
   }
+}
 
-  /* Whole-pixel offsets: half a pixel on the pixel font smudges every stroke. */
-  html:not(.no-retro) body {
-    text-shadow: -1px 0 rgba(255, 40, 80, .45), 1px 0 rgba(40, 200, 255, .45);
-  }
+/* Buttons and inputs don't inherit text-shadow by default; the commands are buttons. */
+button,
+input { text-shadow: inherit; }
 
-  html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
-    text-shadow: -1px 0 rgba(255, 40, 80, .35), 1px 0 rgba(40, 200, 255, .35);
-  }
+/* The RGB fringe: exactly one screen pixel (--dpx) each side, faint, so it tints the edges of
+   each stroke without smearing them. */
+html:not(.no-retro) body {
+  text-shadow: calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, .3), var(--dpx) 0 rgba(40, 200, 255, .3);
 }
 
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
 html:not(.no-retro) body:has(#lightbox.is-open)::before {
   background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 1px, transparent 1px 3px);
-}
-
-/* Grey text is thin enough that the full fringe swamps it; give it a lighter one. */
-@media (max-width: 640px) {
-  html:not(.no-retro) :is(.dim, .tags, #shortcuts button, .row .key, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
-    text-shadow: -.75px 0 rgba(255, 40, 80, .35), .75px 0 rgba(40, 200, 255, .35);
-  }
-}
-
-/* Bold in retro: the glyph struck twice a pixel apart, as on a DOS screen, with the fringe
-   moved out a pixel to match, and the letters spaced out so the strokes don't run together. */
-html:not(.no-retro) :is(b, strong, h1, h2, h3) {
-  letter-spacing: .1em;
-  text-shadow: 1px 0 currentColor, -1px 0 rgba(255, 40, 80, .4), 2px 0 rgba(40, 200, 255, .4);
 }
 
 @keyframes crt-flicker {
@@ -265,7 +258,7 @@ html:not(.no-retro) :is(b, strong, h1, h2, h3) {
 }
 
 /* In retro: an 8x15 cell for Plex's 7.8x14.95 (see .chrome-art). */
-html:not(.no-retro) .name-art { font: 400 16px/15px var(--px); }
+html:not(.no-retro) .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(--px); }
 
 .accent { color: var(--accent); }
 
@@ -408,7 +401,7 @@ button.cmd:hover { color: var(--accent); }
 /* Retro draws the art in the pixel font too. Its characters are 0.5em wide to Plex's 0.6em,
    so 16px (the font's native size, so it stays sharp) on a 13px line gives an 8x13 cell:
    Plex's 7.8x13 within 3%, so the art keeps its shape. */
-html:not(.no-retro) .chrome-art { font: 400 16px/13px var(--px); }
+html:not(.no-retro) .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--px); }
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
    are no per-character spans: mid tones rose, the faint glyphs inside the shape
@@ -689,8 +682,6 @@ html:not(.no-retro) .gate-art { font-family: var(--px); }
   :root { --gutter: 1rem; }
 
   :root { --fs: 14px; }
-  /* Retro on a phone: the pixel font's native size, for more characters per line. */
-  html:not(.no-retro) { --fs: 16px; }
 
   .row {
     grid-template-columns: 1fr;
