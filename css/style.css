@@ -56,10 +56,10 @@
 
 :root {
   --bg: #0b0b0b;
-  /* Text a step softer than full white. Contrast on --bg: --bright 14.9:1, --ink 11:1,
+  /* Text a step softer than full white. Contrast on --bg: --bright 13:1, --ink 9.9:1,
      --dim 4.7:1 (above the WCAG AA minimum of 4.5:1 for body text). */
-  --ink: #c2c2c2;
-  --bright: #e0e0e0;
+  --ink: #b8b8b8;
+  --bright: #d2d2d2;
   --dim: #7c7c7c;
   --line: #262626;
   --accent: #e5484d;
@@ -73,11 +73,13 @@
   --fs: 15px;
   --lh: calc(19 / 15);        /* 19px at 15px */
   /* Spacing: whole lines of text, so everything sits on the same line grid, as in a terminal.
-     0 between the lines of one item (a name and its subtitle, a project's title, text and tags),
-     --gap (one blank line) between blocks, --gap-2 (two) between commands and between projects. */
+  /* Spacing, in even half-line steps: --gap-s (half a line) between the lines of one item (a name
+     and its subtitle, a project's title, text and tags, a label and what it labels), --gap (one
+     line) between blocks, --gap-2 (a line and a half) between commands and between projects. */
   --text-line: calc(var(--fs) * var(--lh));
+  --gap-s: calc(var(--text-line) / 2);
   --gap: var(--text-line);
-  --gap-2: calc(2 * var(--text-line));
+  --gap-2: calc(1.5 * var(--text-line));
   --pxu: 1px;   /* one pixel of the retro font; see index.html */
   --dpx: 1px;   /* one screen pixel */
 
@@ -140,8 +142,8 @@ b { font-weight: 600; color: var(--bright); }
    and the lightbox caption stays centred under the photo. */
 p:not(.tags, .lightbox-caption), li { text-align: justify; }
 
-/* The subtitle is part of the name's item: no gap. */
-h1 + p { margin-top: 0 !important; }
+/* The subtitle belongs to the name. */
+h1 + p { margin-top: var(--gap-s) !important; }
 
 code { font: inherit; color: var(--ink); }
 
@@ -463,6 +465,7 @@ html:not(.no-retro) .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(
 .output > h2 { display: none; }
 
 article + article { margin-top: var(--gap-2); }
+article > * + * { margin-top: var(--gap-s); }
 
 .tags { color: var(--dim); font-size: .87rem; }
 .tags a { margin-left: 1ch; }
@@ -481,7 +484,11 @@ article + article { margin-top: var(--gap-2); }
 
 .row button.key { color: var(--ink); }
 .row button.key:hover { color: var(--accent); }
-.output > .row + .row { margin-top: var(--gap); }
+.row > div > * + * { margin-top: var(--gap-s); }
+/* Key/value lists (skills, certs, contact) are one item per row: half a line apart.
+   Experience entries are blocks of their own (a title and a paragraph): a full line. */
+.output > .row + .row { margin-top: var(--gap-s); }
+.output > .row:has(> div) + .row { margin-top: var(--gap); }
 /* help's command list reads like ls: one line each. */
 .output.list > .row + .row { margin-top: 0; }
 
@@ -553,6 +560,8 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 
 /* The "Featured" strip under whoami: wider 16:10 thumbs, so the first
    screen shows real builds before anyone types a command. */
+/* "Featured:" labels the strip, so it sits with it. */
+.output > * + .thumbs.featured { margin-top: var(--gap-s); }
 .thumbs.featured figure { width: 180px; cursor: pointer; }
 .thumbs.featured figure > :is(img, video) { cursor: pointer; }
 
@@ -724,7 +733,7 @@ html:not(.no-retro) .gate-art { font-family: var(--px); }
 
   .row {
     grid-template-columns: 1fr;
-    gap: 0;
+    gap: var(--gap-s);
   }
 
   #shortcuts { justify-content: flex-start; }
