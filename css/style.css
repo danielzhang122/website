@@ -73,6 +73,8 @@
   --fs: 15px;
   --lh: calc(19 / 15);        /* 19px at 15px */
   /* Spacing: whole lines of text, so everything sits on the same line grid, as in a terminal.
+  /* One size and one line height for all text, as in a terminal: nothing sets its own
+     (only the ASCII art, whose grids need theirs). */
   /* Spacing, in even half-line steps: --gap-s (half a line) between the lines of one item (a name
      and its subtitle, a project's title, text and tags, a label and what it labels), --gap (one
      line) between blocks, --gap-2 (a line and a half) between commands and between projects. */
@@ -138,9 +140,6 @@ h3 {
 b { font-weight: 600; color: var(--bright); }
 
 .dim { color: var(--dim); }
-/* Paragraphs and list items justified, like a Word document; the last line of each stays left. Tag lines stay ragged,
-   and the lightbox caption stays centred under the photo. */
-p:not(.tags, .lightbox-caption), li { text-align: justify; }
 
 /* The subtitle belongs to the name. */
 h1 + p { margin-top: var(--gap-s) !important; }
@@ -170,8 +169,8 @@ a:hover {
    pixel grid and only looks sharp when each of its pixels lands on whole screen pixels, so:
    - its size is 16 screen pixels, or 32 on a 2x screen (--pxu is one font pixel, set by the
      script in index.html from the screen's pixel ratio; 1px if that script never ran);
-   - no fake bold (the browser smears glyphs by a fraction of a pixel) and no justified text
-     (stretched spaces put words between pixels): bold reads by colour, as on a DOS screen;
+   - no fake bold (the browser smears glyphs by a fraction of a pixel): bold reads by colour,
+     as on a DOS screen;
    - the script also nudges the page column onto whole screen pixels.
    Turning retro off regenerates the text in JetBrains Mono block by block (see toggleRetro in js/terminal.js). */
 html:not(.no-retro) {
@@ -183,7 +182,6 @@ html:not(.no-retro) {
 html:not(.no-retro) { --text-line: calc(24 * var(--pxu)); }
 html:not(.no-retro) body { line-height: var(--text-line); }
 
-html:not(.no-retro) :is(p, li) { text-align: start; }
 
 /* The prompt's sliver of space after > would put the command between pixels. */
 html:not(.no-retro) .ps { margin-right: 0; }
@@ -191,11 +189,6 @@ html:not(.no-retro) .ps { margin-right: 0; }
 /* 1.5ch between command buttons is half a pixel on the 9px-wide font; round it to 2ch. */
 html:not(.no-retro) button.cmd + button.cmd { margin-left: 2ch; }
 html:not(.no-retro) .banner button.cmd + button.cmd { margin-left: 0; }
-
-/* Small grey text stays at the full size: smaller would land between pixels. */
-html:not(.no-retro) :is(.tags, #shortcuts button, .thumbs figcaption, .gate-hint, .lightbox-caption, .lightbox-count) {
-  font-size: calc(16 * var(--pxu));
-}
 
 /* .crt-leaving keeps the overlay up while a sweep takes it away (see sweep in js/terminal.js). */
 :is(html:not(.no-retro), html.crt-leaving) body::before,
@@ -395,7 +388,7 @@ button.cmd {
   cursor: pointer;
 }
 
-#shortcuts button { color: var(--dim); font-size: .87rem; }
+#shortcuts button { color: var(--dim); }
 #shortcuts button:hover,
 button.cmd:hover { color: var(--accent); }
 
@@ -467,7 +460,7 @@ html:not(.no-retro) .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(
 article + article { margin-top: var(--gap-2); }
 article > * + * { margin-top: var(--gap-s); }
 
-.tags { color: var(--dim); font-size: .87rem; }
+.tags { color: var(--dim); }
 .tags a { margin-left: 1ch; }
 
 /* key / value lines: experience dates, skill groups, help */
@@ -547,10 +540,8 @@ article > * + * { margin-top: var(--gap-s); }
 .thumbs figure { width: 120px; }
 
 .thumbs figcaption {
-  margin-top: calc(var(--text-line) / 4);   /* a caption belongs to its picture */
+  margin-top: var(--gap-s);
   color: var(--dim);
-  font-size: .75rem;
-  line-height: 1.4;
 }
 
 /* Inline command links in a sentence ("More: projects  misc") need a gap. */
@@ -642,7 +633,6 @@ html:not(.no-retro) .gate-art { font-family: var(--px); }
   right: 1.5rem;
   bottom: 1.25rem;
   color: var(--dim);
-  font-size: .75rem;
 }
 
 /* Touchscreens have no Esc key: show the tap wording instead. */
@@ -686,7 +676,6 @@ html:not(.no-retro) .gate-art { font-family: var(--px); }
 .lightbox-caption {
   max-width: 640px;
   color: var(--dim);
-  font-size: .85rem;
   text-align: center;
 }
 
@@ -698,10 +687,7 @@ html:not(.no-retro) .gate-art { font-family: var(--px); }
 
 .lightbox-caption a { margin-left: 1ch; }
 
-.lightbox-count {
-  color: var(--dim);
-  font-size: .75rem;
-}
+.lightbox-count { color: var(--dim); }
 
 .lightbox-nav {
   position: absolute;
@@ -711,7 +697,7 @@ html:not(.no-retro) .gate-art { font-family: var(--px); }
   border: 1px solid var(--line);
   background: var(--bg);
   color: var(--ink);
-  font: 1.25rem/1 var(--mono);
+  font: inherit;
   cursor: pointer;
   transform: translateY(-50%);
 }
