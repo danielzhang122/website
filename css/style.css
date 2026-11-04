@@ -1,6 +1,6 @@
 /* ==========================================================================
-   Fonts: Cascadia Mono, Windows Terminal's font (Microsoft, SIL Open Font License; see
-   fonts/cascadia-mono-LICENSE.txt), latin + latin-ext subsets via Fontsource,
+   Fonts: JetBrains Mono (SIL Open Font License; see fonts/jetbrains-mono-LICENSE.txt),
+   latin + latin-ext subsets via Fontsource,
    and, for retro mode, IBM VGA 9x16 (text) and 8x16 (ASCII art) from VileR's Ultimate
    Oldschool PC Font Pack, CC BY-SA 4.0; see fonts/px437-LICENSE.txt
    ========================================================================== */
@@ -22,31 +22,31 @@
 }
 
 @font-face {
-  font-family: 'Cascadia Mono';
+  font-family: 'JetBrains Mono';
   font-weight: 400;
   font-display: swap;
-  src: url(../fonts/cascadia-mono-400-latin.woff2) format('woff2');
+  src: url(../fonts/jetbrains-mono-400-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Cascadia Mono';
+  font-family: 'JetBrains Mono';
   font-weight: 400;
   font-display: swap;
-  src: url(../fonts/cascadia-mono-400-latin-ext.woff2) format('woff2');
+  src: url(../fonts/jetbrains-mono-400-latin-ext.woff2) format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 @font-face {
-  font-family: 'Cascadia Mono';
+  font-family: 'JetBrains Mono';
   font-weight: 700;
   font-display: swap;
-  src: url(../fonts/cascadia-mono-700-latin.woff2) format('woff2');
+  src: url(../fonts/jetbrains-mono-700-latin.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
-  font-family: 'Cascadia Mono';
+  font-family: 'JetBrains Mono';
   font-weight: 700;
   font-display: swap;
-  src: url(../fonts/cascadia-mono-700-latin-ext.woff2) format('woff2');
+  src: url(../fonts/jetbrains-mono-700-latin-ext.woff2) format('woff2');
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 
@@ -62,18 +62,14 @@
   --line: #262626;
   --accent: #e5484d;
 
-  --mono: 'Cascadia Mono', Consolas, ui-monospace, Menlo, monospace;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
   --px: 'Px437 IBM VGA', var(--mono);
   --px-text: 'IBM VGA 9x16', var(--px);
   --text: var(--mono);
-  /* Windows Terminal's default text grid: Cascadia Mono at 16px in 9x19px cells. The font's own
-     advance is 9.375px, so letter-spacing trims it to the terminal's whole-pixel 9. */
-  --fs: 16px;
-  --lh: 1.1875;               /* 19px at 16px */
-  --ls: -0.0234375em;         /* 9.375px -> 9px at 16px */
-  /* The ASCII art's grids are built for 0.6em-wide characters (7.8px at 13px): Cascadia is
-     0.5859em, so the art gets the difference back. The retro font needs none. */
-  --art-ls: 0.0140625em;
+  /* A terminal's text grid: 9x19px cells, as in Windows Terminal. JetBrains Mono is 0.6em
+     wide, so 15px gives the 9px columns on its own. */
+  --fs: 15px;
+  --lh: calc(19 / 15);        /* 19px at 15px */
   --pxu: 1px;   /* one pixel of the retro font; see index.html */
   --dpx: 1px;   /* one screen pixel */
 
@@ -92,13 +88,16 @@
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  /* JetBrains Mono's code ligatures would merge => and == into single glyphs, the ASCII art's
+     included. Important, as any font shorthand (the art uses them) resets these. */
+  font-variant-ligatures: none !important;
+  font-feature-settings: 'calt' 0 !important;
 }
 
 body {
   background: var(--bg);
   color: var(--ink);
   font: 400 var(--fs)/var(--lh) var(--text);
-  letter-spacing: var(--ls);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -164,12 +163,10 @@ a:hover {
    - no fake bold (the browser smears glyphs by a fraction of a pixel) and no justified text
      (stretched spaces put words between pixels): bold reads by colour, as on a DOS screen;
    - the script also nudges the page column onto whole screen pixels.
-   Turning retro off regenerates the text in Cascadia block by block (see toggleRetro in js/terminal.js). */
+   Turning retro off regenerates the text in JetBrains Mono block by block (see toggleRetro in js/terminal.js). */
 html:not(.no-retro) {
   --text: var(--px-text);
   --fs: calc(16 * var(--pxu));
-  --ls: 0;
-  --art-ls: 0;
   font-synthesis: none;
 }
 
@@ -276,7 +273,6 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
   margin: 0;
   color: var(--ink);
   font: 400 13px/1.15 var(--mono);
-  letter-spacing: var(--art-ls);
   white-space: pre;
 }
 
@@ -415,7 +411,6 @@ button.cmd:hover { color: var(--accent); }
   max-width: 100%;
   margin: 0 auto 1.5rem;
   font: 400 13px/1 var(--mono);
-  letter-spacing: var(--art-ls);
   color: var(--ink);
   contain: content;
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
@@ -607,7 +602,6 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   color: var(--ink);
   font-family: var(--mono);
   line-height: 1.15;
-  letter-spacing: var(--art-ls);
   white-space: pre;
 }
 

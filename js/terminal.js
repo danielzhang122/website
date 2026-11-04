@@ -269,7 +269,7 @@
   }
 
   // Turning retro off doesn't swap the font in one go: a sweep runs down the page, and as
-  // it reaches each block of text, the block switches to Cascadia and its characters regenerate,
+  // it reaches each block of text, the block switches to JetBrains Mono and its characters regenerate,
   // like rm -rf / in reverse: each one starts as a dot, flickers through scrambled glyphs and
   // settles, in random order.
   let pxTimers = [];
@@ -409,7 +409,7 @@
 
     // The art is drawn for 13px characters; when the console is too narrow for the
     // row of three (phones), the glyphs stack vertically.
-    // The art's cell width at 13px (Cascadia plus --art-ls), or the pixel font's at 16px in retro (see .name-art).
+    // JetBrains Mono's advance width at 13px, or the pixel font's at 16px in retro (see .name-art).
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
     const charW = document.documentElement.classList.contains('no-retro') ? 13 * 0.6 : 8 * pxu;
     const vertical = screen.clientWidth < art.nameArt().cols * charW;

@@ -269,8 +269,7 @@
       pre.style.lineHeight = '';
     }
     // Fixed to the full art width, so the drawing stays centred while it fills in.
-    // (Cascadia's cells are 0.6em with the art's letter-spacing, which ch doesn't count.)
-    pre.style.width = retro() ? `${art.cols}ch` : `${art.cols * 0.6}em`;
+    pre.style.width = `${art.cols}ch`;
     window.snapPixels?.();
   }
 
@@ -325,7 +324,7 @@
 
   // Wait for the mono font so the characters measure right; don't hang if it never comes.
   Promise.race([
-    document.fonts.load(retro() ? "16px 'Px437 IBM VGA'" : "14px 'Cascadia Mono'"),
+    document.fonts.load(retro() ? "16px 'Px437 IBM VGA'" : "14px 'JetBrains Mono'"),
     new Promise((resolve) => setTimeout(resolve, 600)),
   ]).finally(() => {
     build();
