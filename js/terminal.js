@@ -239,7 +239,7 @@
 
   function printHelp() {
     const list = document.createElement('div');
-    list.className = 'output';
+    list.className = 'output list';
     for (const [name, { help }] of Object.entries(COMMANDS)) {
       const row = document.createElement('div');
       row.className = 'row';

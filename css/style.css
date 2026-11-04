@@ -70,6 +70,12 @@
      wide, so 15px gives the 9px columns on its own. */
   --fs: 15px;
   --lh: calc(19 / 15);        /* 19px at 15px */
+  /* Spacing: whole lines of text, so everything sits on the same line grid, as in a terminal.
+     0 between the lines of one item (a name and its subtitle, a project's title, text and tags),
+     --gap (one blank line) between blocks, --gap-2 (two) between commands and between projects. */
+  --line: calc(var(--fs) * var(--lh));
+  --gap: var(--line);
+  --gap-2: calc(2 * var(--line));
   --pxu: 1px;   /* one pixel of the retro font; see index.html */
   --dpx: 1px;   /* one screen pixel */
 
@@ -132,7 +138,7 @@ b { font-weight: 600; color: var(--bright); }
    and the lightbox caption stays centred under the photo. */
 p:not(.tags, .lightbox-caption), li { text-align: justify; }
 
-/* The subtitle sits tight under the name. */
+/* The subtitle is part of the name's item: no gap. */
 h1 + p { margin-top: 0 !important; }
 
 code { font: inherit; color: var(--ink); }
@@ -170,7 +176,8 @@ html:not(.no-retro) {
   font-synthesis: none;
 }
 
-html:not(.no-retro) body { line-height: calc(24 * var(--pxu)); }
+html:not(.no-retro) { --line: calc(24 * var(--pxu)); }
+html:not(.no-retro) body { line-height: var(--line); }
 
 html:not(.no-retro) :is(p, li) { text-align: start; }
 
@@ -260,15 +267,15 @@ html:not(.no-retro) [data-retro-label="off"] { display: none; }
   max-width: calc(var(--column) + 2 * var(--gutter));
   margin: 0 auto;
   /* Room at the bottom so the prompt never hides behind the shortcut bar. */
-  padding: 2.5rem var(--gutter) 6rem;
+  padding: var(--gap-2) var(--gutter) 6rem;
 }
 
-#screen > * + * { margin-top: 1rem; }
+#screen > * + * { margin-top: var(--gap); }
 
-.output > * + * { margin-top: .9rem; }
+.output > * + * { margin-top: var(--gap); }
 
 .cmdline {
-  margin-top: 1.75rem !important;
+  margin-top: var(--gap-2) !important;
   color: var(--bright);
 }
 
@@ -308,7 +315,7 @@ html:not(.no-retro) .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--
 #prompt {
   display: flex;
   gap: 1ch;
-  margin-top: 1.75rem;
+  margin-top: var(--gap-2);
 }
 
 .input-wrap {
@@ -420,7 +427,7 @@ button.cmd:hover { color: var(--accent); }
   overflow: hidden;
   width: max-content;
   max-width: 100%;
-  margin: 0 auto 1.5rem;
+  margin: 0 auto var(--gap-2);
   font: 400 13px/1 var(--mono);
   color: var(--ink);
   contain: content;
@@ -447,14 +454,13 @@ html:not(.no-retro) .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(
 .chrome-mid { color: color-mix(in srgb, var(--accent) 70%, var(--ink)); }
 .chrome-red { color: var(--accent); }
 
-.banner > div > * + * { margin-top: .9rem; }
+.banner > div > * + * { margin-top: var(--gap); }
 
 /* The command line already names the section, so printed copies drop the heading.
    The no-JS README keeps them. */
 .output > h2 { display: none; }
 
-article + article { margin-top: 2rem; }
-article > * + * { margin-top: .4rem; }
+article + article { margin-top: var(--gap-2); }
 
 .tags { color: var(--dim); font-size: .87rem; }
 .tags a { margin-left: 1ch; }
@@ -473,13 +479,14 @@ article > * + * { margin-top: .4rem; }
 
 .row button.key { color: var(--ink); }
 .row button.key:hover { color: var(--accent); }
-.row > div > * + * { margin-top: .2rem; }
-.output > .row + .row { margin-top: .6rem; }
+.output > .row + .row { margin-top: var(--gap); }
+/* help's command list reads like ls: one line each. */
+.output.list > .row + .row { margin-top: 0; }
 
 .thumb {
   width: fit-content;
   max-width: min(420px, 100%);
-  margin-top: .75rem !important;
+  margin-top: var(--gap) !important;
   cursor: zoom-in;
 }
 
@@ -498,7 +505,7 @@ article > * + * { margin-top: .4rem; }
 .thumbs {
   display: flex;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: var(--gap);
 }
 
 .thumbs > :is(img, video),
@@ -531,7 +538,7 @@ article > * + * { margin-top: .4rem; }
 .thumbs figure { width: 120px; }
 
 .thumbs figcaption {
-  margin-top: .3rem;
+  margin-top: calc(var(--line) / 4);   /* a caption belongs to its picture */
   color: var(--dim);
   font-size: .75rem;
   line-height: 1.4;
@@ -548,7 +555,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 .thumbs.featured figure > :is(img, video) { cursor: pointer; }
 
 /* A project jumped to from Featured flashes briefly. */
-[data-id] { scroll-margin-top: 1.5rem; }
+[data-id] { scroll-margin-top: var(--gap-2); }
 .is-shown { animation: shown 1.6s ease-out; }
 
 @keyframes shown {
@@ -577,11 +584,11 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 .no-js #content {
   max-width: calc(var(--column) + 2 * var(--gutter));
   margin: 0 auto;
-  padding: 2.5rem var(--gutter) 4rem;
+  padding: var(--gap-2) var(--gutter) 4rem;
 }
 
-.no-js #content > * + * { margin-top: 2.5rem; }
-.no-js #content section > * + * { margin-top: .9rem; }
+.no-js #content > * + * { margin-top: var(--gap-2); }
+.no-js #content section > * + * { margin-top: var(--gap); }
 
 
 /* ==========================================================================
@@ -715,7 +722,7 @@ html:not(.no-retro) .gate-art { font-family: var(--px); }
 
   .row {
     grid-template-columns: 1fr;
-    gap: .1rem;
+    gap: 0;
   }
 
   #shortcuts { justify-content: flex-start; }
@@ -723,7 +730,6 @@ html:not(.no-retro) .gate-art { font-family: var(--px); }
   /* 72 characters at 13px is wider than a phone; the banner art is decoration only (typed eggs still show, clipped). */
   #console > .chrome-art { display: none; }
 
-  .thumbs { gap: .6rem; }
 
   .thumbs > :is(img, video),
   .thumbs figure > :is(img, video),
@@ -737,7 +743,7 @@ html:not(.no-retro) .gate-art { font-family: var(--px); }
   .thumbs.whole > :is(img, video) { width: auto; height: 110px; }
 
   /* Two across on a phone; the third wraps underneath. */
-  .thumbs.featured figure { width: calc(50% - .3rem); }
+  .thumbs.featured figure { width: calc(50% - var(--gap) / 2); }
   .thumbs.featured figure > :is(img, video) { width: 100%; height: auto; }
 }
 
