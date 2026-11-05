@@ -271,8 +271,8 @@ html.vga .banner button.cmd + button.cmd { margin-left: 0; }
    Cascadia's smoother, heavier strokes hold up to a stronger one. */
 html {
   --scan: .16;       /* scanline darkness */
-  --streak: .05;     /* rolling streak brightness */
-  --streak-trail: .025; /* the fainter streak trailing it */
+  --streak: .03;     /* rolling streak brightness */
+  --streak-trail: .015; /* the fainter streak trailing it */
   --fringe: .2;      /* RGB fringe opacity */
   --glare: .2;       /* horizontal glare strength, near the text; superhot has its own */
   /* In each text's own colour, stronger the redder it is, as red is darker and would barely show. */
@@ -331,9 +331,10 @@ html:not(.no-retro) body::after {
   bottom: auto;
   /* Rolls downward, so the trail is the upper band: 25vh of trail, 5vh of gap, 40vh of streak. */
   height: 70vh;
+  /* Bell-shaped, not a straight fade to a peak, which reads as a hard line across the screen. */
   background:
-    linear-gradient(transparent, rgba(255, 255, 255, var(--streak)), transparent) bottom / 100% 40vh no-repeat,
-    linear-gradient(transparent, rgba(255, 255, 255, var(--streak-trail)), transparent) top / 100% 25vh no-repeat;
+    linear-gradient(transparent, rgba(255, 255, 255, calc(var(--streak) * .2)) 15%, rgba(255, 255, 255, calc(var(--streak) * .65)) 30%, rgba(255, 255, 255, calc(var(--streak) * 1)) 50%, rgba(255, 255, 255, calc(var(--streak) * .65)) 70%, rgba(255, 255, 255, calc(var(--streak) * .2)) 85%, transparent) bottom / 100% 40vh no-repeat,
+    linear-gradient(transparent, rgba(255, 255, 255, calc(var(--streak-trail) * .2)) 15%, rgba(255, 255, 255, calc(var(--streak-trail) * .65)) 30%, rgba(255, 255, 255, calc(var(--streak-trail) * 1)) 50%, rgba(255, 255, 255, calc(var(--streak-trail) * .65)) 70%, rgba(255, 255, 255, calc(var(--streak-trail) * .2)) 85%, transparent) top / 100% 25vh no-repeat;
   animation: crt-roll 14.6s linear infinite; /* the same speed as 140vh in 12s */
 }
 
