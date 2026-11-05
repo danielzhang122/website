@@ -40,7 +40,28 @@
     retro: { help: 'toggle the crt screen effect', run: toggleRetro },
   };
   // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
-  const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume', hardware: 'misc' };
+  // The rest are words people try for a section.
+  const ALIASES = {
+    ls: 'help', '?': 'help', commands: 'help', menu: 'help',
+    about: 'whoami', me: 'whoami', bio: 'whoami', home: 'whoami',
+    cls: 'clear',
+    cv: 'resume', pdf: 'resume',
+    hardware: 'misc',
+    portfolio: 'projects', project: 'projects', builds: 'projects',
+    work: 'experience', jobs: 'experience', job: 'experience', education: 'experience', school: 'experience',
+    hobbies: 'interests',
+    skill: 'skills', tools: 'skills',
+    certifications: 'certs', certificates: 'certs',
+    paintings: 'art', drawings: 'art', carvings: 'art', artwork: 'art', gallery: 'art',
+    socials: 'contact', links: 'contact', connect: 'contact', reach: 'contact',
+    // The links in contact, printed on their own (see LINKS).
+    mail: 'email', 'e-mail': 'email', gmail: 'email', inbox: 'email',
+    gh: 'github', git: 'github', repos: 'github', code: 'github',
+    li: 'linkedin',
+  };
+
+  // Typing a link's name prints it: the contact section's row of that name (its .key).
+  const LINKS = { email: 'Email', github: 'GitHub', linkedin: 'LinkedIn' };
 
   // Easter eggs: work when typed, but stay out of help and tab completion.
   const HIDDEN = {
@@ -746,6 +767,13 @@
     return reveal(line);
   }
 
+  // email, github, linkedin: prints that row of the contact section, link and all.
+  function printLink(name) {
+    const row = [...content.querySelectorAll('.row')].find((r) => r.querySelector('.key')?.textContent.trim() === LINKS[name]);
+    if (!row) return printLine(`${name} is unavailable.`, 'dim');
+    return reveal(row.cloneNode(true));
+  }
+
   // Erases everything below the first whoami, which stays put, so the page never goes blank.
   async function clear() {
     stopPieces.splice(0).forEach((stop) => stop());
@@ -818,7 +846,7 @@
   function closest(word) {
     let best = null;
     let bestDistance = Infinity;
-    for (const candidate of [...Object.keys(COMMANDS), ...Object.keys(ALIASES)]) {
+    for (const candidate of [...Object.keys(COMMANDS), ...Object.keys(LINKS), ...Object.keys(ALIASES)]) {
       if (candidate.length < 3) continue;   // ls, cv and ? would swallow any short word
       const distance = editDistance(word, candidate);
       if (distance <= (candidate.length > 6 ? 2 : 1) && distance < bestDistance) {
@@ -851,9 +879,11 @@
 
     const word = text.toLowerCase().split(/\s+/)[0];
     const exact = ALIASES[word] || word;
-    const name = COMMANDS[exact] || HIDDEN[exact] ? exact : closest(word) || exact;
+    const name = COMMANDS[exact] || HIDDEN[exact] || LINKS[exact] ? exact : closest(word) || exact;
     const command = COMMANDS[name];
-    if (HIDDEN[name]) {
+    if (LINKS[name]) {
+      await printLink(name);
+    } else if (HIDDEN[name]) {
       await HIDDEN[name](line, text);
     } else if (command) {
       await command.run();
