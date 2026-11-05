@@ -304,6 +304,7 @@ html {
     24px 0 10px color-mix(in srgb, var(--glare-colour) 50%, transparent);
 }
 html.vga { --glare: .14; }
+html.plex { --glare: .16; }   /* retro's default font: a touch softer */
 html:not(.vga) { --fringe: .4; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
