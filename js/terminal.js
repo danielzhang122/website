@@ -629,7 +629,7 @@
   const CRUMBLE = 600;        // ms over which characters start crumbling, in random order
   const CRUMBLE_CELL = 100;   // ms each shows a dot before it's gone
 
-  async function crumble() {
+  async function crumbleScreen() {
     stopPieces.splice(0).forEach((stop) => stop());
     endSweep();   // so it crumbles the real text, not a half-regenerated one
     if (!restoring && !reduceMotion) {
@@ -649,6 +649,10 @@
       }
     }
     screen.replaceChildren();
+  }
+
+  async function crumble() {
+    await crumbleScreen();
     setHash('');
     ran = ['whoami'];
     saveSession();
@@ -656,14 +660,15 @@
     await printLine('just kidding.', 'dim');
   }
 
-  // Easter egg: a fresh visit, intro and all.
-  function exit() {
+  // Easter egg: a fresh visit, intro and all, after the screen crumbles away.
+  async function exit() {
     try {
       sessionStorage.removeItem('gate');
       sessionStorage.removeItem(SESSION_KEY);
     } catch {
       // storage blocked: the reload starts fresh anyway
     }
+    await crumbleScreen();
     location.reload();
     // Never resolves, so run() can't save the session again before the page goes.
     return new Promise(() => {});
