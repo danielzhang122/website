@@ -194,7 +194,7 @@ a:hover {
 
 
 /* ==========================================================================
-   CRT: scanlines, a faint flicker, a rolling streak and a hint of RGB fringe. The `retro`
+   CRT: scanlines, a tube-glass vignette, a faint flicker, a rolling streak, RGB fringe and phosphor glow. The `retro`
    command toggles .no-retro on <html> to turn them off. Each mode also keeps its own page font
    (.plex or .vga on <html>, or neither for Cascadia; see setFont in js/terminal.js).
    ========================================================================== */
@@ -235,19 +235,20 @@ html.vga .banner button.cmd + button.cmd { margin-left: 0; }
 /* The effect's strength. The VGA font's 1px strokes take only a lighter fringe (see below);
    Cascadia's smoother, heavier strokes hold up to a stronger one. */
 html {
-  --scan: .08;       /* scanline darkness */
-  --streak: .02;     /* rolling streak brightness */
+  --scan: .16;       /* scanline darkness */
+  --streak: .05;     /* rolling streak brightness */
   --fringe: .2;      /* RGB fringe opacity */
+  --glow: 35%;       /* phosphor glow strength */
 }
-html:not(.vga) { --fringe: .3; }
+html:not(.vga) { --fringe: .4; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
-  html { --scan: .1; }
+  html { --scan: .22; }
 }
 /* The fringe is one screen pixel, a third as wide on a 3x phone as on a desktop; make it bolder there. */
 @media (max-width: 640px) {
   html { --fringe: .3; }
-  html:not(.vga) { --fringe: .45; }
+  html:not(.vga) { --fringe: .55; }
 }
 
 /* .crt-leaving keeps the overlay up while a sweep takes it away (see sweep in js/terminal.js). */
@@ -261,7 +262,9 @@ html:not(.vga) { --fringe: .3; }
 }
 
 :is(html:not(.no-retro), html.crt-leaving) body::before {
-  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 1px, transparent 1px 3px);
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 60%, rgba(0, 0, 0, .4));
   animation: crt-flicker 4s steps(1) infinite;
 }
 
@@ -278,9 +281,13 @@ input { text-shadow: inherit; }
 
 /* The RGB fringe: exactly one screen pixel (--dpx) each side, faint, so it tints the edges of
    each stroke without smearing them. On the VGA font it's kept at .2: at .3 it doubles the width
-   of the font's 1px strokes and grey text reads as smudged bold. */
+   of the font's 1px strokes and grey text reads as smudged bold. The glow takes each text's own
+   colour, so red stays red. */
 html:not(.no-retro) body {
-  text-shadow: calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)), var(--dpx) 0 rgba(40, 200, 255, var(--fringe));
+  text-shadow:
+    calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
+    var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
+    0 0 6px color-mix(in srgb, currentColor var(--glow), transparent);
 }
 
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
