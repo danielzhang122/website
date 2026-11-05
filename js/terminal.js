@@ -40,7 +40,28 @@
     retro: { help: 'toggle the crt screen effect', run: toggleRetro },
   };
   // hardware was misc's old name; kept so old #hardware links and saved sessions still work.
-  const ALIASES = { ls: 'help', '?': 'help', about: 'whoami', cls: 'clear', cv: 'resume', hardware: 'misc' };
+  // The rest are words people try for a section.
+  const ALIASES = {
+    ls: 'help', '?': 'help', commands: 'help', menu: 'help',
+    about: 'whoami', me: 'whoami', bio: 'whoami', home: 'whoami',
+    cls: 'clear',
+    cv: 'resume', pdf: 'resume',
+    hardware: 'misc',
+    portfolio: 'projects', project: 'projects', builds: 'projects',
+    work: 'experience', jobs: 'experience', job: 'experience', education: 'experience', school: 'experience',
+    hobbies: 'interests',
+    skill: 'skills', tools: 'skills',
+    certifications: 'certs', certificates: 'certs',
+    paintings: 'art', drawings: 'art', carvings: 'art', artwork: 'art', gallery: 'art',
+    socials: 'contact', links: 'contact', connect: 'contact', reach: 'contact',
+    // The links in contact, opened straight away (see LINKS).
+    mail: 'email', 'e-mail': 'email', gmail: 'email', inbox: 'email',
+    gh: 'github', git: 'github', repos: 'github', code: 'github',
+    li: 'linkedin',
+  };
+
+  // Typing a link's name opens it: the contact section's row of that name (its .key).
+  const LINKS = { email: 'Email', github: 'GitHub', linkedin: 'LinkedIn' };
 
   // Easter eggs: work when typed, but stay out of help and tab completion.
   const HIDDEN = {
@@ -746,6 +767,22 @@
     return reveal(line);
   }
 
+  // email, github, linkedin: opens the contact link (mail in the mail app, the rest in a new tab) and
+  // prints it, so it's there to click if a popup blocker stops the tab. Not opened again on a refresh.
+  function openLink(name) {
+    const row = [...content.querySelectorAll('.row')].find((r) => r.querySelector('.key')?.textContent.trim() === LINKS[name]);
+    const source = row?.querySelector('a');
+    if (!source) return printLine(`${name} is unavailable.`, 'dim');
+    const link = source.cloneNode(true);
+    const line = document.createElement('p');
+    line.append(link.href.startsWith('mailto:') ? 'opening mail to ' : 'opening ', link);
+    if (!restoring) {
+      if (link.href.startsWith('mailto:')) location.href = link.href;
+      else window.open(link.href, '_blank', 'noopener');
+    }
+    return reveal(line);
+  }
+
   // Erases everything below the first whoami, which stays put, so the page never goes blank.
   async function clear() {
     stopPieces.splice(0).forEach((stop) => stop());
@@ -818,7 +855,7 @@
   function closest(word) {
     let best = null;
     let bestDistance = Infinity;
-    for (const candidate of [...Object.keys(COMMANDS), ...Object.keys(ALIASES)]) {
+    for (const candidate of [...Object.keys(COMMANDS), ...Object.keys(LINKS), ...Object.keys(ALIASES)]) {
       if (candidate.length < 3) continue;   // ls, cv and ? would swallow any short word
       const distance = editDistance(word, candidate);
       if (distance <= (candidate.length > 6 ? 2 : 1) && distance < bestDistance) {
@@ -851,9 +888,11 @@
 
     const word = text.toLowerCase().split(/\s+/)[0];
     const exact = ALIASES[word] || word;
-    const name = COMMANDS[exact] || HIDDEN[exact] ? exact : closest(word) || exact;
+    const name = COMMANDS[exact] || HIDDEN[exact] || LINKS[exact] ? exact : closest(word) || exact;
     const command = COMMANDS[name];
-    if (HIDDEN[name]) {
+    if (LINKS[name]) {
+      await openLink(name);
+    } else if (HIDDEN[name]) {
       await HIDDEN[name](line, text);
     } else if (command) {
       await command.run();
