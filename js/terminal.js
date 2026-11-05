@@ -317,7 +317,10 @@
   const REGEN_CELL = 110;    // ms each flickers before it settles
   const SCRAMBLE = '·:=+*#%@';
   // The look a block keeps until the sweep reaches it.
-  const PINNED = ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'textAlign', 'textShadow', 'fontSynthesis'];
+  const PINNED = ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'textAlign', 'textShadow', 'fontSynthesis', 'color', 'backgroundColor', 'textTransform'];
+  const ART = '.chrome-art, .name-art';
+  const SWEEP_FADE = 300;    // ms the last block's colour and glow keep fading (see html.sweeping)
+  let sweepFade = 0;
 
   // The block-level element a text node sits in.
   function blockOf(node) {
@@ -336,17 +339,23 @@
     return nodes;
   }
 
-  // Each visible block of page text (the console and the command bar), in document order.
-  // The ASCII art has its own font rules and animation, so it just switches with the page.
+  // Each visible block of page text (the console and the command bar) and piece of ASCII art,
+  // in document order. The art takes the new look with the sweep too, line by line as it plays.
   function textBlocks() {
     const found = new Set();
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       if (!n.data.trim() || !n.parentElement.getClientRects().length) continue;
       const el = blockOf(n);
-      if (el && !el.closest('.chrome-art, .name-art, .gate-art, #gate, #lightbox, script')) found.add(el);
+      if (el && !el.closest(`${ART}, .gate-art, #gate, #lightbox, script`)) found.add(el);
     }
-    return [...found];
+    document.querySelectorAll(ART).forEach((art) => { if (art.getClientRects().length) found.add(art); });
+    return [...found].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+  }
+
+  // A block and what's inside it, up to any block nested in it, which is pinned on its own.
+  function pinnedIn(block) {
+    return [block, ...[...block.querySelectorAll('*')].filter((el) => el.parentElement.closest('[data-px]') === block && !el.hasAttribute('data-px'))];
   }
 
   function regenTick(now) {
@@ -367,6 +376,8 @@
     for (const n of nodes) {
       const full = [...n.data];
       regenerating.push({ n, full, start, at: full.map(() => Math.random() * REGEN) });
+      // Dots now, not on the next frame, or this frame shows the finished text in the new font first.
+      n.data = full.map((c) => (c.trim() ? '·' : c)).join('');
     }
     if (!regenFrame && regenerating.length) regenFrame = requestAnimationFrame(regenTick);
   }
@@ -374,11 +385,48 @@
   // Lets a block take the new look; with animate, its text regenerates into it.
   function release(el, animate) {
     if (!el.hasAttribute('data-px')) return;
+    // Taken while still pinned, so these copies keep the old look.
+    const oldArt = animate && el.matches(ART) ? artLayers(el).map((layer) => {
+      const copy = layer.cloneNode(true);
+      copy.removeAttribute('data-px');
+      copy.classList.add('art-old');
+      copy.style.opacity = getComputedStyle(layer).opacity;
+      return copy;
+    }) : null;
+    for (const pinned of pinnedIn(el)) {
+      for (const prop of PINNED) pinned.style[prop] = '';
+    }
     el.removeAttribute('data-px');
-    for (const prop of PINNED) el.style[prop] = '';
     // The banner's "Hard on the eyes?" / "Miss the glow?" changes as the sweep passes too.
     el.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
-    if (animate) regenerate(ownText(el));
+    if (!animate) return;
+    if (oldArt) replaceArt(el, oldArt);
+    else regenerate(ownText(el));
+  }
+
+  // The layers of text a piece of art is drawn in: the stacked <pre>s, or the name art itself.
+  function artLayers(art) {
+    return art.matches('.chrome-art') ? [...art.children] : [art];
+  }
+
+  // Replaces art line by line while it plays: the old-look copies sit over the new look, and a seam
+  // moves down a row at a time, hiding the copies above it and showing the new look. js/chrome.js
+  // draws each frame into the copies too.
+  function replaceArt(art, oldLayers) {
+    const layers = artLayers(art);
+    art.style.setProperty('--rows', layers[0].textContent.split('\n').length);
+    if (art.matches('.chrome-art')) {
+      art.append(...oldLayers);
+    } else {
+      const [copy] = oldLayers;
+      Object.assign(copy.style, { position: 'absolute', margin: 0, top: `${art.offsetTop}px`, left: `${art.offsetLeft}px`, width: `${art.offsetWidth}px` });
+      art.after(copy);
+    }
+    layers.forEach((layer) => layer.classList.add('art-new'));
+    layers[0].addEventListener('animationend', () => {
+      oldLayers.forEach((copy) => copy.remove());
+      layers.forEach((layer) => layer.classList.remove('art-new'));
+    }, { once: true });
   }
 
   function endSweep() {
@@ -390,7 +438,10 @@
     regenerating = [];
     document.querySelectorAll('[data-px]').forEach((el) => release(el, false));
     document.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
-    document.documentElement.classList.remove('crt-power');
+    clearTimeout(sweepFade);
+    document.querySelectorAll('.art-old').forEach((copy) => copy.remove());
+    document.querySelectorAll('.art-new').forEach((layer) => layer.classList.remove('art-new'));
+    document.documentElement.classList.remove('crt-power', 'sweeping');
   }
 
   // apply switches the classes on <html>; power plays the CRT flicker, and regen regenerates the
@@ -402,14 +453,13 @@
       label.style.display = getComputedStyle(label).display;
     });
     const blocks = textBlocks();
-    const looks = blocks.map((el) => {
+    blocks.forEach((el) => { el.dataset.px = ''; });
+    // Read every look before writing any, or each write would force a fresh style pass.
+    const looks = blocks.flatMap(pinnedIn).map((el) => {
       const cs = getComputedStyle(el);
-      return Object.fromEntries(PINNED.map((prop) => [prop, cs[prop]]));
+      return [el, Object.fromEntries(PINNED.map((prop) => [prop, cs[prop]]))];
     });
-    blocks.forEach((el, i) => {
-      el.dataset.px = '';
-      Object.assign(el.style, looks[i]);
-    });
+    looks.forEach(([el, look]) => Object.assign(el.style, look));
 
     if (power) root.classList.add('crt-power');
     apply();
@@ -421,6 +471,7 @@
       release(el, false);
       return false;
     });
+    root.classList.add('sweeping');
     const startedAt = performance.now();
     const tick = (now) => {
       const p = Math.min(1, (now - startedAt) / SWEEP_MS);
@@ -434,6 +485,7 @@
       else {
         sweepFrame = 0;
         root.classList.remove('crt-power');
+        sweepFade = setTimeout(() => root.classList.remove('sweeping'), SWEEP_FADE);
       }
     };
     sweepFrame = requestAnimationFrame(tick);
@@ -552,12 +604,12 @@
     const drawing = { cols, rows, cells };
     const render = (t, done) => { pre.innerHTML = art.renderText(drawing, t, { done, labelPad }); };
 
-    // Draw the empty first frame (full height) and scroll now, so the animation
+    // Draw the empty first frame (full height) and scroll first, so the animation
     // plays in view instead of finishing off screen before the usual scroll.
     render(0, false);
-    if (line && !restoring) scrollAfter(line);
+    const scrolled = line && !restoring ? scrollAfter(line) : Promise.resolve();
 
-    return new Promise((resolve) => {
+    return scrolled.then(() => new Promise((resolve) => {
       if (reduceMotion || restoring) {
         render(Infinity, true);
         resolve();
@@ -576,7 +628,7 @@
         nextFrame().then(frame);
       };
       nextFrame().then(frame);
-    });
+    }));
   }
 
   // Easter egg: prints one of the banner's ASCII Magic pieces (js/chrome.js), which
@@ -602,8 +654,8 @@
       stopPieces.push(await window.ChromeArt.playPiece(art, piece, {
         build: !restoring && !reduceMotion,
         skip: () => fastForward,
-        // Scroll once the art has its full height, so the build plays in view.
-        ready: () => { if (line && !restoring) scrollAfter(line); },
+        // Scroll once the art has its full height, and build once it's in view.
+        ready: () => (line && !restoring ? scrollAfter(line) : undefined),
       }));
     } catch {
       art.remove();   // the piece didn't load
@@ -629,16 +681,20 @@
   const CRUMBLE = 600;        // ms over which characters start crumbling, in random order
   const CRUMBLE_CELL = 100;   // ms each shows a dot before it's gone
 
-  async function crumble() {
+  // Crumbles the screen and the banner art above it. Resolves to whether the banner went with it.
+  async function crumbleScreen() {
     stopPieces.splice(0).forEach((stop) => stop());
     endSweep();   // so it crumbles the real text, not a half-regenerated one
+    const banner = await window.ChromeArt?.stopBanner();
     if (!restoring && !reduceMotion) {
       screen.querySelectorAll(MEDIA).forEach((media) => media.classList.add('pending'));
       const nodes = [];
-      const walker = document.createTreeWalker(screen, NodeFilter.SHOW_TEXT);
-      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-        const full = [...n.data];
-        nodes.push({ n, full, at: full.map(() => Math.random() * CRUMBLE) });
+      for (const root of banner ? [banner, screen] : [screen]) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+          const full = [...n.data];
+          nodes.push({ n, full, at: full.map(() => Math.random() * CRUMBLE) });
+        }
       }
       const startedAt = performance.now();
       for (let t = 0; t < CRUMBLE + CRUMBLE_CELL && !fastForward; t = performance.now() - startedAt) {
@@ -649,21 +705,30 @@
       }
     }
     screen.replaceChildren();
+    if (banner) [...banner.children].forEach((layer) => { layer.textContent = ''; });
+    return Boolean(banner);
+  }
+
+  async function crumble() {
+    const banner = await crumbleScreen();
     setHash('');
     ran = ['whoami'];
     saveSession();
+    // The banner builds itself back in as whoami returns.
+    if (banner) window.ChromeArt.replayBanner({ build: !reduceMotion });
     await printWhoami();
     await printLine('just kidding.', 'dim');
   }
 
-  // Easter egg: a fresh visit, intro and all.
-  function exit() {
+  // Easter egg: a fresh visit, intro and all, after the screen crumbles away.
+  async function exit() {
     try {
       sessionStorage.removeItem('gate');
       sessionStorage.removeItem(SESSION_KEY);
     } catch {
       // storage blocked: the reload starts fresh anyway
     }
+    await crumbleScreen();
     location.reload();
     // Never resolves, so run() can't save the session again before the page goes.
     return new Promise(() => {});
@@ -727,17 +792,25 @@
   let queue = Promise.resolve();
 
   // Keeps the new output readable: a long one starts at the top of the screen,
-  // a short one just scrolls far enough to show the prompt again.
+  // a short one just scrolls far enough to show the prompt again. Resolves once the scroll ends.
   function scrollAfter(line) {
     if (!line.isConnected) {
       scrollTo({ top: 0 });
-      return;
+      return Promise.resolve();
     }
     const lineTop = line.getBoundingClientRect().top + scrollY - 16;
     const promptBottom = form.getBoundingClientRect().bottom + scrollY;
     const bar = document.getElementById('shortcuts').offsetHeight;
     const target = Math.min(lineTop, promptBottom + bar + 24 - innerHeight);
-    scrollTo({ top: Math.max(0, target), behavior: reduceMotion ? 'auto' : 'smooth' });
+    const top = Math.min(Math.max(0, target), document.documentElement.scrollHeight - innerHeight);
+    if (Math.abs(top - scrollY) < 1) return Promise.resolve();
+    return new Promise((resolve) => {
+      // scrollend, or a timeout where it isn't supported or another scroll cuts this one short.
+      const done = () => { clearTimeout(timer); removeEventListener('scrollend', done); resolve(); };
+      const timer = setTimeout(done, 700);
+      addEventListener('scrollend', done, { once: true });
+      scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
   }
 
   // Typo tolerance: the nearest command or alias, within 1 edit (2 for names over 6 letters).

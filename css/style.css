@@ -258,7 +258,25 @@ html.superhot {
     18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent);
 }
 
-html.superhot :is(h1, h2, h3) { text-transform: uppercase; }
+/* The light blue and red text in capitals, as in SUPERHOT. The blue-grey dim text keeps its case, and so
+   does the ASCII art, as capitals would change its shapes. Form controls don't inherit text-transform,
+   so the buttons and the command input opt in themselves. */
+html.superhot body,
+html.superhot :is(input, button) { text-transform: uppercase; }
+html.superhot .dim,
+html.superhot .tags,
+html.superhot .row .key,
+html.superhot #shortcuts button,
+html.superhot .thumbs figcaption,
+html.superhot .gate-hint,
+html.superhot .lightbox-caption,
+html.superhot .lightbox-count,
+html.superhot .chrome-art,
+html.superhot .name-art,
+html.superhot .gate-art { text-transform: none; }
+/* Light text inside the dim blocks. */
+html.superhot .row button.key,
+html.superhot :is(.dim, .tags, .lightbox-caption) :is(a, b, strong) { text-transform: uppercase; }
 
 /* The prompt's sliver of space after > would put the command between pixels. */
 html.vga .ps { margin-right: 0; }
@@ -274,7 +292,7 @@ html {
   --streak: .03;     /* rolling streak brightness */
   --streak-trail: .015; /* the fainter streak trailing it */
   --fringe: .2;      /* RGB fringe opacity */
-  --glare: .2;       /* horizontal glare strength, near the text; superhot has its own */
+  --glare: .16;      /* horizontal glare strength, near the text; superhot has its own */
   /* In each text's own colour, stronger the redder it is, as red is darker and would barely show. */
   --glare-colour: rgb(from currentColor r g b / calc(var(--glare) + max(0, r - b) / 760));
   --glare-near:
@@ -285,7 +303,7 @@ html {
     -24px 0 10px color-mix(in srgb, var(--glare-colour) 50%, transparent),
     24px 0 10px color-mix(in srgb, var(--glare-colour) 50%, transparent);
 }
-html.vga { --glare: .14; }
+html.vga { --glare: .11; }
 html:not(.vga) { --fringe: .4; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
@@ -358,6 +376,12 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
 }
 
 html:not(.no-retro):has(#lightbox.is-open)::before { display: none; }
+
+/* While a sweep runs, each block's colour and glow fade into its new look as the sweep lets it go. */
+html.sweeping #console *,
+html.sweeping #shortcuts * {
+  transition: color .25s, background-color .25s, text-shadow .25s;
+}
 
 /* A CRT's power flicker as the `retro` command switches modes, with three pulses at most so it stays
    within the flash safety limit. Reduced motion never gets the class (see applyLook in js/terminal.js). */
@@ -453,6 +477,15 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
 @keyframes print-in {
   from { clip-path: inset(0 0 100% 0); }
   to { clip-path: inset(0); }
+}
+
+/* A look change replacing art line by line: --rows steps, so the seam moves a row at a time. The old-look
+   copy stays visible below the seam, the new look above it. See replaceArt in js/terminal.js. */
+.art-new { animation: print-in .6s steps(var(--rows, 16)) backwards; }
+.art-old { animation: art-old .6s steps(var(--rows, 16)) forwards; }
+@keyframes art-old {
+  from { clip-path: inset(0); }
+  to { clip-path: inset(100% 0 0 0); }
 }
 
 /* No bare prompt on an empty screen while the first screen prints. */

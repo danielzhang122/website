@@ -67,18 +67,24 @@ const nextFrame = () => new Promise((resolve) => {
 // Plays piece in art (a .chrome-art with its three <pre> layers). With build, the first
 // frame assembles itself before the animation starts from that same frame; skip()
 // returning true finishes the build at once, and ready() runs once the art has its full
-// size. Resolves to the player's stop function.
+// size; the build waits for the promise it returns (the scroll bringing the art into view).
+// Resolves to the player's stop function.
 async function playPiece(art, piece, { build = false, skip = () => false, ready = () => {} } = {}) {
   const layers = [...art.children];
   // draw() replaces whatever the player writes here, so don't let it build that DOM every frame.
-  Object.defineProperty(layers[0], 'innerHTML', { set() {} });
+  // Configurable, so the banner can play again into the same layer (see replayBanner).
+  Object.defineProperty(layers[0], 'innerHTML', { set() {}, configurable: true });
   const mod = await import(`${BASE}${piece}.js`);
   // Only liquid-chrome's dotted backdrop is kept out of the red (the other two read better
   // with every faint glyph red), so only it needs the frames' colour keys.
   const backdrop = piece === 'liquid-chrome' ? backdropKeys(mod.meta.palette) : new Set();
   const look = backdrop.size ? { ...LOOK, mono: false } : LOOK;
   const colorOf = (f) => (backdrop.size && typeof f !== 'string' ? f.color : null);
-  const draw = (text, color) => split(text, color, backdrop).forEach((t, i) => { layers[i].textContent = t; });
+  // Past the three layers are the old-look copies a look change adds (see replaceArt in js/terminal.js).
+  const draw = (text, color) => split(text, color, backdrop).forEach((t, i) => {
+    layers[i].textContent = t;
+    if (art.children[i + 3]) art.children[i + 3].textContent = t;
+  });
   const opts = { dom: true, look, maxFps: 24, onFrame: (f) => draw(frameText(f), colorOf(f)) };
   if (build) {
     let first = '', firstColor = null;
@@ -86,7 +92,9 @@ async function playPiece(art, piece, { build = false, skip = () => false, ready 
     const rows = first.split('\n');
     const cols = Math.max(...rows.map((r) => r.length));
     const starts = rows.map((r, y) => [...r].map((_, x) => ((y + x / cols) / rows.length) * BUILD + Math.random() * JITTER));
-    ready();   // the still frame already gives the art its full size
+    // A blank frame of the full size, so the scroll can bring all of it into view before it builds.
+    draw(rows.map((r) => ' '.repeat(r.length)).join('\n'), firstColor);
+    await ready();
     const startedAt = performance.now();
     for (let t = 0; t < BUILD + JITTER + SETTLE && !skip(); t = performance.now() - startedAt) {
       draw(rows.map((r, y) => [...r].map((c, x) => (c === ' ' || t >= starts[y][x] + SETTLE ? c : t >= starts[y][x] ? BUILDING : ' ')).join('')).join('\n'), firstColor);
@@ -106,17 +114,36 @@ async function playPiece(art, piece, { build = false, skip = () => false, ready 
   return () => { seen.disconnect(); stop?.(); };
 }
 
-window.ChromeArt = { playPiece };
-
 const art = document.querySelector('#console > .chrome-art');
+let bannerPiece = null;
+let bannerStop = Promise.resolve(null);   // the banner player's stop function, once it's playing
 // Hidden at phone widths (see style.css), so hold off there: a player's frame loop never sleeps.
 const wide = matchMedia('(min-width: 641px)');
 function startArt() {
   if (!wide.matches) return;
   wide.removeEventListener('change', startArt);
-  playPiece(art, PIECES[Math.floor(Math.random() * PIECES.length)]);
+  bannerPiece = PIECES[Math.floor(Math.random() * PIECES.length)];
+  bannerStop = playPiece(art, bannerPiece).catch(() => null);
 }
 if (art) {
   wide.addEventListener('change', startArt);
   startArt();
 }
+
+// Freezes the banner on its current frame, so js/terminal.js can crumble it (rm -rf /, exit).
+// Resolves to the banner, or null when it isn't showing.
+async function stopBanner() {
+  const stop = await bannerStop;
+  bannerStop = Promise.resolve(null);
+  if (!stop) return null;
+  stop();
+  return art;
+}
+
+// After a crumble, the banner builds itself in again, the same piece.
+function replayBanner({ build = true } = {}) {
+  if (!bannerPiece) return;
+  bannerStop = playPiece(art, bannerPiece, { build }).catch(() => null);
+}
+
+window.ChromeArt = { playPiece, stopBanner, replayBanner };
