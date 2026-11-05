@@ -273,11 +273,10 @@
     }
   }
 
-  // Toggling retro or vga doesn't swap the look in one go: an invisible sweep runs down the
-  // screen, and each block of text takes the new look as it passes. For retro, the CRT
-  // scanlines wipe in or out with it; for vga, each block switches font and its characters
-  // regenerate (each starts as a dot, flickers through scrambled glyphs and settles, in random
-  // order, like rm -rf / in reverse).
+  // Toggling retro or a font doesn't swap the text in one go: an invisible sweep runs down the
+  // screen, and each block takes the new look as it passes, with its characters regenerating
+  // (each starts as a dot, flickers through scrambled glyphs and settles, in random order, like
+  // rm -rf / in reverse). The CRT overlay switches at once, under a power flicker for retro.
   let sweepFrame = 0;
   let regenerating = [];     // { n, full, start, at }: text nodes mid-regeneration
   let regenFrame = 0;
@@ -359,14 +358,12 @@
     regenerating = [];
     document.querySelectorAll('[data-px]').forEach((el) => release(el, false));
     document.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
-    const root = document.documentElement;
-    root.classList.remove('crt-entering', 'crt-leaving');
-    root.style.removeProperty('--sweep');
+    document.documentElement.classList.remove('crt-power');
   }
 
-  // apply switches the classes on <html>; crt is 'crt-entering' or 'crt-leaving' when the
-  // scanlines change, and regen regenerates the text as the sweep passes it.
-  function sweep(apply, crt, regen) {
+  // apply switches the classes on <html>; power plays the CRT flicker, and regen regenerates the
+  // text as the sweep passes it.
+  function sweep(apply, power, regen) {
     const root = document.documentElement;
     // Hold the banner's label as it is, then pin every block to its current look.
     document.querySelectorAll('[data-retro-label]').forEach((label) => {
@@ -382,8 +379,7 @@
       Object.assign(el.style, looks[i]);
     });
 
-    root.style.setProperty('--sweep', '0px');
-    if (crt) root.classList.add(crt);
+    if (power) root.classList.add('crt-power');
     apply();
     window.snapPixels?.();
 
@@ -397,7 +393,6 @@
     const tick = (now) => {
       const p = Math.min(1, (now - startedAt) / SWEEP_MS);
       const y = (1 - Math.cos(p * Math.PI)) / 2 * innerHeight;   // eases in and out
-      root.style.setProperty('--sweep', `${y}px`);
       // In document order, so roughly top to bottom; re-measured as released blocks reflow.
       while (waiting.length && (p === 1 || waiting[0].getBoundingClientRect().top <= y)) {
         const el = waiting.shift();
@@ -406,8 +401,7 @@
       if (p < 1) sweepFrame = requestAnimationFrame(tick);
       else {
         sweepFrame = 0;
-        root.classList.remove('crt-entering', 'crt-leaving');
-        root.style.removeProperty('--sweep');
+        root.classList.remove('crt-power');
       }
     };
     sweepFrame = requestAnimationFrame(tick);
@@ -462,7 +456,7 @@
       root.classList.toggle('superhot', font === 'superhot');
     };
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) apply();
-    else sweep(apply, crtChange ? (retro ? 'crt-entering' : 'crt-leaving') : '', fontChange);
+    else sweep(apply, crtChange, fontChange);
     window.snapPixels?.();
   }
 

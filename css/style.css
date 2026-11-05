@@ -296,9 +296,8 @@ html:not(.vga) { --fringe: .4; }
   html:not(.vga) { --fringe: .55; }
 }
 
-/* .crt-leaving keeps the overlay up while a sweep takes it away (see sweep in js/terminal.js). */
-:is(html:not(.no-retro), html.crt-leaving) body::before,
-:is(html:not(.no-retro), html.crt-leaving) body::after {
+html:not(.no-retro) body::before,
+html:not(.no-retro) body::after {
   content: '';
   position: fixed;
   inset: 0;
@@ -306,7 +305,7 @@ html:not(.vga) { --fringe: .4; }
   pointer-events: none;
 }
 
-:is(html:not(.no-retro), html.crt-leaving) body::before {
+html:not(.no-retro) body::before {
   background:
     repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 1px, transparent 1px 3px),
     radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 60%, rgba(0, 0, 0, .4));
@@ -314,7 +313,7 @@ html:not(.vga) { --fringe: .4; }
 }
 
 /* TV static: its own layer, moved by transform so each jump costs no repaint, and big enough to cover
-   the screen at every offset in crt-static. It sits out sweeps and zoomed photos. A generated noise tile;
+   the screen at every offset in crt-static. It sits out zoomed photos. A generated noise tile;
    a custom property can't reach inside the image, so its strength is the rect's opacity. */
 html:not(.no-retro)::before {
   content: '';
@@ -327,7 +326,7 @@ html:not(.no-retro)::before {
   animation: crt-flicker 4s steps(1) infinite, crt-static .5s steps(1) infinite;
 }
 
-:is(html:not(.no-retro), html.crt-leaving) body::after {
+html:not(.no-retro) body::after {
   bottom: auto;
   /* Rolls downward, so the trail is the upper band: 25vh of trail, 5vh of gap, 40vh of streak. */
   height: 70vh;
@@ -356,13 +355,29 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
   background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 1px, transparent 1px 3px);
 }
 
-/* Mid-sweep, the scanlines cover only what the sweep has passed (turning on) or not yet
-   reached (turning off); the rolling streak sits it out. */
-html.crt-entering body::before { clip-path: inset(0 0 calc(100% - var(--sweep, 0px)) 0); }
-html.crt-leaving body::before { clip-path: inset(var(--sweep, 0px) 0 0 0); }
-html:is(.crt-entering, .crt-leaving)::before,
-html:not(.no-retro):has(#lightbox.is-open)::before,
-html:is(.crt-entering, .crt-leaving) body::after { display: none; }
+html:not(.no-retro):has(#lightbox.is-open)::before { display: none; }
+
+/* A CRT's power flicker as the `retro` command switches modes, with three pulses at most so it stays
+   within the flash safety limit. Reduced motion never gets the class (see applyLook in js/terminal.js). */
+html.crt-power::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: 201;
+  pointer-events: none;
+  background: #fff;
+  opacity: 0;
+  animation: crt-power .3s steps(1);
+}
+
+@keyframes crt-power {
+  0% { opacity: .16; }
+  15% { opacity: 0; }
+  35% { opacity: .1; }
+  50% { opacity: 0; }
+  70% { opacity: .05; }
+  85% { opacity: 0; }
+}
 
 /* The banner's lead-in to the retro command fits the mode it would switch to. */
 html.no-retro [data-retro-label="on"],
