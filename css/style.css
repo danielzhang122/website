@@ -258,11 +258,25 @@ html.superhot {
     18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent);
 }
 
-/* All text in capitals, as in SUPERHOT; only the ASCII art keeps its case, as capitals would change its shapes.
-   Form controls don't inherit text-transform, so the buttons and the command input opt in themselves. */
+/* The light blue and red text in capitals, as in SUPERHOT. The blue-grey dim text keeps its case, and so
+   does the ASCII art, as capitals would change its shapes. Form controls don't inherit text-transform,
+   so the buttons and the command input opt in themselves. */
 html.superhot body,
 html.superhot :is(input, button) { text-transform: uppercase; }
-html.superhot :is(.chrome-art, .name-art, .gate-art) { text-transform: none; }
+html.superhot .dim,
+html.superhot .tags,
+html.superhot .row .key,
+html.superhot #shortcuts button,
+html.superhot .thumbs figcaption,
+html.superhot .gate-hint,
+html.superhot .lightbox-caption,
+html.superhot .lightbox-count,
+html.superhot .chrome-art,
+html.superhot .name-art,
+html.superhot .gate-art { text-transform: none; }
+/* Light text inside the dim blocks. */
+html.superhot .row button.key,
+html.superhot :is(.dim, .tags, .lightbox-caption) :is(a, b, strong) { text-transform: uppercase; }
 
 /* The prompt's sliver of space after > would put the command between pixels. */
 html.vga .ps { margin-right: 0; }

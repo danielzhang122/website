@@ -604,12 +604,12 @@
     const drawing = { cols, rows, cells };
     const render = (t, done) => { pre.innerHTML = art.renderText(drawing, t, { done, labelPad }); };
 
-    // Draw the empty first frame (full height) and scroll now, so the animation
+    // Draw the empty first frame (full height) and scroll first, so the animation
     // plays in view instead of finishing off screen before the usual scroll.
     render(0, false);
-    if (line && !restoring) scrollAfter(line);
+    const scrolled = line && !restoring ? scrollAfter(line) : Promise.resolve();
 
-    return new Promise((resolve) => {
+    return scrolled.then(() => new Promise((resolve) => {
       if (reduceMotion || restoring) {
         render(Infinity, true);
         resolve();
@@ -628,7 +628,7 @@
         nextFrame().then(frame);
       };
       nextFrame().then(frame);
-    });
+    }));
   }
 
   // Easter egg: prints one of the banner's ASCII Magic pieces (js/chrome.js), which
@@ -654,8 +654,8 @@
       stopPieces.push(await window.ChromeArt.playPiece(art, piece, {
         build: !restoring && !reduceMotion,
         skip: () => fastForward,
-        // Scroll once the art has its full height, so the build plays in view.
-        ready: () => { if (line && !restoring) scrollAfter(line); },
+        // Scroll once the art has its full height, and build once it's in view.
+        ready: () => (line && !restoring ? scrollAfter(line) : undefined),
       }));
     } catch {
       art.remove();   // the piece didn't load
@@ -784,17 +784,25 @@
   let queue = Promise.resolve();
 
   // Keeps the new output readable: a long one starts at the top of the screen,
-  // a short one just scrolls far enough to show the prompt again.
+  // a short one just scrolls far enough to show the prompt again. Resolves once the scroll ends.
   function scrollAfter(line) {
     if (!line.isConnected) {
       scrollTo({ top: 0 });
-      return;
+      return Promise.resolve();
     }
     const lineTop = line.getBoundingClientRect().top + scrollY - 16;
     const promptBottom = form.getBoundingClientRect().bottom + scrollY;
     const bar = document.getElementById('shortcuts').offsetHeight;
     const target = Math.min(lineTop, promptBottom + bar + 24 - innerHeight);
-    scrollTo({ top: Math.max(0, target), behavior: reduceMotion ? 'auto' : 'smooth' });
+    const top = Math.min(Math.max(0, target), document.documentElement.scrollHeight - innerHeight);
+    if (Math.abs(top - scrollY) < 1) return Promise.resolve();
+    return new Promise((resolve) => {
+      // scrollend, or a timeout where it isn't supported or another scroll cuts this one short.
+      const done = () => { clearTimeout(timer); removeEventListener('scrollend', done); resolve(); };
+      const timer = setTimeout(done, 700);
+      addEventListener('scrollend', done, { once: true });
+      scrollTo({ top, behavior: reduceMotion ? 'auto' : 'smooth' });
+    });
   }
 
   // Typo tolerance: the nearest command or alias, within 1 edit (2 for names over 6 letters).

@@ -67,7 +67,8 @@ const nextFrame = () => new Promise((resolve) => {
 // Plays piece in art (a .chrome-art with its three <pre> layers). With build, the first
 // frame assembles itself before the animation starts from that same frame; skip()
 // returning true finishes the build at once, and ready() runs once the art has its full
-// size. Resolves to the player's stop function.
+// size; the build waits for the promise it returns (the scroll bringing the art into view).
+// Resolves to the player's stop function.
 async function playPiece(art, piece, { build = false, skip = () => false, ready = () => {} } = {}) {
   const layers = [...art.children];
   // draw() replaces whatever the player writes here, so don't let it build that DOM every frame.
@@ -90,7 +91,9 @@ async function playPiece(art, piece, { build = false, skip = () => false, ready 
     const rows = first.split('\n');
     const cols = Math.max(...rows.map((r) => r.length));
     const starts = rows.map((r, y) => [...r].map((_, x) => ((y + x / cols) / rows.length) * BUILD + Math.random() * JITTER));
-    ready();   // the still frame already gives the art its full size
+    // A blank frame of the full size, so the scroll can bring all of it into view before it builds.
+    draw(rows.map((r) => ' '.repeat(r.length)).join('\n'), firstColor);
+    await ready();
     const startedAt = performance.now();
     for (let t = 0; t < BUILD + JITTER + SETTLE && !skip(); t = performance.now() - startedAt) {
       draw(rows.map((r, y) => [...r].map((c, x) => (c === ' ' || t >= starts[y][x] + SETTLE ? c : t >= starts[y][x] ? BUILDING : ' ')).join('')).join('\n'), firstColor);
