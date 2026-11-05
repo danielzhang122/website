@@ -61,11 +61,39 @@
     vga: () => setFont('vga'),
     plex: () => setFont('plex'),
     cascadia: () => setFont('cascadia'),
+    superhot: () => setFont('superhot'),
     default: resetFonts,
   };
   // Not re-run when a refresh restores the session: clear and rm reset it themselves,
   // and the look commands would redo saved settings.
-  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'cascadia', 'default', 'rm', 'sudo'];
+  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'cascadia', 'superhot', 'default', 'rm', 'sudo'];
+
+  // What Tab suggests on an empty prompt: the fun ones, never rm, sudo, exit, logout or default.
+  const TAB_HINTS = ['superhot', 'vga', 'plex', 'mercury', 'klein', 'torus', 'name', 'coffee', 'history'];
+  let tabHint = '';
+  let psstShown = false;     // the last unrecognized command got the Tab tip
+
+  // Now and then the banner's last prompt hints at an easter egg instead: at most once every 5
+  // page loads, then a 1 in 3 chance each load. Set before whoami copies the banner, so nothing
+  // flashes and a restored session copies the same line.
+  // shortcut: with storage blocked the count never advances, so the limit can't hold; that's rare and harmless.
+  const BANNER_HINTS = {
+    superhot: 'Too cold in here?',
+    vga: 'Miss DOS?',
+    mercury: 'Want something shiny?',
+    name: "What's in a name?",
+  };
+  const clearHint = document.querySelector('.banner [data-run="clear"]');
+  const sinceHint = Number(saved('banner-hint-wait') ?? 4) || 0;
+  save('banner-hint-wait', sinceHint + 1);
+  if (clearHint && sinceHint >= 4 && Math.random() < 1 / 3) {
+    save('banner-hint-wait', 0);
+    const names = Object.keys(BANNER_HINTS);
+    const name = names[Math.floor(Math.random() * names.length)];
+    clearHint.dataset.run = name;
+    clearHint.textContent = name;
+    clearHint.parentElement.previousSibling.data = ` ${BANNER_HINTS[name]} `;
+  }
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -258,6 +286,10 @@
       row.append(key, desc);
       list.appendChild(row);
     }
+    const hint = document.createElement('p');
+    hint.className = 'dim';
+    hint.textContent = 'not everything is listed here. try tab.';
+    list.appendChild(hint);
     return reveal(list);
   }
 
@@ -272,11 +304,10 @@
     }
   }
 
-  // Toggling retro or vga doesn't swap the look in one go: an invisible sweep runs down the
-  // screen, and each block of text takes the new look as it passes. For retro, the CRT
-  // scanlines wipe in or out with it; for vga, each block switches font and its characters
-  // regenerate (each starts as a dot, flickers through scrambled glyphs and settles, in random
-  // order, like rm -rf / in reverse).
+  // Toggling retro or a font doesn't swap the text in one go: an invisible sweep runs down the
+  // screen, and each block takes the new look as it passes, with its characters regenerating
+  // (each starts as a dot, flickers through scrambled glyphs and settles, in random order, like
+  // rm -rf / in reverse). The CRT overlay switches at once, under a power flicker for retro.
   let sweepFrame = 0;
   let regenerating = [];     // { n, full, start, at }: text nodes mid-regeneration
   let regenFrame = 0;
@@ -358,14 +389,12 @@
     regenerating = [];
     document.querySelectorAll('[data-px]').forEach((el) => release(el, false));
     document.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
-    const root = document.documentElement;
-    root.classList.remove('crt-entering', 'crt-leaving');
-    root.style.removeProperty('--sweep');
+    document.documentElement.classList.remove('crt-power');
   }
 
-  // apply switches the classes on <html>; crt is 'crt-entering' or 'crt-leaving' when the
-  // scanlines change, and regen regenerates the text as the sweep passes it.
-  function sweep(apply, crt, regen) {
+  // apply switches the classes on <html>; power plays the CRT flicker, and regen regenerates the
+  // text as the sweep passes it.
+  function sweep(apply, power, regen) {
     const root = document.documentElement;
     // Hold the banner's label as it is, then pin every block to its current look.
     document.querySelectorAll('[data-retro-label]').forEach((label) => {
@@ -381,8 +410,7 @@
       Object.assign(el.style, looks[i]);
     });
 
-    root.style.setProperty('--sweep', '0px');
-    if (crt) root.classList.add(crt);
+    if (power) root.classList.add('crt-power');
     apply();
     window.snapPixels?.();
 
@@ -396,7 +424,6 @@
     const tick = (now) => {
       const p = Math.min(1, (now - startedAt) / SWEEP_MS);
       const y = (1 - Math.cos(p * Math.PI)) / 2 * innerHeight;   // eases in and out
-      root.style.setProperty('--sweep', `${y}px`);
       // In document order, so roughly top to bottom; re-measured as released blocks reflow.
       while (waiting.length && (p === 1 || waiting[0].getBoundingClientRect().top <= y)) {
         const el = waiting.shift();
@@ -405,17 +432,16 @@
       if (p < 1) sweepFrame = requestAnimationFrame(tick);
       else {
         sweepFrame = 0;
-        root.classList.remove('crt-entering', 'crt-leaving');
-        root.style.removeProperty('--sweep');
+        root.classList.remove('crt-power');
       }
     };
     sweepFrame = requestAnimationFrame(tick);
   }
 
-  // Retro and modern each keep their own page font: vga, plex or cascadia, set by the hidden
+  // Retro and modern each keep their own page font: vga, plex, superhot or cascadia, set by the hidden
   // command of the same name for whichever mode is on, and put back by the hidden default.
   // index.html applies the saved choice before first paint, with the same defaults.
-  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'", cascadia: "15px 'Cascadia Mono'" };
+  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'", superhot: "16px 'Perfect DOS VGA 437'", cascadia: "15px 'Cascadia Mono'" };
   const DEFAULT_FONT = { retro: 'plex', modern: 'cascadia' };
   const modeName = (retro) => (retro ? 'retro' : 'modern');
 
@@ -438,6 +464,7 @@
   }
   function currentFont() {
     const { classList } = document.documentElement;
+    if (classList.contains('superhot')) return 'superhot';
     return classList.contains('vga') ? 'vga' : classList.contains('plex') ? 'plex' : 'cascadia';
   }
 
@@ -455,11 +482,12 @@
     const root = document.documentElement;
     const apply = () => {
       root.classList.toggle('no-retro', !retro);
-      root.classList.toggle('vga', font === 'vga');
+      root.classList.toggle('vga', font === 'vga' || font === 'superhot');
       root.classList.toggle('plex', font === 'plex');
+      root.classList.toggle('superhot', font === 'superhot');
     };
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) apply();
-    else sweep(apply, crtChange ? (retro ? 'crt-entering' : 'crt-leaving') : '', fontChange);
+    else sweep(apply, crtChange, fontChange);
     window.snapPixels?.();
   }
 
@@ -471,7 +499,7 @@
     return printLine(`retro ${on ? 'on' : 'off'}`, 'dim');
   }
 
-  // Easter eggs: vga, plex and cascadia set the font for the mode that's on.
+  // Easter eggs: vga, plex, superhot and cascadia set the font for the mode that's on.
   async function setFont(font) {
     const retro = retroOn();
     save(`font-${modeName(retro)}`, font);
@@ -758,6 +786,11 @@
       if (SECTIONS.includes(name)) setHash(name);
     } else {
       await printLine(`'${word}' is not recognized as a command. type help for the list.`, 'dim');
+      // Skipped on restore, so a refresh reprints the same lines without a new random one.
+      if (!restoring) {
+        psstShown = !psstShown && Math.random() < 1 / 4;
+        if (psstShown) await printLine('psst: press tab on an empty prompt.', 'dim');
+      }
     }
     if (restoring) return;
     if (!UNSAVED.includes(name)) ran.push(text);
@@ -816,7 +849,14 @@
     } else if (e.key === 'Tab') {
       e.preventDefault();
       const start = input.value.trim().toLowerCase();
-      if (!start) return;
+      if (!start || start === tabHint) {
+        const others = TAB_HINTS.filter((name) => name !== tabHint);
+        tabHint = others[Math.floor(Math.random() * others.length)];
+        input.value = tabHint;
+        input.setSelectionRange(tabHint.length, tabHint.length);
+        requestAnimationFrame(updateCursor);
+        return;
+      }
       const matches = Object.keys(COMMANDS).filter((name) => name.startsWith(start));
       if (matches.length === 1) {
         input.value = matches[0];

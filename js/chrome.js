@@ -70,6 +70,8 @@ const nextFrame = () => new Promise((resolve) => {
 // size. Resolves to the player's stop function.
 async function playPiece(art, piece, { build = false, skip = () => false, ready = () => {} } = {}) {
   const layers = [...art.children];
+  // draw() replaces whatever the player writes here, so don't let it build that DOM every frame.
+  Object.defineProperty(layers[0], 'innerHTML', { set() {} });
   const mod = await import(`${BASE}${piece}.js`);
   // Only liquid-chrome's dotted backdrop is kept out of the red (the other two read better
   // with every faint glyph red), so only it needs the frames' colour keys.
@@ -91,12 +93,30 @@ async function playPiece(art, piece, { build = false, skip = () => false, ready 
       await nextFrame();
     }
   }
-  const stop = play(layers[0], mod, opts);
+  // Off screen the player only stops drawing and its frame loop keeps the page awake, so stop it
+  // there and resume from the same moment.
+  let t0 = 0;
+  const start = () => play(layers[0], mod, { ...opts, t0, onFrame: (f, t) => { t0 = t; opts.onFrame(f); } });
+  let stop = start();
   if (!build) ready();
-  return stop;
+  const seen = new IntersectionObserver(([entry]) => {
+    if (!entry.isIntersecting) { stop?.(); stop = null; } else if (!stop) stop = start();
+  }, { rootMargin: '100px' });
+  seen.observe(art);
+  return () => { seen.disconnect(); stop?.(); };
 }
 
 window.ChromeArt = { playPiece };
 
 const art = document.querySelector('#console > .chrome-art');
-if (art) playPiece(art, PIECES[Math.floor(Math.random() * PIECES.length)]);
+// Hidden at phone widths (see style.css), so hold off there: a player's frame loop never sleeps.
+const wide = matchMedia('(min-width: 641px)');
+function startArt() {
+  if (!wide.matches) return;
+  wide.removeEventListener('change', startArt);
+  playPiece(art, PIECES[Math.floor(Math.random() * PIECES.length)]);
+}
+if (art) {
+  wide.addEventListener('change', startArt);
+  startArt();
+}
