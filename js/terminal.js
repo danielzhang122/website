@@ -317,7 +317,10 @@
   const REGEN_CELL = 110;    // ms each flickers before it settles
   const SCRAMBLE = '·:=+*#%@';
   // The look a block keeps until the sweep reaches it.
-  const PINNED = ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'textAlign', 'textShadow', 'fontSynthesis'];
+  const PINNED = ['fontFamily', 'fontSize', 'lineHeight', 'letterSpacing', 'textAlign', 'textShadow', 'fontSynthesis', 'color', 'backgroundColor', 'textTransform'];
+  const ART = '.chrome-art, .name-art';
+  const SWEEP_FADE = 300;    // ms the last block's colour and glow keep fading (see html.sweeping)
+  let sweepFade = 0;
 
   // The block-level element a text node sits in.
   function blockOf(node) {
@@ -336,17 +339,23 @@
     return nodes;
   }
 
-  // Each visible block of page text (the console and the command bar), in document order.
-  // The ASCII art has its own font rules and animation, so it just switches with the page.
+  // Each visible block of page text (the console and the command bar) and piece of ASCII art,
+  // in document order. The art takes the new look with the sweep too, line by line as it plays.
   function textBlocks() {
     const found = new Set();
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
     for (let n = walker.nextNode(); n; n = walker.nextNode()) {
       if (!n.data.trim() || !n.parentElement.getClientRects().length) continue;
       const el = blockOf(n);
-      if (el && !el.closest('.chrome-art, .name-art, .gate-art, #gate, #lightbox, script')) found.add(el);
+      if (el && !el.closest(`${ART}, .gate-art, #gate, #lightbox, script`)) found.add(el);
     }
-    return [...found];
+    document.querySelectorAll(ART).forEach((art) => { if (art.getClientRects().length) found.add(art); });
+    return [...found].sort((a, b) => (a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING ? -1 : 1));
+  }
+
+  // A block and what's inside it, up to any block nested in it, which is pinned on its own.
+  function pinnedIn(block) {
+    return [block, ...[...block.querySelectorAll('*')].filter((el) => el.parentElement.closest('[data-px]') === block && !el.hasAttribute('data-px'))];
   }
 
   function regenTick(now) {
@@ -367,6 +376,8 @@
     for (const n of nodes) {
       const full = [...n.data];
       regenerating.push({ n, full, start, at: full.map(() => Math.random() * REGEN) });
+      // Dots now, not on the next frame, or this frame shows the finished text in the new font first.
+      n.data = full.map((c) => (c.trim() ? '·' : c)).join('');
     }
     if (!regenFrame && regenerating.length) regenFrame = requestAnimationFrame(regenTick);
   }
@@ -374,11 +385,48 @@
   // Lets a block take the new look; with animate, its text regenerates into it.
   function release(el, animate) {
     if (!el.hasAttribute('data-px')) return;
+    // Taken while still pinned, so these copies keep the old look.
+    const oldArt = animate && el.matches(ART) ? artLayers(el).map((layer) => {
+      const copy = layer.cloneNode(true);
+      copy.removeAttribute('data-px');
+      copy.classList.add('art-old');
+      copy.style.opacity = getComputedStyle(layer).opacity;
+      return copy;
+    }) : null;
+    for (const pinned of pinnedIn(el)) {
+      for (const prop of PINNED) pinned.style[prop] = '';
+    }
     el.removeAttribute('data-px');
-    for (const prop of PINNED) el.style[prop] = '';
     // The banner's "Hard on the eyes?" / "Miss the glow?" changes as the sweep passes too.
     el.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
-    if (animate) regenerate(ownText(el));
+    if (!animate) return;
+    if (oldArt) replaceArt(el, oldArt);
+    else regenerate(ownText(el));
+  }
+
+  // The layers of text a piece of art is drawn in: the stacked <pre>s, or the name art itself.
+  function artLayers(art) {
+    return art.matches('.chrome-art') ? [...art.children] : [art];
+  }
+
+  // Replaces art line by line while it plays: the old-look copies sit over the new look, and a seam
+  // moves down a row at a time, hiding the copies above it and showing the new look. js/chrome.js
+  // draws each frame into the copies too.
+  function replaceArt(art, oldLayers) {
+    const layers = artLayers(art);
+    art.style.setProperty('--rows', layers[0].textContent.split('\n').length);
+    if (art.matches('.chrome-art')) {
+      art.append(...oldLayers);
+    } else {
+      const [copy] = oldLayers;
+      Object.assign(copy.style, { position: 'absolute', margin: 0, top: `${art.offsetTop}px`, left: `${art.offsetLeft}px`, width: `${art.offsetWidth}px` });
+      art.after(copy);
+    }
+    layers.forEach((layer) => layer.classList.add('art-new'));
+    layers[0].addEventListener('animationend', () => {
+      oldLayers.forEach((copy) => copy.remove());
+      layers.forEach((layer) => layer.classList.remove('art-new'));
+    }, { once: true });
   }
 
   function endSweep() {
@@ -390,7 +438,10 @@
     regenerating = [];
     document.querySelectorAll('[data-px]').forEach((el) => release(el, false));
     document.querySelectorAll('[data-retro-label]').forEach((label) => { label.style.display = ''; });
-    document.documentElement.classList.remove('crt-power');
+    clearTimeout(sweepFade);
+    document.querySelectorAll('.art-old').forEach((copy) => copy.remove());
+    document.querySelectorAll('.art-new').forEach((layer) => layer.classList.remove('art-new'));
+    document.documentElement.classList.remove('crt-power', 'sweeping');
   }
 
   // apply switches the classes on <html>; power plays the CRT flicker, and regen regenerates the
@@ -402,14 +453,13 @@
       label.style.display = getComputedStyle(label).display;
     });
     const blocks = textBlocks();
-    const looks = blocks.map((el) => {
+    blocks.forEach((el) => { el.dataset.px = ''; });
+    // Read every look before writing any, or each write would force a fresh style pass.
+    const looks = blocks.flatMap(pinnedIn).map((el) => {
       const cs = getComputedStyle(el);
-      return Object.fromEntries(PINNED.map((prop) => [prop, cs[prop]]));
+      return [el, Object.fromEntries(PINNED.map((prop) => [prop, cs[prop]]))];
     });
-    blocks.forEach((el, i) => {
-      el.dataset.px = '';
-      Object.assign(el.style, looks[i]);
-    });
+    looks.forEach(([el, look]) => Object.assign(el.style, look));
 
     if (power) root.classList.add('crt-power');
     apply();
@@ -421,6 +471,7 @@
       release(el, false);
       return false;
     });
+    root.classList.add('sweeping');
     const startedAt = performance.now();
     const tick = (now) => {
       const p = Math.min(1, (now - startedAt) / SWEEP_MS);
@@ -434,6 +485,7 @@
       else {
         sweepFrame = 0;
         root.classList.remove('crt-power');
+        sweepFade = setTimeout(() => root.classList.remove('sweeping'), SWEEP_FADE);
       }
     };
     sweepFrame = requestAnimationFrame(tick);

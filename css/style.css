@@ -359,6 +359,12 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
 
 html:not(.no-retro):has(#lightbox.is-open)::before { display: none; }
 
+/* While a sweep runs, each block's colour and glow fade into its new look as the sweep lets it go. */
+html.sweeping #console *,
+html.sweeping #shortcuts * {
+  transition: color .25s, background-color .25s, text-shadow .25s;
+}
+
 /* A CRT's power flicker as the `retro` command switches modes, with three pulses at most so it stays
    within the flash safety limit. Reduced motion never gets the class (see applyLook in js/terminal.js). */
 html.crt-power::after {
@@ -453,6 +459,15 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
 @keyframes print-in {
   from { clip-path: inset(0 0 100% 0); }
   to { clip-path: inset(0); }
+}
+
+/* A look change replacing art line by line: --rows steps, so the seam moves a row at a time. The old-look
+   copy stays visible below the seam, the new look above it. See replaceArt in js/terminal.js. */
+.art-new { animation: print-in .6s steps(var(--rows, 16)) backwards; }
+.art-old { animation: art-old .6s steps(var(--rows, 16)) forwards; }
+@keyframes art-old {
+  from { clip-path: inset(0); }
+  to { clip-path: inset(100% 0 0 0); }
 }
 
 /* No bare prompt on an empty screen while the first screen prints. */

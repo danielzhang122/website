@@ -78,7 +78,11 @@ async function playPiece(art, piece, { build = false, skip = () => false, ready 
   const backdrop = piece === 'liquid-chrome' ? backdropKeys(mod.meta.palette) : new Set();
   const look = backdrop.size ? { ...LOOK, mono: false } : LOOK;
   const colorOf = (f) => (backdrop.size && typeof f !== 'string' ? f.color : null);
-  const draw = (text, color) => split(text, color, backdrop).forEach((t, i) => { layers[i].textContent = t; });
+  // Past the three layers are the old-look copies a look change adds (see replaceArt in js/terminal.js).
+  const draw = (text, color) => split(text, color, backdrop).forEach((t, i) => {
+    layers[i].textContent = t;
+    if (art.children[i + 3]) art.children[i + 3].textContent = t;
+  });
   const opts = { dom: true, look, maxFps: 24, onFrame: (f) => draw(frameText(f), colorOf(f)) };
   if (build) {
     let first = '', firstColor = null;
