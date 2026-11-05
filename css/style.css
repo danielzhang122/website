@@ -235,23 +235,29 @@ html.plex {
 }
 
 /* SUPERHOT, the hidden `superhot` command: always set together with .vga, which supplies the pixel
-   grid. The only font that glows: a halo and a horizontal glare, white on grey text and red on red
-   text. --glow-colour lifts grey to white and leaves any colour with over 10% saturation alone,
-   and fades with the text's lightness so dim grey only just glows
-   (currentColor stays unresolved in a custom property, so each text gets its own). CSS can't blur
-   sideways only, so the glare is blurred copies of the text to each side. */
+   grid. Light blue text and blue-grey dim text, with the site's strongest glow in retro: a halo and a
+   horizontal glare in each text's own colour. --glow-colour sets the strength from that colour:
+   brightness, plus how much redder than blue it is, gives about .38 on light blue, .05 on blue-grey
+   and .5 on red (saturation can't tell them apart, as light blue is saturated too). currentColor
+   stays unresolved in a custom property, so each text gets its own. CSS can't blur sideways only,
+   so the glare is blurred copies of the text to each side. */
 html.superhot {
   --text: 'Perfect DOS VGA 437', var(--px-text);
-  --glow-colour: hsl(from currentColor h s calc(l + (100 - l) * max(0, 1 - s / 10)) / calc(l * l * l / 1000000));
+  --ink: #cfe8ff;
+  --bright: #e4f2ff;
+  --dim: #5c6570;
+  --glow-colour: rgb(from currentColor r g b / calc((2 * max(r, g, b) + max(0, r - b) - 181) / 867));
   --glow-shadow:
     0 0 6px var(--glow-colour),
-    -5px 0 3px color-mix(in srgb, var(--glow-colour) 40%, transparent),
-    5px 0 3px color-mix(in srgb, var(--glow-colour) 40%, transparent),
+    -5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent),
+    5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent),
     -11px 0 5px color-mix(in srgb, var(--glow-colour) 20%, transparent),
     11px 0 5px color-mix(in srgb, var(--glow-colour) 20%, transparent),
     -18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent),
     18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent);
 }
+
+html.superhot :is(h1, h2, h3) { text-transform: uppercase; }
 
 /* The prompt's sliver of space after > would put the command between pixels. */
 html.vga .ps { margin-right: 0; }
@@ -267,8 +273,12 @@ html {
   --streak: .05;     /* rolling streak brightness */
   --streak-trail: .025; /* the fainter streak trailing it */
   --fringe: .2;      /* RGB fringe opacity */
-  --glow-shadow: 0 0 transparent; /* none, except in superhot */
+  --glare: 9%;       /* slight horizontal glare, in each text's own colour; superhot has its own */
+  --glow-shadow:
+    -6px 0 4px color-mix(in srgb, currentColor var(--glare), transparent),
+    6px 0 4px color-mix(in srgb, currentColor var(--glare), transparent);
 }
+html.vga { --glare: 6%; }
 html:not(.vga) { --fringe: .4; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
@@ -334,7 +344,6 @@ html:not(.no-retro) body {
     var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
     var(--glow-shadow);
 }
-html.no-retro body { text-shadow: var(--glow-shadow); }
 
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
 html:not(.no-retro) body:has(#lightbox.is-open)::before {
@@ -554,12 +563,13 @@ button.cmd:hover { color: var(--accent); }
    the usual 7.8x13 within 3%, so the art keeps its shape. */
 html.vga .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--px); }
 
-/* The art repaints every frame, and on text this dense the far glare layers and retro's fringe don't show. */
-html.superhot .chrome-art {
+/* The art repaints every frame, and on text this dense retro's fringe and superhot's far glare don't show. */
+html:not(.no-retro) .chrome-art { text-shadow: var(--glow-shadow); }
+html.superhot:not(.no-retro) .chrome-art {
   text-shadow:
     0 0 6px var(--glow-colour),
-    -5px 0 3px color-mix(in srgb, var(--glow-colour) 40%, transparent),
-    5px 0 3px color-mix(in srgb, var(--glow-colour) 40%, transparent);
+    -5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent),
+    5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent);
 }
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
