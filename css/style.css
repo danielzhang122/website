@@ -101,7 +101,7 @@
      --dim 4.7:1 (above the WCAG AA minimum of 4.5:1 for body text). */
   --ink: #b8b8b8;
   --bright: #d2d2d2;
-  --dim: #7c7c7c;
+  --dim: #5c5c5c;
   --line: #262626;
   --accent: #e5484d;
 
@@ -236,20 +236,21 @@ html.plex {
 
 /* SUPERHOT, the hidden `superhot` command: always set together with .vga, which supplies the pixel
    grid. The only font that glows: a halo and a horizontal glare, white on grey text and red on red
-   text. --glow-colour lifts grey to white and leaves any colour with over 10% saturation alone
+   text. --glow-colour lifts grey to white and leaves any colour with over 10% saturation alone,
+   and fades with the text's lightness so dim grey only just glows
    (currentColor stays unresolved in a custom property, so each text gets its own). CSS can't blur
    sideways only, so the glare is blurred copies of the text to each side. */
 html.superhot {
   --text: 'Perfect DOS VGA 437', var(--px-text);
-  --glow-colour: hsl(from currentColor h s calc(l + (100 - l) * max(0, 1 - s / 10)));
+  --glow-colour: hsl(from currentColor h s calc(l + (100 - l) * max(0, 1 - s / 10)) / calc(l * l * l / 1000000));
   --glow-shadow:
-    0 0 6px color-mix(in srgb, var(--glow-colour) 35%, transparent),
-    -8px 0 4px color-mix(in srgb, var(--glow-colour) 14%, transparent),
-    8px 0 4px color-mix(in srgb, var(--glow-colour) 14%, transparent),
-    -18px 0 7px color-mix(in srgb, var(--glow-colour) 8%, transparent),
-    18px 0 7px color-mix(in srgb, var(--glow-colour) 8%, transparent),
-    -32px 0 10px color-mix(in srgb, var(--glow-colour) 8%, transparent),
-    32px 0 10px color-mix(in srgb, var(--glow-colour) 8%, transparent);
+    0 0 6px var(--glow-colour),
+    -5px 0 3px color-mix(in srgb, var(--glow-colour) 40%, transparent),
+    5px 0 3px color-mix(in srgb, var(--glow-colour) 40%, transparent),
+    -11px 0 5px color-mix(in srgb, var(--glow-colour) 20%, transparent),
+    11px 0 5px color-mix(in srgb, var(--glow-colour) 20%, transparent),
+    -18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent),
+    18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent);
 }
 
 /* The prompt's sliver of space after > would put the command between pixels. */
@@ -556,9 +557,9 @@ html.vga .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var
 /* The art repaints every frame, and on text this dense the far glare layers and retro's fringe don't show. */
 html.superhot .chrome-art {
   text-shadow:
-    0 0 6px color-mix(in srgb, var(--glow-colour) 35%, transparent),
-    -8px 0 4px color-mix(in srgb, var(--glow-colour) 14%, transparent),
-    8px 0 4px color-mix(in srgb, var(--glow-colour) 14%, transparent);
+    0 0 6px var(--glow-colour),
+    -5px 0 3px color-mix(in srgb, var(--glow-colour) 40%, transparent),
+    5px 0 3px color-mix(in srgb, var(--glow-colour) 40%, transparent);
 }
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
