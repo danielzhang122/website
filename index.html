@@ -36,6 +36,12 @@
       const font = localStorage.getItem(retro ? 'font-retro' : 'font-modern') || (retro ? 'plex' : 'cascadia');
       if (font === 'vga' || font === 'plex') root.classList.add(font);
       if (font === 'superhot') root.classList.add('vga', 'superhot');
+      // Only visitors on a pixel font download them up front.
+      if (root.classList.contains('vga')) {
+        for (const file of [font === 'superhot' ? 'perfect-dos-vga-437.woff2' : 'px437-ibm-vga-9x16.woff', 'px437-ibm-vga-8x16.woff']) {
+          document.head.append(Object.assign(document.createElement('link'), { rel: 'preload', href: `fonts/${file}`, as: 'font', crossOrigin: '' }));
+        }
+      }
     } catch {
       document.documentElement.classList.add('plex');
     }
@@ -69,8 +75,6 @@
   <!-- Self-hosted (see @font-face in css/style.css) so no third-party server can block or break the first paint. -->
   <link rel="preload" href="fonts/cascadia-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <link rel="preload" href="fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="preload" href="fonts/px437-ibm-vga-9x16.woff" as="font" type="font/woff" crossorigin>
-  <link rel="preload" href="fonts/px437-ibm-vga-8x16.woff" as="font" type="font/woff" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
   <link rel="stylesheet" href="css/style.css?v=20261107-15">

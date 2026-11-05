@@ -292,8 +292,20 @@ html:not(.vga) { --fringe: .4; }
 :is(html:not(.no-retro), html.crt-leaving) body::before {
   background:
     repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 60%, rgba(0, 0, 0, .4)),
-    /* TV static: a generated noise tile. A custom property can't reach inside the image, so its strength is the rect's opacity. */
+    radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 60%, rgba(0, 0, 0, .4));
+  animation: crt-flicker 4s steps(1) infinite;
+}
+
+/* TV static: its own layer, moved by transform so each jump costs no repaint, and big enough to cover
+   the screen at every offset in crt-static. It sits out sweeps and zoomed photos. A generated noise tile;
+   a custom property can't reach inside the image, so its strength is the rect's opacity. */
+html:not(.no-retro)::before {
+  content: '';
+  position: fixed;
+  inset: -64px;
+  z-index: 200;
+  pointer-events: none;
+  background:
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 3 0 0 0 -1.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
   animation: crt-flicker 4s steps(1) infinite, crt-static .5s steps(1) infinite;
 }
@@ -332,6 +344,8 @@ html:not(.no-retro) body:has(#lightbox.is-open)::before {
    reached (turning off); the rolling streak sits it out. */
 html.crt-entering body::before { clip-path: inset(0 0 calc(100% - var(--sweep, 0px)) 0); }
 html.crt-leaving body::before { clip-path: inset(var(--sweep, 0px) 0 0 0); }
+html:is(.crt-entering, .crt-leaving)::before,
+html:not(.no-retro):has(#lightbox.is-open)::before,
 html:is(.crt-entering, .crt-leaving) body::after { display: none; }
 
 /* The banner's lead-in to the retro command fits the mode it would switch to. */
@@ -344,12 +358,12 @@ html:not(.no-retro) [data-retro-label="off"] { display: none; }
   34% { opacity: .85; }
 }
 
-/* Only the third layer, the noise, jumps; a tile shifted by an arbitrary offset reads as a new frame of static. */
+/* The tile shifted by an arbitrary offset reads as a new frame of static. */
 @keyframes crt-static {
-  0% { background-position: 0 0, 0 0, 0 0; }
-  25% { background-position: 0 0, 0 0, -83px 47px; }
-  50% { background-position: 0 0, 0 0, 61px -109px; }
-  75% { background-position: 0 0, 0 0, -137px -29px; }
+  0% { transform: none; }
+  25% { transform: translate(-41px, 23px); }
+  50% { transform: translate(30px, -55px); }
+  75% { transform: translate(-59px, -14px); }
 }
 
 @keyframes crt-roll {
@@ -538,6 +552,14 @@ button.cmd:hover { color: var(--accent); }
    so 16px (the font's native size, so it stays sharp) on a 13px line gives an 8x13 cell:
    the usual 7.8x13 within 3%, so the art keeps its shape. */
 html.vga .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--px); }
+
+/* The art repaints every frame, and on text this dense the far glare layers and retro's fringe don't show. */
+html.superhot .chrome-art {
+  text-shadow:
+    0 0 6px color-mix(in srgb, var(--glow-colour) 35%, transparent),
+    -8px 0 4px color-mix(in srgb, var(--glow-colour) 14%, transparent),
+    8px 0 4px color-mix(in srgb, var(--glow-colour) 14%, transparent);
+}
 
 /* Three stacked layers of plain text, split by glyph weight in js/chrome.js so there
    are no per-character spans: mid tones rose, the faint glyphs inside the shape
@@ -848,6 +870,6 @@ html.vga .gate-art { font-family: var(--px); }
 
 @media (prefers-reduced-motion: reduce) {
   .cursor { animation: none; }
-  body::before { animation: none !important; }
+  html::before, body::before { animation: none !important; }
   body::after { display: none !important; }
 }
