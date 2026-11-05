@@ -237,11 +237,12 @@
     copy.querySelectorAll('video').forEach((video) => videoObserver.observe(video));
   }
 
-  // Once the page has loaded, fetch every photo and video into the browser cache, so a
-  // printed section shows its media straight away. Skipped when the visitor asked to save data.
+  // Once the page has loaded, fetch the photos into the browser cache, so a printed section shows
+  // them straight away. Videos stream when played, as they're most of the page's weight. Skipped
+  // on phone widths and when the visitor asked to save data.
   addEventListener('load', () => {
-    if (navigator.connection?.saveData) return;
-    const sources = new Set([...content.querySelectorAll('img, video')].map((media) => media.getAttribute('src')));
+    if (navigator.connection?.saveData || !matchMedia('(min-width: 641px)').matches) return;
+    const sources = new Set([...content.querySelectorAll('img')].map((media) => media.getAttribute('src')));
     for (const src of sources) fetch(src, { priority: 'low' }).catch(() => {});
   });
 
