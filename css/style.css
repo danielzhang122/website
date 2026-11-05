@@ -182,6 +182,7 @@ h3 {
 b { font-weight: 600; color: var(--bright); }
 
 .dim { color: var(--dim); }
+.nowrap { white-space: nowrap; }
 
 /* The subtitle belongs to the name. */
 h1 + p { margin-top: var(--gap-s) !important; }

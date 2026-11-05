@@ -68,6 +68,33 @@
   // and the look commands would redo saved settings.
   const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'cascadia', 'superhot', 'default', 'rm', 'sudo'];
 
+  // What Tab suggests on an empty prompt: the fun ones, never rm, sudo, exit, logout or default.
+  const TAB_HINTS = ['superhot', 'vga', 'plex', 'mercury', 'klein', 'torus', 'name', 'coffee', 'history'];
+  let tabHint = '';
+  let psstShown = false;     // the last unrecognized command got the Tab tip
+
+  // Now and then the banner's last prompt hints at an easter egg instead: at most once every 5
+  // page loads, then a 1 in 3 chance each load. Set before whoami copies the banner, so nothing
+  // flashes and a restored session copies the same line.
+  // shortcut: with storage blocked the count never advances, so the limit can't hold; that's rare and harmless.
+  const BANNER_HINTS = {
+    superhot: 'Too cold in here?',
+    vga: 'Miss DOS?',
+    mercury: 'Want something shiny?',
+    name: "What's in a name?",
+  };
+  const clearHint = document.querySelector('.banner [data-run="clear"]');
+  const sinceHint = Number(saved('banner-hint-wait') ?? 4) || 0;
+  save('banner-hint-wait', sinceHint + 1);
+  if (clearHint && sinceHint >= 4 && Math.random() < 1 / 3) {
+    save('banner-hint-wait', 0);
+    const names = Object.keys(BANNER_HINTS);
+    const name = names[Math.floor(Math.random() * names.length)];
+    clearHint.dataset.run = name;
+    clearHint.textContent = name;
+    clearHint.parentElement.previousSibling.data = ` ${BANNER_HINTS[name]} `;
+  }
+
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
   /* ---------- printing ---------- */
@@ -259,6 +286,10 @@
       row.append(key, desc);
       list.appendChild(row);
     }
+    const hint = document.createElement('p');
+    hint.className = 'dim';
+    hint.textContent = 'not everything is listed here. try tab.';
+    list.appendChild(hint);
     return reveal(list);
   }
 
@@ -755,6 +786,11 @@
       if (SECTIONS.includes(name)) setHash(name);
     } else {
       await printLine(`'${word}' is not recognized as a command. type help for the list.`, 'dim');
+      // Skipped on restore, so a refresh reprints the same lines without a new random one.
+      if (!restoring) {
+        psstShown = !psstShown && Math.random() < 1 / 4;
+        if (psstShown) await printLine('psst: press tab on an empty prompt.', 'dim');
+      }
     }
     if (restoring) return;
     if (!UNSAVED.includes(name)) ran.push(text);
@@ -813,7 +849,14 @@
     } else if (e.key === 'Tab') {
       e.preventDefault();
       const start = input.value.trim().toLowerCase();
-      if (!start) return;
+      if (!start || start === tabHint) {
+        const others = TAB_HINTS.filter((name) => name !== tabHint);
+        tabHint = others[Math.floor(Math.random() * others.length)];
+        input.value = tabHint;
+        input.setSelectionRange(tabHint.length, tabHint.length);
+        requestAnimationFrame(updateCursor);
+        return;
+      }
       const matches = Object.keys(COMMANDS).filter((name) => name.startsWith(start));
       if (matches.length === 1) {
         input.value = matches[0];
