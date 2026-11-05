@@ -292,7 +292,7 @@ html {
   --streak: .03;     /* rolling streak brightness */
   --streak-trail: .015; /* the fainter streak trailing it */
   --fringe: .2;      /* RGB fringe opacity */
-  --glare: .2;       /* horizontal glare strength, near the text; superhot has its own */
+  --glare: .16;      /* horizontal glare strength, near the text; superhot has its own */
   /* In each text's own colour, stronger the redder it is, as red is darker and would barely show. */
   --glare-colour: rgb(from currentColor r g b / calc(var(--glare) + max(0, r - b) / 760));
   --glare-near:
@@ -303,8 +303,7 @@ html {
     -24px 0 10px color-mix(in srgb, var(--glare-colour) 50%, transparent),
     24px 0 10px color-mix(in srgb, var(--glare-colour) 50%, transparent);
 }
-html.vga { --glare: .14; }
-html.plex { --glare: .16; }   /* retro's default font: a touch softer */
+html.vga { --glare: .11; }
 html:not(.vga) { --fringe: .4; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
