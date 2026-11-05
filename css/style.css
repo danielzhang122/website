@@ -23,6 +23,15 @@
   src: url(../fonts/px437-ibm-vga-8x16.woff) format('woff');
 }
 
+/* SUPERHOT text: Perfect DOS VGA 437 by Zeh Fernando (see fonts/perfect-dos-vga-437-LICENSE.txt), the "Win"
+   variant, whose accents map correctly. Also 9x16, so it shares the vga pixel handling (see html.superhot). */
+@font-face {
+  font-family: 'Perfect DOS VGA 437';
+  font-weight: 400;
+  font-display: swap;
+  src: url(../fonts/perfect-dos-vga-437.woff2) format('woff2');
+}
+
 @font-face {
   font-family: 'Cascadia Mono';
   font-weight: 400;
@@ -194,7 +203,7 @@ a:hover {
 
 
 /* ==========================================================================
-   CRT: scanlines, a tube-glass vignette, a faint flicker, a rolling streak, RGB fringe and phosphor glow. The `retro`
+   CRT: scanlines, a tube-glass vignette, TV static, a faint flicker, a rolling streak and RGB fringe. The `retro`
    command toggles .no-retro on <html> to turn them off. Each mode also keeps its own page font
    (.plex or .vga on <html>, or neither for Cascadia; see setFont in js/terminal.js).
    ========================================================================== */
@@ -225,6 +234,22 @@ html.plex {
   --lh: calc(19 / 15);
 }
 
+/* SUPERHOT, the hidden `superhot` command: always set together with .vga, which supplies the pixel
+   grid. The only font that glows: a halo in each text's own colour (currentColor stays unresolved
+   in a custom property) and a red horizontal glare. CSS can't blur sideways only, so the glare is
+   blurred copies of the text to each side. */
+html.superhot {
+  --text: 'Perfect DOS VGA 437', var(--px-text);
+  --glow-shadow:
+    0 0 6px color-mix(in srgb, currentColor 60%, transparent),
+    -8px 0 4px rgba(255, 30, 40, .3),
+    8px 0 4px rgba(255, 30, 40, .3),
+    -18px 0 7px rgba(255, 30, 40, .16),
+    18px 0 7px rgba(255, 30, 40, .16),
+    -32px 0 10px rgba(255, 30, 40, .16),
+    32px 0 10px rgba(255, 30, 40, .16);
+}
+
 /* The prompt's sliver of space after > would put the command between pixels. */
 html.vga .ps { margin-right: 0; }
 
@@ -237,8 +262,9 @@ html.vga .banner button.cmd + button.cmd { margin-left: 0; }
 html {
   --scan: .16;       /* scanline darkness */
   --streak: .05;     /* rolling streak brightness */
+  --streak-trail: .025; /* the fainter streak trailing it */
   --fringe: .2;      /* RGB fringe opacity */
-  --glow: 35%;       /* phosphor glow strength */
+  --glow-shadow: 0 0 transparent; /* none, except in superhot */
 }
 html:not(.vga) { --fringe: .4; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
@@ -264,15 +290,20 @@ html:not(.vga) { --fringe: .4; }
 :is(html:not(.no-retro), html.crt-leaving) body::before {
   background:
     repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 60%, rgba(0, 0, 0, .4));
-  animation: crt-flicker 4s steps(1) infinite;
+    radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 60%, rgba(0, 0, 0, .4)),
+    /* TV static: a generated noise tile. A custom property can't reach inside the image, so its strength is the rect's opacity. */
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='256' height='256'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 3 0 0 0 -1.4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.05'/%3E%3C/svg%3E");
+  animation: crt-flicker 4s steps(1) infinite, crt-static .5s steps(1) infinite;
 }
 
 :is(html:not(.no-retro), html.crt-leaving) body::after {
   bottom: auto;
-  height: 40vh;
-  background: linear-gradient(transparent, rgba(255, 255, 255, var(--streak)), transparent);
-  animation: crt-roll 12s linear infinite;
+  /* Rolls downward, so the trail is the upper band: 25vh of trail, 5vh of gap, 40vh of streak. */
+  height: 70vh;
+  background:
+    linear-gradient(transparent, rgba(255, 255, 255, var(--streak)), transparent) bottom / 100% 40vh no-repeat,
+    linear-gradient(transparent, rgba(255, 255, 255, var(--streak-trail)), transparent) top / 100% 25vh no-repeat;
+  animation: crt-roll 14.6s linear infinite; /* the same speed as 140vh in 12s */
 }
 
 /* Buttons and inputs don't inherit text-shadow by default; the commands are buttons. */
@@ -281,14 +312,14 @@ input { text-shadow: inherit; }
 
 /* The RGB fringe: exactly one screen pixel (--dpx) each side, faint, so it tints the edges of
    each stroke without smearing them. On the VGA font it's kept at .2: at .3 it doubles the width
-   of the font's 1px strokes and grey text reads as smudged bold. The glow takes each text's own
-   colour, so red stays red. */
+   of the font's 1px strokes and grey text reads as smudged bold. */
 html:not(.no-retro) body {
   text-shadow:
     calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
     var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
-    0 0 6px color-mix(in srgb, currentColor var(--glow), transparent);
+    var(--glow-shadow);
 }
+html.no-retro body { text-shadow: var(--glow-shadow); }
 
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
 html:not(.no-retro) body:has(#lightbox.is-open)::before {
@@ -311,8 +342,16 @@ html:not(.no-retro) [data-retro-label="off"] { display: none; }
   34% { opacity: .85; }
 }
 
+/* Only the third layer, the noise, jumps; a tile shifted by an arbitrary offset reads as a new frame of static. */
+@keyframes crt-static {
+  0% { background-position: 0 0, 0 0, 0 0; }
+  25% { background-position: 0 0, 0 0, -83px 47px; }
+  50% { background-position: 0 0, 0 0, 61px -109px; }
+  75% { background-position: 0 0, 0 0, -137px -29px; }
+}
+
 @keyframes crt-roll {
-  from { transform: translateY(-40vh); }
+  from { transform: translateY(-70vh); }
   to { transform: translateY(100vh); }
 }
 

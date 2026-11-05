@@ -61,11 +61,12 @@
     vga: () => setFont('vga'),
     plex: () => setFont('plex'),
     cascadia: () => setFont('cascadia'),
+    superhot: () => setFont('superhot'),
     default: resetFonts,
   };
   // Not re-run when a refresh restores the session: clear and rm reset it themselves,
   // and the look commands would redo saved settings.
-  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'cascadia', 'default', 'rm', 'sudo'];
+  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'cascadia', 'superhot', 'default', 'rm', 'sudo'];
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -412,10 +413,10 @@
     sweepFrame = requestAnimationFrame(tick);
   }
 
-  // Retro and modern each keep their own page font: vga, plex or cascadia, set by the hidden
+  // Retro and modern each keep their own page font: vga, plex, superhot or cascadia, set by the hidden
   // command of the same name for whichever mode is on, and put back by the hidden default.
   // index.html applies the saved choice before first paint, with the same defaults.
-  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'", cascadia: "15px 'Cascadia Mono'" };
+  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'", superhot: "16px 'Perfect DOS VGA 437'", cascadia: "15px 'Cascadia Mono'" };
   const DEFAULT_FONT = { retro: 'plex', modern: 'cascadia' };
   const modeName = (retro) => (retro ? 'retro' : 'modern');
 
@@ -438,6 +439,7 @@
   }
   function currentFont() {
     const { classList } = document.documentElement;
+    if (classList.contains('superhot')) return 'superhot';
     return classList.contains('vga') ? 'vga' : classList.contains('plex') ? 'plex' : 'cascadia';
   }
 
@@ -455,8 +457,9 @@
     const root = document.documentElement;
     const apply = () => {
       root.classList.toggle('no-retro', !retro);
-      root.classList.toggle('vga', font === 'vga');
+      root.classList.toggle('vga', font === 'vga' || font === 'superhot');
       root.classList.toggle('plex', font === 'plex');
+      root.classList.toggle('superhot', font === 'superhot');
     };
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) apply();
     else sweep(apply, crtChange ? (retro ? 'crt-entering' : 'crt-leaving') : '', fontChange);
@@ -471,7 +474,7 @@
     return printLine(`retro ${on ? 'on' : 'off'}`, 'dim');
   }
 
-  // Easter eggs: vga, plex and cascadia set the font for the mode that's on.
+  // Easter eggs: vga, plex, superhot and cascadia set the font for the mode that's on.
   async function setFont(font) {
     const retro = retroOn();
     save(`font-${modeName(retro)}`, font);
