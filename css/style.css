@@ -258,7 +258,11 @@ html.superhot {
     18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent);
 }
 
-html.superhot :is(h1, h2, h3) { text-transform: uppercase; }
+/* All text in capitals, as in SUPERHOT; only the ASCII art keeps its case, as capitals would change its shapes.
+   Form controls don't inherit text-transform, so the buttons and the command input opt in themselves. */
+html.superhot body,
+html.superhot :is(input, button) { text-transform: uppercase; }
+html.superhot :is(.chrome-art, .name-art, .gate-art) { text-transform: none; }
 
 /* The prompt's sliver of space after > would put the command between pixels. */
 html.vga .ps { margin-right: 0; }
