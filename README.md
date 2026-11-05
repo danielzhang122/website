@@ -11,4 +11,5 @@ half the commit history used to be me changing one word and pushing it then chan
 - **modern font:** [Cascadia Mono](https://github.com/microsoft/cascadia-code) by Microsoft, SIL Open Font License (license in `fonts/cascadia-mono-LICENSE.txt`).
 - **retro font:** [IBM Plex Mono](https://github.com/IBM/plex) by IBM, SIL Open Font License (license in `fonts/ibm-plex-mono-LICENSE.txt`).
 - **vga fonts** (the hidden `vga` command): "WebPlus IBM VGA 9x16" (text) and "WebPlus IBM VGA 8x16" (ASCII art) from the [Ultimate Oldschool PC Font Pack](https://int10h.org/oldschool-pc-fonts/) by VileR, CC BY-SA 4.0 (license in `fonts/px437-LICENSE.txt`).
+- **superhot font** (the hidden `superhot` command): [Perfect DOS VGA 437](https://www.dafont.com/perfect-dos-vga-437.font) by Zeh Fernando, free to distribute but not to sell (license in `fonts/perfect-dos-vga-437-LICENSE.txt`).
 - **other visuals:** found on [21st.dev](https://21st.dev/).
