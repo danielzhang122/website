@@ -681,16 +681,20 @@
   const CRUMBLE = 600;        // ms over which characters start crumbling, in random order
   const CRUMBLE_CELL = 100;   // ms each shows a dot before it's gone
 
+  // Crumbles the screen and the banner art above it. Resolves to whether the banner went with it.
   async function crumbleScreen() {
     stopPieces.splice(0).forEach((stop) => stop());
     endSweep();   // so it crumbles the real text, not a half-regenerated one
+    const banner = await window.ChromeArt?.stopBanner();
     if (!restoring && !reduceMotion) {
       screen.querySelectorAll(MEDIA).forEach((media) => media.classList.add('pending'));
       const nodes = [];
-      const walker = document.createTreeWalker(screen, NodeFilter.SHOW_TEXT);
-      for (let n = walker.nextNode(); n; n = walker.nextNode()) {
-        const full = [...n.data];
-        nodes.push({ n, full, at: full.map(() => Math.random() * CRUMBLE) });
+      for (const root of banner ? [banner, screen] : [screen]) {
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+          const full = [...n.data];
+          nodes.push({ n, full, at: full.map(() => Math.random() * CRUMBLE) });
+        }
       }
       const startedAt = performance.now();
       for (let t = 0; t < CRUMBLE + CRUMBLE_CELL && !fastForward; t = performance.now() - startedAt) {
@@ -701,13 +705,17 @@
       }
     }
     screen.replaceChildren();
+    if (banner) [...banner.children].forEach((layer) => { layer.textContent = ''; });
+    return Boolean(banner);
   }
 
   async function crumble() {
-    await crumbleScreen();
+    const banner = await crumbleScreen();
     setHash('');
     ran = ['whoami'];
     saveSession();
+    // The banner builds itself back in as whoami returns.
+    if (banner) window.ChromeArt.replayBanner({ build: !reduceMotion });
     await printWhoami();
     await printLine('just kidding.', 'dim');
   }
