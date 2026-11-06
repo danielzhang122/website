@@ -22,7 +22,7 @@
   // Things that pop in whole when the typing reaches them, instead of being typed.
   const MEDIA = 'figure, .thumbs > :is(img, video)';
 
-  const SECTIONS = ['whoami', 'projects', 'misc', 'interests', 'experience', 'skills', 'certs', 'resume', 'art', 'contact'];
+  const SECTIONS = ['whoami', 'projects', 'misc', 'interests', 'experience', 'skills', 'certs', 'resume', 'art', 'fonts', 'contact'];
 
   const COMMANDS = {
     help: { help: 'list commands', run: printHelp },
@@ -35,6 +35,7 @@
     certs: { help: 'certifications', run: () => printSection('certs') },
     resume: { help: 'one-page pdf', run: () => printSection('resume') },
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
+    fonts: { help: 'switch the page font', run: () => printSection('fonts') },
     contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
     retro: { help: 'toggle the crt screen effect', run: toggleRetro },
@@ -53,6 +54,7 @@
     skill: 'skills', tools: 'skills',
     certifications: 'certs', certificates: 'certs',
     paintings: 'art', drawings: 'art', carvings: 'art', artwork: 'art', gallery: 'art',
+    font: 'fonts', typeface: 'fonts',
     socials: 'contact', links: 'contact', connect: 'contact', reach: 'contact',
     // The links in contact, printed on their own (see LINKS).
     mail: 'email', 'e-mail': 'email', gmail: 'email', inbox: 'email',
