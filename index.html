@@ -236,11 +236,11 @@
 
       <article data-id="resume-sync">
         <h3>Résumé Sync Pipeline</h3>
-        <p>Updating my résumé got tedious, so I spent far too long automating it. Every Monday a script checks my repos, an AI agent proposes source-backed edits, and GitHub Actions makes sure it still compiles on one page. I review everything before merging. The repo's private, mostly so nobody watches me reword the same bullet eleven times.</p>
-        <p class="tags">Python, GitHub Actions, LaTeX, Claude Code</p>
+        <p>Updating my résumé got tedious, so I spent far too long automating it. Every Monday a script checks my repos, an AI agent proposes source-backed edits, and GitHub Actions makes sure it still compiles on one page. I review everything before merging. The repo's public now, so you can watch me reword the same bullet eleven times. It's the most innovative résumé I've built in years.</p>
+        <p class="tags">Python, GitHub Actions, LaTeX, Claude Code <a href="https://github.com/danielzhang122/resume-sync" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <figure class="thumb">
           <img src="images/resume-sync-diagram.svg" width="1200" height="520" class="fit-whole" loading="lazy" data-lightbox
-               alt="Pipeline diagram: a weekly schedule runs check.py, which stops if nothing changed; otherwise an agent reviews the diffs, edits resume.tex on a new branch, a GitHub Action builds the PDF and, if it runs over one page, sends it back to the agent to rewrite and retry; once it passes, a pull request shows each edit with its source commit, I review and merge, and the next run opens a website PR with the new PDF, which I merge. My project work during the week becomes the next Monday's input" data-title="Résumé Sync Pipeline"
+               alt="Pipeline diagram: a weekly schedule runs check.py, which stops if nothing changed; otherwise an agent reviews the diffs, edits resume.tex on a new branch, a GitHub Action builds the PDF and, if it runs over one page, sends it back to the agent to rewrite and retry; once it passes, a pull request shows each edit with its source commit, I review and merge, and the next run opens a website PR with the new PDF, which I merge. My project work during the week becomes the next Monday's input" data-title="Résumé Sync Pipeline" data-repo="https://github.com/danielzhang122/resume-sync"
                data-caption="Grey steps run on their own. Red ones are me: nothing reaches the résumé or this site until I merge.">
         </figure>
       </article>
