@@ -52,7 +52,7 @@
     <text x="165" y="234" fill="#e5484d">throughout the week</text>
   </g>
   <g text-anchor="middle" font-size="13.5" fill="#a8a8a8">
-    <text x="165" y="110">Sundays 06:00,</text>
+    <text x="165" y="110">Mondays 07:00,</text>
     <text x="165" y="130">cloud agent</text>
     <text x="455" y="110">diff repos since last</text>
     <text x="455" y="130">review, skip own files</text>
@@ -69,7 +69,7 @@
     <text x="165" y="400">opened next run;</text>
     <text x="165" y="420" fill="#e5484d">I merge, site updates</text>
     <text x="165" y="262">New commits become</text>
-    <text x="165" y="281">next Sunday's inputs.</text>
+    <text x="165" y="281">next Monday's inputs.</text>
     <text x="455" y="222">nothing changed: stop, no commits</text>
   </g>
 
