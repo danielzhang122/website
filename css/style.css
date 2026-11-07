@@ -14,8 +14,9 @@
   src: url(../fonts/px437-ibm-vga-9x16.woff) format('woff');
 }
 
-/* Retro ASCII art: its 8x16 grid is close to the art's 0.6em-wide cells, so the art keeps its proportions.
-   (The art was drawn for 0.6em cells; Cascadia Mono's 0.586em draws it 2% narrower, which doesn't show.) */
+/* VGA's ASCII art: its 8x16 grid is close to the art's 0.6em-wide cells, so the art keeps its proportions.
+   (The art was drawn for 0.6em cells; Cascadia Mono's 0.586em draws it 2% narrower, which doesn't show.)
+   Each font mode draws the art in its own font (--art). */
 @font-face {
   font-family: 'Px437 IBM VGA';
   font-weight: 400;
@@ -110,6 +111,7 @@
   --px-text: 'IBM VGA 9x16', var(--px);
   --plex: 'IBM Plex Mono', var(--mono);
   --text: var(--mono);
+  --art: var(--mono);   /* the ASCII art's font: each font mode draws its art in its own font */
   /* A terminal's text grid: 9x19px cells, as in Windows Terminal. Cascadia Mono is 0.5859375em
      (1200/2048) wide, so 15.36px gives exactly 9px columns. */
   --fs: 15.36px;
@@ -219,6 +221,7 @@ a:hover {
    Toggling vga regenerates the text in the other font block by block (see sweep in js/terminal.js). */
 html.vga {
   --text: var(--px-text);
+  --art: var(--px);
   --fs: calc(16 * var(--pxu));
   font-synthesis: none;
 }
@@ -227,10 +230,12 @@ html.vga { --text-line: calc(24 * var(--pxu)); }
 html.vga body { line-height: var(--text-line); }
 
 
-/* IBM Plex Mono for the page text: retro's default, or set by the hidden `plex` command (the
-   ASCII art stays in Cascadia). Plex is 0.6em wide, so 15px gives the same 9px columns, on the same 19px lines. */
+/* IBM Plex Mono for the page text and the ASCII art: retro's default, or set by the hidden `plex` command.
+   Plex is 0.6em wide, so 15px gives the same 9px columns, on the same 19px lines; 0.6em is also the
+   art's own cell width, so the art keeps its sizes. */
 html.plex {
   --text: var(--plex);
+  --art: var(--plex);
   --fs: 15px;
   --lh: calc(19 / 15);
 }
@@ -244,6 +249,7 @@ html.plex {
    so the glare is blurred copies of the text to each side. */
 html.superhot {
   --text: 'Perfect DOS VGA 437', var(--px-text);
+  --art: 'Perfect DOS VGA 437', var(--px);
   --ink: #cfe8ff;
   --bright: #cfe8ff;
   --dim: #5c6570;
@@ -460,12 +466,13 @@ html:not(.no-retro) [data-retro-label="off"] { display: none; }
   overflow: hidden;
   margin: 0;
   color: var(--ink);
-  font: 400 13px/1.15 var(--mono);
+  font: 400 13px/1.15 var(--art);
   white-space: pre;
 }
 
-/* In vga: an 8x15 cell for the usual 7.8x14.95 (see .chrome-art). */
-html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(--px); }
+/* In vga: an 8x15 cell for the usual 7.8x14.95 (see .chrome-art). Superhot's font is 9px wide: a 9x17 cell. */
+html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(--art); }
+html.superhot .name-art { line-height: calc(17 * var(--pxu)); }
 
 .accent { color: var(--accent); }
 
@@ -607,7 +614,7 @@ button.cmd:hover { color: var(--accent); }
   width: max-content;
   max-width: 100%;
   margin: 0 auto var(--gap-2);
-  font: 400 13px/1 var(--mono);
+  font: 400 13px/1 var(--art);
   color: var(--ink);
   contain: content;
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 60%, transparent 100%);
@@ -617,12 +624,21 @@ button.cmd:hover { color: var(--accent); }
 /* VGA draws the art in the pixel font too. Its characters are 0.5em wide to the art's 0.6em,
    so 16px (the font's native size, so it stays sharp) on a 13px line gives an 8x13 cell:
    the usual 7.8x13 within 3%, so the art keeps its shape. */
-html.vga .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--px); }
+html.vga .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--art); }
+/* Superhot's font is 9px wide (0.5625em): a 9x15 cell keeps the art's 0.6:1. */
+html.superhot .chrome-art { line-height: calc(15 * var(--pxu)); }
 
-/* The art repaints every frame, and on text this dense retro's fringe and superhot's far glare don't show. */
-html:not(.no-retro) .chrome-art { text-shadow: var(--glare-near); }
+/* The art repaints every frame, so it skips superhot's far glare; it keeps the RGB fringe like all other text. */
+html:not(.no-retro) .chrome-art {
+  text-shadow:
+    calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
+    var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
+    var(--glare-near);
+}
 html.superhot:not(.no-retro) .chrome-art {
   text-shadow:
+    calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
+    var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
     0 0 6px var(--glow-colour),
     -5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent),
     5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent);
@@ -811,13 +827,11 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 .gate-art {
   margin: 0;
   color: var(--ink);
-  font-family: var(--mono);
+  font-family: var(--art);
   line-height: 1.15;
   white-space: pre;
 }
-
-/* In vga js/intro.js scales the font and sets the line height to keep the art's cells. */
-html.vga .gate-art { font-family: var(--px); }
+/* In the pixel fonts js/intro.js scales the font and sets the line height to keep the art's cells. */
 
 .gate-hint {
   position: absolute;

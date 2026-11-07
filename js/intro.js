@@ -239,7 +239,15 @@
   }
 
   const pre = gate.querySelector('.gate-art');
-  const vga = () => document.documentElement.classList.contains('vga');
+  // The art's font in the current mode (CSS --art): its character width in em and, for the pixel
+  // fonts, the line height that keeps the art's cells at their native 16px size.
+  function artFont() {
+    const c = document.documentElement.classList;
+    if (c.contains('superhot')) return { load: "16px 'Perfect DOS VGA 437'", w: 9 / 16, pixelLine: 17 };
+    if (c.contains('vga')) return { load: "16px 'Px437 IBM VGA'", w: 0.5, pixelLine: 15 };
+    if (c.contains('plex')) return { load: "14px 'IBM Plex Mono'", w: 0.6 };
+    return { load: "14px 'Cascadia Mono'", w: MONO_W };
+  }
 
   let art = null;          // the name art, rebuilt on resize
   let labelPad = '';
@@ -251,20 +259,21 @@
     const height = innerHeight;
     const narrow = width < 600;
     art = nameArt({ vertical: narrow });
-    // Cascadia Mono's characters are 0.586em (1200/2048) wide and 1.15em tall; leave room for the label below.
-    const fit = Math.min((width * (narrow ? 0.9 : 0.8)) / (art.cols * MONO_W), (height * 0.8) / ((art.rows + 3) * 1.15));
+    // The art's characters are f.w em wide and about 1.15em tall; leave room for the label below.
+    const f = artFont();
+    const fit = Math.min((width * (narrow ? 0.9 : 0.8)) / (art.cols * f.w), (height * 0.8) / ((art.rows + 3) * 1.15));
     const fontSize = Math.max(6, Math.min(16, Math.floor(fit)));
     labelPad = ' '.repeat(Math.max(0, Math.floor((art.cols - LABEL.length) / 2)));
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
-    if (vga() && fit * MONO_W >= 8 * pxu) {
-      // The pixel font is only sharp at its own size (--pxu, see index.html), on an 8x15
-      // cell: the art's 0.6:1.15 within 2%.
+    if (f.pixelLine && fit >= 16 * pxu) {
+      // A pixel font is only sharp at its own size (--pxu, see index.html): an 8x15 cell in vga,
+      // 9x17 in superhot, both the art's 0.6:1.15 within 2%.
       pre.style.fontSize = `${16 * pxu}px`;
-      pre.style.lineHeight = `${15 * pxu}px`;
-    } else if (vga()) {
-      // Too small a screen for that: scale it, keeping the cell width (the pixel font is 0.5em wide).
-      pre.style.fontSize = `${fontSize * MONO_W / 0.5}px`;
-      pre.style.lineHeight = `${fontSize * 1.15}px`;
+      pre.style.lineHeight = `${f.pixelLine * pxu}px`;
+    } else if (f.pixelLine) {
+      // Too small a screen for that: scale it, keeping the cell's shape.
+      pre.style.fontSize = `${Math.max(6, Math.floor(fit))}px`;
+      pre.style.lineHeight = `${Math.max(6, Math.floor(fit)) * f.pixelLine / 16}px`;
     } else {
       pre.style.fontSize = `${fontSize}px`;
       pre.style.lineHeight = '';
@@ -325,7 +334,7 @@
 
   // Wait for the mono font so the characters measure right; don't hang if it never comes.
   Promise.race([
-    document.fonts.load(vga() ? "16px 'Px437 IBM VGA'" : "14px 'Cascadia Mono'"),
+    document.fonts.load(artFont().load),
     new Promise((resolve) => setTimeout(resolve, 600)),
   ]).finally(() => {
     build();

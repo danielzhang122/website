@@ -610,9 +610,11 @@
 
     // The art is drawn for 13px characters; when the console is too narrow for the
     // row of three (phones), the glyphs stack vertically.
-    // Cascadia Mono's advance width at 13px, or the pixel font's at 16px in vga (see .name-art).
+    // The art font's advance width (see .name-art): superhot's 9px and vga's 8px pixel fonts at 16px,
+    // or Plex (0.6em) or Cascadia (1200/2048 em) at 13px.
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
-    const charW = document.documentElement.classList.contains('vga') ? 8 * pxu : 13 * (1200 / 2048);
+    const cls = document.documentElement.classList;
+    const charW = cls.contains('superhot') ? 9 * pxu : cls.contains('vga') ? 8 * pxu : 13 * (cls.contains('plex') ? 0.6 : 1200 / 2048);
     const vertical = screen.clientWidth < art.nameArt().cols * charW;
     const { cols, rows, cells, fillEnd } = art.nameArt({ vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));

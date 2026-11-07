@@ -38,7 +38,7 @@
       if (font === 'superhot') root.classList.add('vga', 'superhot');
       // Only visitors on a pixel font download them up front.
       if (root.classList.contains('vga')) {
-        for (const file of [font === 'superhot' ? 'perfect-dos-vga-437.woff2' : 'px437-ibm-vga-9x16.woff', 'px437-ibm-vga-8x16.woff']) {
+        for (const file of font === 'superhot' ? ['perfect-dos-vga-437.woff2'] : ['px437-ibm-vga-9x16.woff', 'px437-ibm-vga-8x16.woff']) {
           document.head.append(Object.assign(document.createElement('link'), { rel: 'preload', href: `fonts/${file}`, as: 'font', crossOrigin: '' }));
         }
       }
@@ -77,12 +77,12 @@
   <link rel="preload" href="fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261107-23">
+  <link rel="stylesheet" href="css/style.css?v=20261107-25">
 
   <script src="js/intro-glyphs.js?v=20261031-5" defer></script>
-  <script src="js/intro.js?v=20261106-6" defer></script>
+  <script src="js/intro.js?v=20261107-1" defer></script>
   <script src="js/lightbox.js?v=20261104-1" defer></script>
-  <script src="js/terminal.js?v=20261107-14" defer></script>
+  <script src="js/terminal.js?v=20261107-15" defer></script>
   <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
   <script type="module" src="js/chrome.js?v=20261107-2"></script>
 </head>
