@@ -628,10 +628,17 @@ html.vga .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var
 /* Superhot's font is 9px wide (0.5625em): a 9x15 cell keeps the art's 0.6:1. */
 html.superhot .chrome-art { line-height: calc(15 * var(--pxu)); }
 
-/* The art repaints every frame, and on text this dense retro's fringe and superhot's far glare don't show. */
-html:not(.no-retro) .chrome-art { text-shadow: var(--glare-near); }
+/* The art repaints every frame, so it skips superhot's far glare; it keeps the RGB fringe like all other text. */
+html:not(.no-retro) .chrome-art {
+  text-shadow:
+    calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
+    var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
+    var(--glare-near);
+}
 html.superhot:not(.no-retro) .chrome-art {
   text-shadow:
+    calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
+    var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
     0 0 6px var(--glow-colour),
     -5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent),
     5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent);
