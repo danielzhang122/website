@@ -116,11 +116,10 @@
      (1200/2048) wide, so 15.36px gives exactly 9px columns. */
   --fs: 15.36px;
   --lh: calc(19 / 15.36);     /* 19px at 15.36px */
-  /* Spacing: whole lines of text, so everything sits on the same line grid, as in a terminal.
   /* One size and one line height for all text, as in a terminal: nothing sets its own
      (only the ASCII art, whose grids need theirs). */
-  /* Spacing, in even half-line steps: --gap-s (half a line) between the lines of one item (a name
-     and its subtitle, a project's title, text and tags, a label and what it labels), --gap (one
+  /* Spacing, in even half-line steps: --gap-s (half a line) between the lines of one item (a
+     project's title, text and tags, a label and what it labels), --gap (one
      line) between blocks, --gap-2 (a line and a half) between commands and between projects. */
   --text-line: calc(var(--fs) * var(--lh));
   --gap-s: calc(var(--text-line) / 2);
@@ -185,9 +184,6 @@ b { font-weight: 600; color: var(--bright); }
 
 .dim { color: var(--dim); }
 .nowrap { white-space: nowrap; }
-
-/* The subtitle belongs to the name. */
-h1 + p { margin-top: var(--gap-s) !important; }
 
 code { font: inherit; color: var(--ink); }
 
@@ -663,8 +659,11 @@ html.superhot:not(.no-retro) .chrome-art {
 /* The command line already names the section, so printed copies drop the heading.
    The no-JS README keeps them. */
 .output > h2 { display: none; }
+/* A hidden heading should not leave a blank line before the first visible item. */
+.output > h2 + * { margin-top: 0; }
 
-article + article { margin-top: var(--gap-2); }
+.output > article + article,
+.no-js #content section > article + article { margin-top: var(--gap-2); }
 article > * + * { margin-top: var(--gap-s); }
 
 .tags { color: var(--dim); }
@@ -687,8 +686,10 @@ article > * + * { margin-top: var(--gap-s); }
 .row > div > * + * { margin-top: var(--gap-s); }
 /* Key/value lists (skills, certs, contact) are one item per row: half a line apart.
    Experience entries are blocks of their own (a title and a paragraph): a full line. */
-.output > .row + .row { margin-top: var(--gap-s); }
-.output > .row:has(> div) + .row { margin-top: var(--gap); }
+.output > .row + .row,
+.no-js #content section > .row + .row { margin-top: var(--gap-s); }
+.output > .row:has(> div) + .row,
+.no-js #content section > .row:has(> div) + .row { margin-top: var(--gap); }
 /* help's command list reads like ls: one line each. */
 .output.list > .row + .row { margin-top: 0; }
 
@@ -745,6 +746,10 @@ article > * + * { margin-top: var(--gap-s); }
 .thumbs.whole > .resume-thumb { height: 320px; }
 
 .thumbs figure { width: 120px; }
+
+/* Media covers and artwork keep their original proportions. */
+.thumbs.media-gallery figure { width: auto; max-width: 100%; }
+.thumbs.media-gallery figure > img { width: auto; height: 160px; max-width: 100%; object-fit: contain; }
 
 .thumbs figcaption {
   margin-top: var(--gap-s);
@@ -853,6 +858,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
    ========================================================================== */
 
 #lightbox {
+  --viewer-gap: 1rem;
   position: fixed;
   inset: 0;
   z-index: 90;
@@ -860,7 +866,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1rem;
+  gap: var(--viewer-gap);
   padding: 1.5rem;
   background: rgba(8, 8, 8, .96);
   cursor: zoom-out;
@@ -888,6 +894,11 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   display: block;
   color: var(--bright);
   font-weight: 600;
+}
+
+.lightbox-caption strong + span {
+  display: block;
+  margin-top: var(--viewer-gap);
 }
 
 .lightbox-caption a { margin-left: 1ch; }
@@ -943,6 +954,9 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   .thumbs figure > :is(img, video) { height: 96px; }
 
   .thumbs.whole > :is(img, video) { width: auto; height: 110px; }
+
+  .thumbs.media-gallery figure { width: auto; }
+  .thumbs.media-gallery figure > img { width: auto; height: 110px; }
 
   /* Two across on a phone; the third wraps underneath. */
   .thumbs.featured figure { width: calc(50% - var(--gap) / 2); }
