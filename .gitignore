@@ -10,6 +10,7 @@ desktop.ini
 *.swp
 
 # Tooling, in case any gets added later
+.claude/
 node_modules/
 *.log
 .env
