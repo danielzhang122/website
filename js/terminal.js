@@ -22,7 +22,7 @@
   // Things that pop in whole when the typing reaches them, instead of being typed.
   const MEDIA = 'figure, .thumbs > :is(img, video)';
 
-  const SECTIONS = ['whoami', 'projects', 'misc', 'interests', 'experience', 'skills', 'certs', 'resume', 'art', 'fonts', 'contact'];
+  const SECTIONS = ['whoami', 'projects', 'misc', 'interests', 'experience', 'skills', 'certs', 'resume', 'art', 'media', 'fonts', 'contact'];
 
   const COMMANDS = {
     help: { help: 'list commands', run: printHelp },
@@ -35,6 +35,7 @@
     certs: { help: 'certifications', run: () => printSection('certs') },
     resume: { help: 'one-page pdf', run: () => printSection('resume') },
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
+    media: { help: 'art, books, music and shows i like', run: () => printSection('media') },
     fonts: { help: 'switch the page font', run: () => printSection('fonts') },
     contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
@@ -96,7 +97,7 @@
   let tabHint = '';
   let psstShown = false;     // the last unrecognized command got the Tab tip
 
-  // Now and then the banner's last prompt hints at an easter egg instead: at most once every 5
+  // Now and then the banner's last prompt suggests another command: at most once every 5
   // page loads, then a 1 in 3 chance each load. Set before whoami copies the banner, so nothing
   // flashes and a restored session copies the same line.
   // shortcut: with storage blocked the count never advances, so the limit can't hold; that's rare and harmless.
@@ -105,6 +106,8 @@
     vga: 'Miss DOS?',
     mercury: 'Want something shiny?',
     name: "What's in a name?",
+    interests: 'Curious what else I do?',
+    media: 'Looking for favourites?',
   };
   const clearHint = document.querySelector('.banner [data-run="clear"]');
   const sinceHint = Number(saved('banner-hint-wait') ?? 4) || 0;
