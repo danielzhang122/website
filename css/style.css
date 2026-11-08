@@ -748,6 +748,7 @@ article > * + * { margin-top: var(--gap-s); }
 .thumbs figure { width: 120px; }
 
 /* Media covers and artwork keep their original proportions. */
+.thumbs.media-gallery { column-gap: var(--gap-s); }
 .thumbs.media-gallery figure { width: auto; max-width: 100%; }
 .thumbs.media-gallery figure > img { width: auto; height: 160px; max-width: 100%; object-fit: contain; }
 
