@@ -249,6 +249,21 @@
         <h3>daniellm — Language Model From Scratch</h3>
         <p>A GPT-style language model trained from random weights on my own PC, with no pretrained weights: about 34 million parameters, trained on 4.5 billion tokens of English Wikipedia with a tokenizer whose vocabulary I trained on the same data. A local dashboard shows training live, lets you try the model and explore its architecture. Pretraining is done, and the result mostly writes confident nonsense. Next I'm rewriting backpropagation by hand.</p>
         <p class="tags">Python, PyTorch, Hugging Face tokenizers, RTX 4070 Ti <a href="https://github.com/danielzhang122/daniel-lm" target="_blank" rel="noopener noreferrer">Repo</a></p>
+        <figure class="thumb">
+          <img src="images/daniellm-training.webp" width="1600" height="1180" loading="lazy" data-lightbox
+               alt="daniellm training dashboard: step 550,550 of 550,550, validation loss 2.930, 155,655 tokens per second, 5,618,708 articles and 4.5 billion training tokens, above a loss chart falling from about 4.0 to 2.9" data-title="Training dashboard"
+               data-caption="The finished pretraining run: 550,550 steps over 4.5 billion tokens, validation loss down from about 4.0 to 2.93">
+        </figure>
+        <figure class="thumb">
+          <img src="images/daniellm-generate.webp" width="1600" height="1019" loading="lazy" data-lightbox
+               alt="daniellm text playground: prompted with 'The Solar System consists of', the model continues 'two solar cells, each with a pair of gigantic orbital cells in the outer layer, and a central cell. The central cells are made of silicone'" data-title="Trying the model"
+               data-caption="Fluent, confident, wrong: the Solar System is apparently made of silicone">
+        </figure>
+        <figure class="thumb">
+          <img src="images/daniellm-network.webp" width="1600" height="1350" loading="lazy" data-lightbox
+               alt="daniellm model explorer: a sample of real learned weights from transformer block 1, drawn as lines from 32 input features to 48 hidden neurons to 32 output features, red for positive and blue for negative" data-title="Inside the network"
+               data-caption="Real learned weights from one transformer block, sampled: red is positive, blue is negative">
+        </figure>
       </article>
 
       <article data-id="wheelsafe">
