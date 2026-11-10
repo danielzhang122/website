@@ -712,6 +712,33 @@ article > * + * { margin-top: var(--gap-s); }
   max-height: 340px;
 }
 
+/* A project with several photos shows them side by side instead of stacked. Each
+   figure's --ar (width / height) is its flex-grow, so every photo in a line ends
+   up the same height, uncropped, and the line fills the column. A photo wraps to
+   the next line below about 110px tall, and never grows past 240px tall. */
+.thumb-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap-s);
+  margin-top: var(--gap);
+}
+
+.thumb-row > .thumb {
+  flex: var(--ar) 1 calc(var(--ar) * 110px);
+  width: auto;
+  max-width: min(100%, calc(var(--ar) * 240px));
+  margin-top: 0 !important;
+}
+
+.thumb-row > .thumb > :is(img, video) {
+  width: 100%;
+  max-height: none;
+}
+
+@media (max-width: 640px) {
+  .thumb-row > .thumb { flex-basis: calc(var(--ar) * 90px); }
+}
+
 .thumbs {
   display: flex;
   flex-wrap: wrap;

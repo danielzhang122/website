@@ -173,58 +173,64 @@
         <h3>Quadruped Robot &amp; Locomotion Sim</h3>
         <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place. The hardware mode (servos through a PCA9685 board on a Raspberry Pi) is written and tested against a fake servo board, but waits for the first build. It walks perfectly in simulation, where friction always behaves.</p>
         <p class="tags">Python, MuJoCo, Fusion 360, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener noreferrer">Repo</a></p>
-        <figure class="thumb">
-          <video disablepictureinpicture src="images/quadruped-sim.mp4" width="1066" height="756" muted loop playsinline preload="none" data-lightbox
-                 aria-label="Quadruped Robot &amp; Locomotion Sim"
-                 data-caption="Trot gait running in MuJoCo"></video>
-        </figure>
-        <figure class="thumb">
-          <img src="images/quadruped-cad-v2.webp" width="994" height="636" loading="lazy" data-lightbox
-               alt="Fusion 360 render of the 12-servo quadruped: four three-joint legs around a central body plate carrying a Raspberry Pi and a PCA9685 servo driver board" data-title="Quadruped CAD Assembly"
-               data-caption="Full 12-DOF quadruped assembly with the Raspberry Pi and PCA9685 servo driver mounted. Twelve servos, twelve chances for a mate error.">
-        </figure>
-        <figure class="thumb">
-          <img src="images/quadruped-leg.webp" width="1045" height="757" loading="lazy" data-lightbox
-               alt="Fusion 360 render of one quadruped leg: a Tower Pro micro servo in the hip bracket, a two-link linkage and a rounded foot" data-title="Leg Linkage"
-               data-caption="Kinematic linkage for one leg. There are four, so every problem comes in fours.">
-        </figure>
+        <div class="thumb-row">
+          <figure class="thumb" style="--ar: 1.41">
+            <video disablepictureinpicture src="images/quadruped-sim.mp4" width="1066" height="756" muted loop playsinline preload="none" data-lightbox
+                   aria-label="Quadruped Robot &amp; Locomotion Sim"
+                   data-caption="Trot gait running in MuJoCo"></video>
+          </figure>
+          <figure class="thumb" style="--ar: 1.563">
+            <img src="images/quadruped-cad-v2.webp" width="994" height="636" loading="lazy" data-lightbox
+                 alt="Fusion 360 render of the 12-servo quadruped: four three-joint legs around a central body plate carrying a Raspberry Pi and a PCA9685 servo driver board" data-title="Quadruped CAD Assembly"
+                 data-caption="Full 12-DOF quadruped assembly with the Raspberry Pi and PCA9685 servo driver mounted. Twelve servos, twelve chances for a mate error.">
+          </figure>
+          <figure class="thumb" style="--ar: 1.38">
+            <img src="images/quadruped-leg.webp" width="1045" height="757" loading="lazy" data-lightbox
+                 alt="Fusion 360 render of one quadruped leg: a Tower Pro micro servo in the hip bracket, a two-link linkage and a rounded foot" data-title="Leg Linkage"
+                 data-caption="Kinematic linkage for one leg. There are four, so every problem comes in fours.">
+          </figure>
+        </div>
       </article>
 
       <article data-id="pacemaker">
         <h3>Rate-Adaptive Pacemaker Firmware</h3>
         <p>Pacemaker firmware modelled in Simulink and Stateflow for an NXP FRDM-K64F board, with Embedded Coder generating the C that runs on it. The team model paces in AOO, VOO, AAI and VVI modes. My part was the rate-adaptive modes (AOOR, VOOR, AAIR, VVIR): they read the board's FXOS8700 accelerometer and raise the pacing rate with activity, tuned by threshold, reaction and recovery times.</p>
         <p class="tags">Simulink, Stateflow, Embedded Coder, NXP FRDM-K64F <a href="https://github.com/danielzhang122/sfwreng-3k04-pacemaker" target="_blank" rel="noopener noreferrer">Repo</a></p>
-        <figure class="thumb">
-          <img src="images/pacemaker-rate-adaptive.webp" width="2400" height="1002" loading="lazy" data-lightbox
-               alt="Simulink diagram of the rate-adaptive pacing subsystem: the FRDM-K64F accelerometer's three axes are squared, summed and square-rooted, a moving standard deviation turns that into an activity level, and two Stateflow charts set and ramp the pacing rate between the lower and upper rate limits" data-title="Rate-adaptive pacing subsystem"
-               data-caption="My part: accelerometer magnitude, moving standard deviation as the activity level, then a Stateflow chart that sets and ramps the pacing rate">
-        </figure>
-        <figure class="thumb">
-          <img src="images/pacemaker-modes.webp" width="1800" height="1424" loading="lazy" data-lightbox
-               alt="Top-level Stateflow chart: a Start state switches by mode number to eight pacing-mode states, AOO, VOO, AAI, VVI, AOOR, VOOR, AAIR and VVIR" data-title="Pacemaker mode chart"
-               data-caption="Top-level Stateflow chart switching between the eight pacing modes">
-        </figure>
+        <div class="thumb-row">
+          <figure class="thumb" style="--ar: 2.395">
+            <img src="images/pacemaker-rate-adaptive.webp" width="2400" height="1002" loading="lazy" data-lightbox
+                 alt="Simulink diagram of the rate-adaptive pacing subsystem: the FRDM-K64F accelerometer's three axes are squared, summed and square-rooted, a moving standard deviation turns that into an activity level, and two Stateflow charts set and ramp the pacing rate between the lower and upper rate limits" data-title="Rate-adaptive pacing subsystem"
+                 data-caption="My part: accelerometer magnitude, moving standard deviation as the activity level, then a Stateflow chart that sets and ramps the pacing rate">
+          </figure>
+          <figure class="thumb" style="--ar: 1.264">
+            <img src="images/pacemaker-modes.webp" width="1800" height="1424" loading="lazy" data-lightbox
+                 alt="Top-level Stateflow chart: a Start state switches by mode number to eight pacing-mode states, AOO, VOO, AAI, VVI, AOOR, VOOR, AAIR and VVIR" data-title="Pacemaker mode chart"
+                 data-caption="Top-level Stateflow chart switching between the eight pacing modes">
+          </figure>
+        </div>
       </article>
 
       <article data-id="nuclear">
         <h3>Ontario Nuclear Grid Impact Analysis</h3>
         <p>What happens to Ontario's grid when a reactor goes offline? 11.8 million rows of hourly IESO data in DuckDB, SQL that finds 206 outages of a day or longer, and an interactive dashboard that shows who picks up the slack. Mostly gas and fewer exports. Outage hours line up with prices about $4/MWh higher and about 145 more tonnes of CO2 an hour. Predicting outages from public data is a coin flip, but one hour in, a model can tell long ones from short ones 74% of the time.</p>
         <p class="tags">SQL (DuckDB), Python, Streamlit, IESO data <a href="https://nuclear-dashboard.streamlit.app/" target="_blank" rel="noopener noreferrer">Live app</a> <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener noreferrer">Repo</a></p>
-        <figure class="thumb">
-          <img src="images/nuclear-generation.webp" width="1965" height="870" loading="lazy" data-lightbox
-               alt="Dashboard line chart of daily energy in GWh from October 2025 to September 2026 for Bruce, Darlington, Pickering, all nuclear, and all Ontario power plants" data-title="Daily nuclear energy by plant on the dashboard"
-               data-caption="Daily energy from each plant, all nuclear and every Ontario power plant, over any date range">
-        </figure>
-        <figure class="thumb">
-          <img src="images/nuclear-gap.webp" width="1965" height="990" loading="lazy" data-lightbox
-               alt="Dashboard bar chart: when nuclear runs about 840 MW below its monthly average, natural gas, net imports, hydro, wind and solar, and lower demand add up to cover the missing power" data-title="What replaces the missing nuclear power"
-               data-caption="When ~840 MW of nuclear goes missing, gas, imports and lower demand fill the gap, and they add up to it">
-        </figure>
-        <figure class="thumb">
-          <img src="images/nuclear-forecast.webp" width="1965" height="746" loading="lazy" data-lightbox
-               alt="Dashboard bar chart: of outages the model rated least likely to be long, 27% lasted a week or more; middle, 43%; most likely, 79%" data-title="Forecasting outage length"
-               data-caption="One hour into an outage, the model's rating sorts long outages from short ones on years it has never seen">
-        </figure>
+        <div class="thumb-row">
+          <figure class="thumb" style="--ar: 2.259">
+            <img src="images/nuclear-generation.webp" width="1965" height="870" loading="lazy" data-lightbox
+                 alt="Dashboard line chart of daily energy in GWh from October 2025 to September 2026 for Bruce, Darlington, Pickering, all nuclear, and all Ontario power plants" data-title="Daily nuclear energy by plant on the dashboard"
+                 data-caption="Daily energy from each plant, all nuclear and every Ontario power plant, over any date range">
+          </figure>
+          <figure class="thumb" style="--ar: 1.985">
+            <img src="images/nuclear-gap.webp" width="1965" height="990" loading="lazy" data-lightbox
+                 alt="Dashboard bar chart: when nuclear runs about 840 MW below its monthly average, natural gas, net imports, hydro, wind and solar, and lower demand add up to cover the missing power" data-title="What replaces the missing nuclear power"
+                 data-caption="When ~840 MW of nuclear goes missing, gas, imports and lower demand fill the gap, and they add up to it">
+          </figure>
+          <figure class="thumb" style="--ar: 2.634">
+            <img src="images/nuclear-forecast.webp" width="1965" height="746" loading="lazy" data-lightbox
+                 alt="Dashboard bar chart: of outages the model rated least likely to be long, 27% lasted a week or more; middle, 43%; most likely, 79%" data-title="Forecasting outage length"
+                 data-caption="One hour into an outage, the model's rating sorts long outages from short ones on years it has never seen">
+          </figure>
+        </div>
       </article>
 
       <article>
@@ -264,21 +270,23 @@
         <h3>daniellm — Language Model From Scratch</h3>
         <p>A GPT-style language model trained from random weights on my own PC, with no pretrained weights: about 34 million parameters, trained on 4.5 billion tokens of English Wikipedia with a tokenizer whose vocabulary I trained on the same data. A local dashboard shows training live, lets you try the model and explore its architecture. Pretraining is done, and the result mostly writes confident nonsense. Still very incomplete; I'm going to try to rewrite backpropagation by hand.</p>
         <p class="tags">Python, PyTorch, Hugging Face tokenizers, RTX 4070 Ti <a href="https://github.com/danielzhang122/daniel-lm" target="_blank" rel="noopener noreferrer">Repo</a></p>
-        <figure class="thumb">
-          <img src="images/daniellm-training.webp" width="1600" height="1180" loading="lazy" data-lightbox
-               alt="daniellm training dashboard: step 550,550 of 550,550, validation loss 2.930, 155,655 tokens per second, 5,618,708 articles and 4.5 billion training tokens, above a loss chart falling from about 4.0 to 2.9" data-title="Training dashboard"
-               data-caption="The finished pretraining run: 550,550 steps over 4.5 billion tokens, validation loss down from about 4.0 to 2.93">
-        </figure>
-        <figure class="thumb">
-          <img src="images/daniellm-generate.webp" width="1600" height="1019" loading="lazy" data-lightbox
-               alt="daniellm text playground: prompted with 'The Solar System consists of', the model continues 'two solar cells, each with a pair of gigantic orbital cells in the outer layer, and a central cell. The central cells are made of silicone'" data-title="Trying the model"
-               data-caption="Fluent, confident, wrong: the Solar System is apparently made of silicone">
-        </figure>
-        <figure class="thumb">
-          <img src="images/daniellm-network.webp" width="1600" height="1350" loading="lazy" data-lightbox
-               alt="daniellm model explorer: a sample of real learned weights from transformer block 1, drawn as lines from 32 input features to 48 hidden neurons to 32 output features, red for positive and blue for negative" data-title="Inside the network"
-               data-caption="Real learned weights from one transformer block, sampled: red is positive, blue is negative">
-        </figure>
+        <div class="thumb-row">
+          <figure class="thumb" style="--ar: 1.356">
+            <img src="images/daniellm-training.webp" width="1600" height="1180" loading="lazy" data-lightbox
+                 alt="daniellm training dashboard: step 550,550 of 550,550, validation loss 2.930, 155,655 tokens per second, 5,618,708 articles and 4.5 billion training tokens, above a loss chart falling from about 4.0 to 2.9" data-title="Training dashboard"
+                 data-caption="The finished pretraining run: 550,550 steps over 4.5 billion tokens, validation loss down from about 4.0 to 2.93">
+          </figure>
+          <figure class="thumb" style="--ar: 1.57">
+            <img src="images/daniellm-generate.webp" width="1600" height="1019" loading="lazy" data-lightbox
+                 alt="daniellm text playground: prompted with 'The Solar System consists of', the model continues 'two solar cells, each with a pair of gigantic orbital cells in the outer layer, and a central cell. The central cells are made of silicone'" data-title="Trying the model"
+                 data-caption="Fluent, confident, wrong: the Solar System is apparently made of silicone">
+          </figure>
+          <figure class="thumb" style="--ar: 1.185">
+            <img src="images/daniellm-network.webp" width="1600" height="1350" loading="lazy" data-lightbox
+                 alt="daniellm model explorer: a sample of real learned weights from transformer block 1, drawn as lines from 32 input features to 48 hidden neurons to 32 output features, red for positive and blue for negative" data-title="Inside the network"
+                 data-caption="Real learned weights from one transformer block, sampled: red is positive, blue is negative">
+          </figure>
+        </div>
       </article>
 
       <article data-id="wheelsafe">
