@@ -466,9 +466,9 @@ html:not(.no-retro) [data-retro-label="off"] { display: none; }
   white-space: pre;
 }
 
-/* In vga: an 8x15 cell for the usual 7.8x14.95 (see .chrome-art). Superhot's font is 9px wide: a 9x17 cell. */
-html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(--art); }
-html.superhot .name-art { line-height: calc(17 * var(--pxu)); }
+/* In vga: an 8x15 cell for the usual 7.8x14.95 (see .chrome-art). Superhot draws it in vga's 8px font too:
+   its own 9px font made the art too wide for a laptop console, so it stacked vertically. */
+html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(--px); }
 
 .accent { color: var(--accent); }
 
