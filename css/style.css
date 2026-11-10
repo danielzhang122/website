@@ -735,8 +735,16 @@ article > * + * { margin-top: var(--gap-s); }
   max-height: none;
 }
 
+/* Charts need to be read, not just recognised: about two to a line, up to 300px tall. */
+.thumb-row.big > .thumb {
+  flex-basis: calc(var(--ar) * 180px);
+  max-width: min(100%, calc(var(--ar) * 300px));
+}
+
 @media (max-width: 640px) {
   .thumb-row > .thumb { flex-basis: calc(var(--ar) * 90px); }
+  /* On a phone a chart only reads at full width, so they go one per line. */
+  .thumb-row.big > .thumb { flex-basis: 100%; }
 }
 
 .thumbs {
