@@ -198,7 +198,7 @@
 
       <article data-id="nuclear">
         <h3>Ontario Nuclear Grid Impact Analysis</h3>
-        <p>What happens to Ontario's grid when a reactor goes offline? 11.8 million rows of hourly IESO data in DuckDB, SQL that finds 206 outages of a day or longer, and an interactive dashboard that shows who picks up the slack. Mostly gas and fewer exports. Outage hours line up with prices about $4/MWh higher and about 145 more tonnes of CO2 an hour. Reactor behaviour is next.</p>
+        <p>What happens to Ontario's grid when a reactor goes offline? 11.8 million rows of hourly IESO data in DuckDB, SQL that finds 206 outages of a day or longer, and an interactive dashboard that shows who picks up the slack. Mostly gas and fewer exports. Outage hours line up with prices about $4/MWh higher and about 145 more tonnes of CO2 an hour. Predicting outages from public data is a coin flip, but one hour in, a model can tell long ones from short ones 74% of the time.</p>
         <p class="tags">SQL (DuckDB), Python, Streamlit, IESO data <a href="https://nuclear-dashboard.streamlit.app/" target="_blank" rel="noopener noreferrer">Live app</a> <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <figure class="thumb">
           <img src="images/nuclear-generation.webp" width="1965" height="870" loading="lazy" data-lightbox
@@ -209,6 +209,11 @@
           <img src="images/nuclear-gap.webp" width="1965" height="990" loading="lazy" data-lightbox
                alt="Dashboard bar chart: when nuclear runs about 840 MW below its monthly average, natural gas, net imports, hydro, wind and solar, and lower demand add up to cover the missing power" data-title="What replaces the missing nuclear power"
                data-caption="When ~840 MW of nuclear goes missing, gas, imports and lower demand fill the gap, and they add up to it">
+        </figure>
+        <figure class="thumb">
+          <img src="images/nuclear-forecast.webp" width="1965" height="746" loading="lazy" data-lightbox
+               alt="Dashboard bar chart: of outages the model rated least likely to be long, 27% lasted a week or more; middle, 43%; most likely, 79%" data-title="Forecasting outage length"
+               data-caption="One hour into an outage, the model's rating sorts long outages from short ones on years it has never seen">
         </figure>
       </article>
 
