@@ -693,29 +693,29 @@ article > * + * { margin-top: var(--gap-s); }
 /* help's command list reads like ls: one line each. */
 .output.list > .row + .row { margin-top: 0; }
 
+/* Every project thumbnail is about the same height, whatever its shape or how many share
+   its project: about 210px on a computer, 135px on a phone. Each figure's --ar (width /
+   height) sets its width, so media keeps its own shape, uncropped, and never runs wider
+   than the column. */
 .thumb {
-  width: fit-content;
-  max-width: min(420px, 100%);
+  --thumb-h: 210px;
+  width: min(100%, calc(var(--ar) * var(--thumb-h)));
   margin-top: var(--gap) !important;
   cursor: zoom-in;
 }
 
 .thumb:hover { outline: 1px solid var(--accent); }
 
-/* Project media keeps its own shape, uncropped: landscape up to 420px wide,
-   portrait up to 340px tall. width/height in the HTML reserve the shape. */
 .thumb > :is(img, video) {
   display: block;
-  width: auto;
+  width: 100%;
   height: auto;
-  max-width: 100%;
-  max-height: 340px;
 }
 
-/* A project with several photos shows them side by side instead of stacked. Each
-   figure's --ar (width / height) is its flex-grow, so every photo in a line ends
-   up the same height, uncropped, and the line fills the column. A photo wraps to
-   the next line below about 110px tall, and never grows past 240px tall. */
+/* A project with several pieces of media shows them side by side. Each figure grows by its
+   --ar, so a line ends up one height and fills the column, but only within a narrow band
+   (180 to 230px; 120 to 150px on a phone): a project with four images doesn't shrink them
+   to fit one line, it wraps instead. */
 .thumb-row {
   display: flex;
   flex-wrap: wrap;
@@ -724,27 +724,18 @@ article > * + * { margin-top: var(--gap-s); }
 }
 
 .thumb-row > .thumb {
-  flex: var(--ar) 1 calc(var(--ar) * 110px);
+  flex: var(--ar) 1 calc(var(--ar) * 180px);
   width: auto;
-  max-width: min(100%, calc(var(--ar) * 240px));
+  max-width: min(100%, calc(var(--ar) * 230px));
   margin-top: 0 !important;
 }
 
-.thumb-row > .thumb > :is(img, video) {
-  width: 100%;
-  max-height: none;
-}
-
-/* Charts need to be read, not just recognised: about two to a line, up to 300px tall. */
-.thumb-row.big > .thumb {
-  flex-basis: calc(var(--ar) * 180px);
-  max-width: min(100%, calc(var(--ar) * 300px));
-}
-
 @media (max-width: 640px) {
-  .thumb-row > .thumb { flex-basis: calc(var(--ar) * 90px); }
-  /* On a phone a chart only reads at full width, so they go one per line. */
-  .thumb-row.big > .thumb { flex-basis: 100%; }
+  .thumb { --thumb-h: 135px; }
+  .thumb-row > .thumb {
+    flex-basis: calc(var(--ar) * 120px);
+    max-width: min(100%, calc(var(--ar) * 150px));
+  }
 }
 
 .thumbs {

@@ -227,7 +227,7 @@
         <h3>Ontario Nuclear Grid Impact Analysis</h3>
         <p>What happens to Ontario's grid when a reactor goes offline? 11.8 million rows of hourly IESO Data in DuckDB, SQL that finds 206 outages of a day or longer, and an interactive dashboard that shows who picks up the slack. Mostly gas and fewer exports. Outage hours line up with prices about $4/MWh higher and about 145 more tonnes of CO2 an hour. Predicting outages from public data is a coin flip, but one hour in, a model can tell long ones from short ones 74% of the time.</p>
         <p class="tags">SQL (DuckDB), Python, Streamlit, IESO Data <a href="https://nuclear-dashboard.streamlit.app/" target="_blank" rel="noopener noreferrer">Live App</a> <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener noreferrer">Repo</a></p>
-        <div class="thumb-row big">
+        <div class="thumb-row">
           <figure class="thumb" style="--ar: 2.225">
             <img src="images/nuclear-gap.webp" width="1624" height="730" loading="lazy" data-lightbox
                  alt="Dashboard bar chart: when nuclear runs about 840 MW below its monthly average, natural gas and net imports cover most of it, with hydro, wind and solar, and lower demand making up the rest; added up, they match the missing power" data-title="What replaces the missing nuclear power"
@@ -283,7 +283,7 @@
         <h3>Vision-Guided 2-DOF Robotic Arm</h3>
         <p>Built in 12 hours, about as long as SolidWorks takes to open. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
         <p class="tags">OpenCV, ESP32, C++, UDP</p>
-        <figure class="thumb">
+        <figure class="thumb" style="--ar: 0.56">
           <video disablepictureinpicture src="images/robotic-arm.mp4" width="400" height="714" muted loop playsinline preload="none" data-lightbox
                  aria-label="Vision-Guided 2-DOF Robotic Arm"
                  data-caption="Real-time OpenCV hand tracking over UDP to an ESP32"></video>
@@ -294,7 +294,7 @@
         <h3>Globe Ghost — iOS GPS Simulator</h3>
         <p>Simulates an iPhone's reported location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester.</p>
         <p class="tags">Python, pymobiledevice3, OpenStreetMap <a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener noreferrer">Repo</a></p>
-        <figure class="thumb">
+        <figure class="thumb" style="--ar: 1.647">
           <img src="images/spoofer.webp" width="1502" height="912" loading="lazy" data-lightbox
                alt="Globe Ghost desktop app: connection and location controls, a scenario script walking from Times Square to Central Park, a run log, and an OpenStreetMap view of Manhattan with the simulated iPhone position" data-title="Globe Ghost — iOS GPS Simulator"
                data-caption="A scripted walk through Manhattan on the live map, logged step by step">
@@ -305,7 +305,7 @@
         <h3>Résumé Sync Pipeline</h3>
         <p>Updating my résumé got tedious, so I spent far too long automating it. Every Monday a script checks my repos, an AI agent proposes source-backed edits, and GitHub Actions makes sure it still compiles on one page. I review everything before merging. The repo's public now, so you can watch me reword the same bullet eleven times. It's the most innovative résumé I've built in years.</p>
         <p class="tags">Python, GitHub Actions, LaTeX, Claude Code <a href="https://github.com/danielzhang122/resume-sync" target="_blank" rel="noopener noreferrer">Repo</a></p>
-        <figure class="thumb">
+        <figure class="thumb" style="--ar: 2.308">
           <img src="images/resume-sync-diagram.svg" width="1200" height="520" class="fit-whole" loading="lazy" data-lightbox
                alt="Pipeline diagram: a weekly schedule runs check.py, which stops if nothing changed; otherwise an agent reviews the diffs, edits resume.tex on a new branch, a GitHub Action builds the PDF and, if it runs over one page, sends it back to the agent to rewrite and retry; once it passes, a pull request shows each edit with its source commit, I review and merge, and the next run opens a website PR with the new PDF, which I merge. My project work during the week becomes the next Monday's input" data-title="Résumé Sync Pipeline" data-repo="https://github.com/danielzhang122/resume-sync"
                data-caption="Grey steps run on their own. Red ones are me: nothing reaches the résumé or this site until I merge.">
@@ -316,7 +316,7 @@
         <h3>WheelSafe Storage</h3>
         <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the McMaster Design Showcase. My contributions focused on concept development and testing, with some prototyping.</p>
         <p class="tags">Concept Development, Testing, Prototyping, Carbon Fiber <a href="https://www.youtube.com/watch?v=3dYv_6PoitU" target="_blank" rel="noopener noreferrer">Demo</a> <a href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:a0181878-fe27-42bb-92b6-26a483603809" target="_blank" rel="noopener noreferrer">Presentation</a></p>
-        <figure class="thumb">
+        <figure class="thumb" style="--ar: 0.75">
           <img src="images/wheelsafe.webp" width="1280" height="1706" loading="lazy" data-lightbox
                alt="WheelSafe storage module, a black weatherproof fabric bag, next to two McMaster Engineering 3rd-place certificates of achievement" data-title="WheelSafe Storage"
                data-caption="Carbon-fiber wheelchair storage module, Top 3 at the McMaster Design Showcase">
@@ -327,7 +327,7 @@
         <h3>Double Wishbone Suspension (Concept)</h3>
         <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how camber changes as the wheel moves through its travel. Whether any of that keeps a 500 mL payload from sloshing over a 33 m run is a question for the real car.</p>
         <p class="tags">SolidWorks, Kinematics, Vehicle Dynamics</p>
-        <figure class="thumb">
+        <figure class="thumb" style="--ar: 1.183">
           <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="none" data-lightbox
                  aria-label="Double Wishbone Suspension"
                  data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
