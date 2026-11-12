@@ -172,7 +172,8 @@
       <article data-id="quadruped">
         <h3>Quadruped Robot &amp; Locomotion Sim</h3>
         <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place. The hardware mode (servos through a PCA9685 board on a Raspberry Pi) is written and tested against a fake servo board, but waits for the first build. It walks perfectly in simulation, where friction always behaves.</p>
-        <p class="tags">Python, MuJoCo, Fusion 360, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener noreferrer">Repo</a></p>
+        <p>I also designed my first PCB in KiCad, a carrier board for the Pi: battery protection and monitoring, separate 5 V rails for the servos and the Pi, and an on-board PCA9685 for all 12 servos. It's routed and DRC clean but not ordered yet. The CAD shown is an older revision, so next up is redesigning the electronics holder to fit the board.</p>
+        <p class="tags">Python, MuJoCo, Fusion 360, KiCad, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <div class="thumb-row">
           <figure class="thumb" style="--ar: 1.41">
             <video disablepictureinpicture src="images/quadruped-sim.mp4" width="1066" height="756" muted loop playsinline preload="none" data-lightbox
@@ -182,12 +183,23 @@
           <figure class="thumb" style="--ar: 1.563">
             <img src="images/quadruped-cad-v2.webp" width="994" height="636" loading="lazy" data-lightbox
                  alt="Fusion 360 render of the 12-servo quadruped: four three-joint legs around a central body plate carrying a Raspberry Pi and a PCA9685 servo driver board" data-title="Quadruped CAD Assembly"
-                 data-caption="Full 12-DOF quadruped assembly with the Raspberry Pi and PCA9685 servo driver mounted. Twelve servos, twelve chances for a mate error.">
+                 data-caption="Full 12-DOF quadruped assembly (older revision, before the custom PCB) with the Raspberry Pi and PCA9685 servo driver mounted. Twelve servos, twelve chances for a mate error.">
           </figure>
           <figure class="thumb" style="--ar: 1.38">
             <img src="images/quadruped-leg.webp" width="1045" height="757" loading="lazy" data-lightbox
                  alt="Fusion 360 render of one quadruped leg: a Tower Pro micro servo in the hip bracket, a two-link linkage and a rounded foot" data-title="Leg Linkage"
                  data-caption="Kinematic linkage for one leg. There are four, so every problem comes in fours.">
+          </figure>
+          <figure class="thumb" style="--ar: 1.11">
+            <img src="images/quadruped-pcb-3d.webp" width="1400" height="1261" loading="lazy" data-lightbox
+                 alt="KiCad 3D render of the quadruped carrier PCB: a Pi header down the middle, a PCA9685 servo driver, two bulk capacitors, a blade fuse and four groups of servo headers at the corners" data-title="Carrier PCB (3D)"
+                 data-caption="KiCad 3D render of the carrier board. Battery in at the bottom, Pi on the long header, three servos per corner.">
+          </figure>
+          <figure class="thumb" style="--ar: 1.4">
+            <!-- --ar below the real 1.745 so the wide sheet gets a normal thumb width (and ends up shorter), uncropped -->
+            <img src="images/quadruped-pcb-schematic.webp" width="2000" height="1146" loading="lazy" data-lightbox
+                 alt="KiCad schematic of the quadruped carrier board in blocks: battery input, battery monitor, power rails, Pi connections, PCA9685 servo driver, servo connectors and a spare I2C port with test points" data-title="Carrier PCB Schematic"
+                 data-caption="Full schematic: battery in, two 5 V rails, the Pi header and the PCA9685 fanning out to twelve servo plugs.">
           </figure>
         </div>
       </article>
