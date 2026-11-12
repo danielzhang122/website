@@ -251,6 +251,29 @@
         </div>
       </article>
 
+      <article data-id="daniellm">
+        <h3>daniellm — Language Model From Scratch</h3>
+        <p>"Know your enemy and know yourself," said Sun Tzu, so I'm building the enemy myself: a GPT-style language model trained from scratch on my own PC, on 4.5 billion tokens of English Wikipedia. The first, 34 million parameters, writes confident nonsense. A 98-million-parameter version is training now. Next: writing backpropagation by hand.</p>
+        <p class="tags">Python, PyTorch, Hugging Face Tokenizers, RTX 4070 Ti <a href="https://github.com/danielzhang122/daniel-lm" target="_blank" rel="noopener noreferrer">Repo</a></p>
+        <div class="thumb-row">
+          <figure class="thumb" style="--ar: 1.356">
+            <img src="images/daniellm-training.webp" width="1600" height="1180" loading="lazy" data-lightbox
+                 alt="daniellm training dashboard: step 550,550 of 550,550, validation loss 2.930, 155,655 tokens per second, 5,618,708 articles and 4.5 billion training tokens, above a loss chart falling from about 4.0 to 2.9" data-title="Training dashboard"
+                 data-caption="The finished pretraining run: 550,550 steps over 4.5 billion tokens, validation loss down from about 4.0 to 2.93">
+          </figure>
+          <figure class="thumb" style="--ar: 1.57">
+            <img src="images/daniellm-generate.webp" width="1600" height="1019" loading="lazy" data-lightbox
+                 alt="daniellm text playground: prompted with 'The Solar System consists of', the model continues 'two solar cells, each with a pair of gigantic orbital cells in the outer layer, and a central cell. The central cells are made of silicone'" data-title="Trying the model"
+                 data-caption="Fluent, confident, wrong: the Solar System is apparently made of silicone">
+          </figure>
+          <figure class="thumb" style="--ar: 1.185">
+            <img src="images/daniellm-network.webp" width="1600" height="1350" loading="lazy" data-lightbox
+                 alt="daniellm model explorer: a sample of real learned weights from transformer block 1, drawn as lines from 32 input features to 48 hidden neurons to 32 output features, red for positive and blue for negative" data-title="Inside the network"
+                 data-caption="Real learned weights from one transformer block, sampled: red is positive, blue is negative">
+          </figure>
+        </div>
+      </article>
+
       <article>
         <h3>Vision-Guided 2-DOF Robotic Arm</h3>
         <p>Built in 12 hours, about as long as SolidWorks takes to open. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
@@ -282,29 +305,6 @@
                alt="Pipeline diagram: a weekly schedule runs check.py, which stops if nothing changed; otherwise an agent reviews the diffs, edits resume.tex on a new branch, a GitHub Action builds the PDF and, if it runs over one page, sends it back to the agent to rewrite and retry; once it passes, a pull request shows each edit with its source commit, I review and merge, and the next run opens a website PR with the new PDF, which I merge. My project work during the week becomes the next Monday's input" data-title="Résumé Sync Pipeline" data-repo="https://github.com/danielzhang122/resume-sync"
                data-caption="Grey steps run on their own. Red ones are me: nothing reaches the résumé or this site until I merge.">
         </figure>
-      </article>
-
-      <article data-id="daniellm">
-        <h3>daniellm — Language Model From Scratch</h3>
-        <p>"Know your enemy and know yourself," said Sun Tzu, so I'm building the enemy myself: a GPT-style language model trained from scratch on my own PC, on 4.5 billion tokens of English Wikipedia. The first, 34 million parameters, writes confident nonsense. A 98-million-parameter version is training now. Next: writing backpropagation by hand.</p>
-        <p class="tags">Python, PyTorch, Hugging Face Tokenizers, RTX 4070 Ti <a href="https://github.com/danielzhang122/daniel-lm" target="_blank" rel="noopener noreferrer">Repo</a></p>
-        <div class="thumb-row">
-          <figure class="thumb" style="--ar: 1.356">
-            <img src="images/daniellm-training.webp" width="1600" height="1180" loading="lazy" data-lightbox
-                 alt="daniellm training dashboard: step 550,550 of 550,550, validation loss 2.930, 155,655 tokens per second, 5,618,708 articles and 4.5 billion training tokens, above a loss chart falling from about 4.0 to 2.9" data-title="Training dashboard"
-                 data-caption="The finished pretraining run: 550,550 steps over 4.5 billion tokens, validation loss down from about 4.0 to 2.93">
-          </figure>
-          <figure class="thumb" style="--ar: 1.57">
-            <img src="images/daniellm-generate.webp" width="1600" height="1019" loading="lazy" data-lightbox
-                 alt="daniellm text playground: prompted with 'The Solar System consists of', the model continues 'two solar cells, each with a pair of gigantic orbital cells in the outer layer, and a central cell. The central cells are made of silicone'" data-title="Trying the model"
-                 data-caption="Fluent, confident, wrong: the Solar System is apparently made of silicone">
-          </figure>
-          <figure class="thumb" style="--ar: 1.185">
-            <img src="images/daniellm-network.webp" width="1600" height="1350" loading="lazy" data-lightbox
-                 alt="daniellm model explorer: a sample of real learned weights from transformer block 1, drawn as lines from 32 input features to 48 hidden neurons to 32 output features, red for positive and blue for negative" data-title="Inside the network"
-                 data-caption="Real learned weights from one transformer block, sampled: red is positive, blue is negative">
-          </figure>
-        </div>
       </article>
 
       <article data-id="wheelsafe">
