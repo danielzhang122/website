@@ -744,6 +744,7 @@
     saveSession();
     // The banner builds itself back in as whoami returns.
     if (banner) window.ChromeArt.replayBanner({ build: !reduceMotion });
+    echo('whoami');
     await printWhoami();
     await printLine('just kidding.', 'dim');
   }
@@ -790,6 +791,7 @@
     const kept = screen.querySelector('[data-from="whoami"]');
     if (!kept) {
       screen.replaceChildren();
+      echo('whoami');
       await printWhoami();
       return;
     }
