@@ -99,10 +99,10 @@
 :root {
   --bg: #0b0b0b;
   /* Text a step softer than full white. Contrast on --bg: --bright 13:1, --ink 9.9:1,
-     --dim 4.7:1 (above the WCAG AA minimum of 4.5:1 for body text). */
+     --dim 5.2:1 (above the WCAG AA minimum of 4.5:1 for body text). */
   --ink: #b8b8b8;
   --bright: #d2d2d2;
-  --dim: #5c5c5c;
+  --dim: #636363;
   --line: #262626;
   --accent: #e5484d;
 
@@ -248,7 +248,7 @@ html.superhot {
   --art: 'Perfect DOS VGA 437', var(--px);
   --ink: #cfe8ff;
   --bright: #cfe8ff;
-  --dim: #5c6570;
+  --dim: #636c77;
   --glow-colour: rgb(from currentColor r g b / calc((2 * max(r, g, b) + max(0, r - b) - 181) / 867));
   --glow-shadow:
     0 0 6px var(--glow-colour),
