@@ -372,6 +372,14 @@ html:not(.no-retro) body {
     var(--glow-shadow);
 }
 
+/* Grey text takes a slightly lighter fringe, so its thin strokes don't smudge. */
+html:not(.no-retro) :is(.dim, .tags, .row .key, .thumbs figcaption, .lightbox-caption, .lightbox-count, #shortcuts button) {
+  text-shadow:
+    calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, calc(var(--fringe) * .8)),
+    var(--dpx) 0 rgba(40, 200, 255, calc(var(--fringe) * .8)),
+    var(--glow-shadow);
+}
+
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
 html:not(.no-retro) body:has(#lightbox.is-open)::before {
   background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 1px, transparent 1px 3px);
