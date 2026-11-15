@@ -329,7 +329,7 @@ html:not(.no-retro) body::after {
 html:not(.no-retro) body::before {
   background:
     repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 60%, rgba(0, 0, 0, .4));
+    radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 85%, rgba(0, 0, 0, .4));
   animation: crt-flicker 4s steps(1) infinite;
 }
 
