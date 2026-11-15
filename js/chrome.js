@@ -16,6 +16,7 @@ const LOOK = { look: 'dense', gamma: 1.15, mono: true };
 // (light, mid, red in the HTML): mid tones rose, faint glyphs red, the rest text colour.
 // liquid-chrome's backdrop is the exception: it always stays text colour (see split()).
 const DARK = new Set(".'`^\",:;Il!i");
+const STRAY = new Set(".'`,:");
 const MID = new Set('><~+_-?][}{1)(|/tfjrxnuvcz');
 // Marks a cell still building in (shown as a red dot); no piece draws this character.
 const BUILDING = '\u0001';
@@ -44,6 +45,8 @@ function split(text, color, backdrop) {
       if (c === BUILDING) { l += ' '; m += ' '; d += '·'; }
       // The dotted backdrop is dropped so only the piece itself shows.
       else if (k && backdrop.has(k[x])) { l += ' '; m += ' '; d += ' '; }
+      // Lone faint dots with blank cells on both sides are the other pieces' scattered backdrop.
+      else if (STRAY.has(c) && (r[x - 1] ?? ' ') === ' ' && (r[x + 1] ?? ' ') === ' ') { l += ' '; m += ' '; d += ' '; }
       else if (MID.has(c)) { l += ' '; m += c; d += ' '; }
       else if (DARK.has(c)) { l += ' '; m += ' '; d += c; }
       else { l += c; m += ' '; d += ' '; }
