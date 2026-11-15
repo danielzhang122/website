@@ -329,7 +329,7 @@ html:not(.no-retro) body::after {
 html:not(.no-retro) body::before {
   background:
     repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 1px, transparent 1px 3px),
-    radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 60%, rgba(0, 0, 0, .4));
+    radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 50%, rgba(0, 0, 0, .65));
   animation: crt-flicker 4s steps(1) infinite;
 }
 
@@ -621,8 +621,8 @@ button.cmd:hover { color: var(--accent); }
   font: 400 13px/1 var(--art);
   color: var(--ink);
   contain: content;
-  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 82%, transparent 100%);
-  mask-image: radial-gradient(ellipse closest-side, #000 82%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse closest-side, #000 92%, transparent 100%);
+  mask-image: radial-gradient(ellipse closest-side, #000 92%, transparent 100%);
 }
 
 /* VGA draws the art in the pixel font too. Its characters are 0.5em wide to the art's 0.6em,
