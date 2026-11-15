@@ -42,8 +42,8 @@ function split(text, color, backdrop) {
     for (let x = 0; x < r.length; x++) {
       const c = r[x];
       if (c === BUILDING) { l += ' '; m += ' '; d += '·'; }
-      // Thin the dotted backdrop to a third of its cells so it reads as a faint grid, not a wall.
-      else if (k && backdrop.has(k[x])) { l += (x + 2 * y) % 3 ? ' ' : c; m += ' '; d += ' '; }
+      // Thin the dotted backdrop to one cell in six so it reads as a faint grid, not a wall.
+      else if (k && backdrop.has(k[x])) { l += (x % 3 || y % 2) ? ' ' : c; m += ' '; d += ' '; }
       else if (MID.has(c)) { l += ' '; m += c; d += ' '; }
       else if (DARK.has(c)) { l += ' '; m += ' '; d += c; }
       else { l += c; m += ' '; d += ' '; }
