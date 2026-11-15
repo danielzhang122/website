@@ -37,6 +37,8 @@ function split(text, color, backdrop) {
   const keys = color ? color.split('\n') : null;
   const light = [], mid = [], red = [];
   rows.forEach((r, y) => {
+    // Clear the scattered backdrop: any lone glyph, and short runs of faint glyphs, with blank cells around them.
+    r = r.replace(/(?<=^| )(?:[^ \u0001]|[^ \u0001\w%@#&*$]{2,3})(?= |$)/g, (g) => ' '.repeat(g.length));
     const k = keys ? [...keys[y]] : null;
     let l = '', m = '', d = '';
     for (let x = 0; x < r.length; x++) {
@@ -44,8 +46,6 @@ function split(text, color, backdrop) {
       if (c === BUILDING) { l += ' '; m += ' '; d += '·'; }
       // The dotted backdrop is dropped so only the piece itself shows.
       else if (k && backdrop.has(k[x])) { l += ' '; m += ' '; d += ' '; }
-      // Any lone glyph with blank cells on both sides is the other pieces' scattered backdrop.
-      else if (c !== ' ' && (r[x - 1] ?? ' ') === ' ' && (r[x + 1] ?? ' ') === ' ') { l += ' '; m += ' '; d += ' '; }
       else if (MID.has(c)) { l += ' '; m += c; d += ' '; }
       else if (DARK.has(c)) { l += ' '; m += ' '; d += c; }
       else { l += c; m += ' '; d += ' '; }
