@@ -36,7 +36,7 @@
     interests: { help: 'what i do outside work', run: () => printSection('interests') },
     skills: { help: 'tools and standards', run: () => printSection('skills') },
     certs: { help: 'certifications', run: () => printSection('certs') },
-    media: { help: 'art, books, music and shows i like', run: () => printSection('media') },
+    media: { help: 'art, books, music and shows that stuck with me', run: () => printSection('media') },
     fonts: { help: 'switch the page font', run: () => printSection('fonts') },
     clear: { help: 'clear the screen', run: clear },
     retro: { help: 'toggle the crt screen effect', run: toggleRetro },
