@@ -37,8 +37,8 @@ function split(text, color, backdrop) {
   const keys = color ? color.split('\n') : null;
   const light = [], mid = [], red = [];
   rows.forEach((r, y) => {
-    // The other pieces scatter their backdrop as '·' dots; clear those, and leave every other glyph to the art.
-    r = r.replaceAll('·', ' ');
+    // The other pieces scatter their backdrop as lone '·' dots; clear those. A '·' touching other glyphs is part of the art's shading.
+    r = r.replace(/(?<=^| )·(?= |$)/g, ' ');
     const k = keys ? [...keys[y]] : null;
     let l = '', m = '', d = '';
     for (let x = 0; x < r.length; x++) {
