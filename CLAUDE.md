@@ -10,7 +10,7 @@ When changing something, check every other place it appears and update those too
 - **Cache busting:** when editing any css/js file, bump its `?v=` in `index.html` (format `YYYYMMDD-N`), or browsers keep the old file.
 - **New pages:** add them to `sitemap.xml`.
 
-`scripts/check-consistency.py` checks command order and `?v=` bumps automatically and runs as a hook after every edit. When you spot a new kind of inconsistency, add a check there and a line here.
+`scripts/check-consistency.py` checks command order (nav, whoami links and the help list) and `?v=` bumps automatically and runs as a hook after every edit. When you spot a new kind of inconsistency, add a check there and a line here.
 
 ## Commits
 Author all commits as danielzhang122 <98472640+danielzhang122@users.noreply.github.com>. No Claude attribution or co-author lines.

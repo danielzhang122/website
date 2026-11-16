@@ -22,22 +22,22 @@
   // Things that pop in whole when the typing reaches them, instead of being typed.
   const MEDIA = 'figure, .thumbs > :is(img, video)';
 
-  const SECTIONS = ['whoami', 'projects', 'misc', 'interests', 'experience', 'skills', 'certs', 'resume', 'art', 'media', 'fonts', 'contact'];
+  const SECTIONS = ['whoami', 'projects', 'experience', 'resume', 'contact', 'art', 'misc', 'interests', 'skills', 'certs', 'media', 'fonts'];
 
   const COMMANDS = {
     help: { help: 'list commands', run: printHelp },
     whoami: { help: 'who i am', run: printWhoami },
     projects: { help: 'things i have built', run: () => printSection('projects') },
+    experience: { help: 'work and school', run: () => printSection('experience') },
+    resume: { help: 'one-page pdf', run: () => printSection('resume') },
+    contact: { help: 'email and links', run: () => printSection('contact') },
+    art: { help: 'painting, drawing, carving', run: () => printSection('art') },
     misc: { help: 'bench tests, cad and side builds', run: () => printSection('misc') },
     interests: { help: 'what i do outside work', run: () => printSection('interests') },
-    experience: { help: 'work and school', run: () => printSection('experience') },
     skills: { help: 'tools and standards', run: () => printSection('skills') },
     certs: { help: 'certifications', run: () => printSection('certs') },
-    resume: { help: 'one-page pdf', run: () => printSection('resume') },
-    art: { help: 'painting, drawing, carving', run: () => printSection('art') },
     media: { help: 'art, books, music and shows i like', run: () => printSection('media') },
     fonts: { help: 'switch the page font', run: () => printSection('fonts') },
-    contact: { help: 'email and links', run: () => printSection('contact') },
     clear: { help: 'clear the screen', run: clear },
     retro: { help: 'toggle the crt screen effect', run: toggleRetro },
   };

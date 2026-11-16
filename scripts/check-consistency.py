@@ -20,6 +20,16 @@ for m in re.finditer(r'<(nav|p)\b[^>]*>(.*?)</\1>', html, re.S):
         line = html.count("\n", 0, m.start()) + 1
         groups.append((line, runs))
 
+# The help listing follows the order of COMMANDS in js/terminal.js; check it against the page's lists too.
+js = (root / "js/terminal.js").read_text()
+cmds = re.search(r"const COMMANDS = \{(.*?)\n  \};", js, re.S)
+if cmds:
+    groups.append(("js/terminal.js COMMANDS (help)", re.findall(r"^\s{4}(\w+):", cmds.group(1), re.M)))
+
+# Utility commands (help, clear, retro) sit wherever suits each list; only sections must line up.
+UTIL = {"help", "clear", "retro"}
+groups = [(l, [x for x in g if x not in UTIL]) for l, g in groups]
+
 for (la, a), (lb, b) in itertools.combinations(groups, 2):
     shared = [x for x in a if x in b]
     if len(shared) >= 2 and shared != [x for x in b if x in a]:
