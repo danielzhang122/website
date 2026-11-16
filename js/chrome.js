@@ -32,13 +32,13 @@ function backdropKeys(palette) {
 
 // Splits one frame's text into the three layers' text. color holds the frame's colour
 // keys (liquid-chrome only); cells drawn in a backdrop colour stay text colour.
-function split(text, color, backdrop) {
+function split(text, color, backdrop, allDots = false) {
   const rows = text.split('\n');
   const keys = color ? color.split('\n') : null;
   const light = [], mid = [], red = [];
   rows.forEach((r, y) => {
-    // '·' is the only dot drawn in text colour (white); it's the pieces' backdrop, so drop every one.
-    r = r.replaceAll('·', ' ');
+    // '·' is the white backdrop dot: klein-bottle drops every one, the others only the lone ones (a '·' touching glyphs is their shading).
+    r = allDots ? r.replaceAll('·', ' ') : r.replace(/(?<=^| )·(?= |$)/g, ' ');
     const k = keys ? [...keys[y]] : null;
     let l = '', m = '', d = '';
     for (let x = 0; x < r.length; x++) {
@@ -84,7 +84,7 @@ async function playPiece(art, piece, { build = false, skip = () => false, ready 
   const look = backdrop.size ? { ...LOOK, mono: false } : LOOK;
   const colorOf = (f) => (backdrop.size && typeof f !== 'string' ? f.color : null);
   // Past the three layers are the old-look copies a look change adds (see replaceArt in js/terminal.js).
-  const draw = (text, color) => split(text, color, backdrop).forEach((t, i) => {
+  const draw = (text, color) => split(text, color, backdrop, piece === 'klein-bottle').forEach((t, i) => {
     layers[i].textContent = t;
     if (art.children[i + 3]) art.children[i + 3].textContent = t;
   });
