@@ -290,7 +290,7 @@ html.vga .banner button.cmd + button.cmd { margin-left: 0; }
 /* The effect's strength. The VGA font's 1px strokes take only a lighter fringe (see below);
    Cascadia's smoother, heavier strokes hold up to a stronger one. */
 html {
-  --scan: .16;       /* scanline darkness */
+  --scan: .12;       /* scanline darkness */
   --streak: .03;     /* rolling streak brightness */
   --streak-trail: .015; /* the fainter streak trailing it */
   --fringe: .2;      /* RGB fringe opacity */
@@ -309,7 +309,7 @@ html.vga { --glare: .11; }
 html:not(.vga) { --fringe: .4; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
-  html { --scan: .22; }
+  html { --scan: .15; }
 }
 /* The fringe is one screen pixel, a third as wide on a 3x phone as on a desktop; make it bolder there. */
 @media (max-width: 640px) {
