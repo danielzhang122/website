@@ -543,7 +543,7 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
   position: absolute;
   top: 0;
   left: 0;
-  right: 0;
+  max-width: calc(100% - 1ch);
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;

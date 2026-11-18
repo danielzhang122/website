@@ -942,9 +942,15 @@
 
   /* ---------- input ---------- */
 
+  // On an empty prompt the cursor waits at the end of the ghost hint instead of under its first letter.
+  const ghost = form.querySelector('.ghost');
   function updateCursor() {
-    cursor.style.left = `${input.selectionStart ?? input.value.length}ch`;
+    cursor.style.left = !input.value && ghost
+      ? `${ghost.offsetWidth}px`
+      : `${input.selectionStart ?? input.value.length}ch`;
   }
+  // The hint's width changes with the font, the window and the hint picked, so follow it.
+  if (ghost) new ResizeObserver(updateCursor).observe(ghost);
 
   form.addEventListener('submit', (e) => {
     e.preventDefault();
