@@ -84,12 +84,12 @@
   <link rel="preload" href="fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261118-4">
+  <link rel="stylesheet" href="css/style.css?v=20261118-5">
 
   <script src="js/intro-glyphs.js?v=20261031-5" defer></script>
   <script src="js/intro.js?v=20261107-1" defer></script>
   <script src="js/lightbox.js?v=20261104-1" defer></script>
-  <script src="js/terminal.js?v=20261118-2" defer></script>
+  <script src="js/terminal.js?v=20261118-3" defer></script>
   <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
   <script type="module" src="js/chrome.js?v=20261116-4"></script>
 </head>
@@ -109,8 +109,10 @@
     <form id="prompt" autocomplete="off">
       <label for="cmd" class="ps">&gt;</label>
       <span class="input-wrap">
-        <input id="cmd" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" aria-label="Command">
+        <input id="cmd" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" aria-label="Command" placeholder=" ">
         <span class="cursor" aria-hidden="true"></span>
+        <!-- Ghost hint: shows while the prompt is empty; its commands still run when clicked. -->
+        <span class="ghost dim">Lost? Try <span class="nowrap"><button type="button" class="cmd" data-run="help">help</button>.</span> <span data-retro-label="on">Hard on the eyes?</span><span data-retro-label="off">Miss the glow?</span> <span class="nowrap"><button type="button" class="cmd" data-run="retro">retro</button>.</span> Too much clutter? <span class="nowrap"><button type="button" class="cmd" data-run="clear">clear</button>.</span></span>
       </span>
     </form>
   </main>
@@ -169,7 +171,6 @@
           <figcaption>WheelSafe, top 3 of 200+</figcaption>
         </figure>
       </div>
-      <p class="dim js-only hints">Lost? Try <span class="nowrap"><button type="button" class="cmd" data-run="help">help</button>.</span> <span data-retro-label="on">Hard on the eyes?</span><span data-retro-label="off">Miss the glow?</span> <span class="nowrap"><button type="button" class="cmd" data-run="retro">retro</button>.</span> Too much clutter? <span class="nowrap"><button type="button" class="cmd" data-run="clear">clear</button>.</span></p>
       <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="experience">experience</button> <button type="button" class="cmd" data-run="resume">resume</button> <button type="button" class="cmd" data-run="contact">contact</button></p>
     </section>
 

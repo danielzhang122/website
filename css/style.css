@@ -537,6 +537,22 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
   pointer-events: none;
 }
 
+/* Ghost hint after the cursor; gone once anything is typed. Only its commands take clicks,
+   so clicking elsewhere on it still lands in the input. */
+.ghost {
+  position: absolute;
+  top: 0;
+  left: 2ch;
+  right: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  pointer-events: none;
+}
+.ghost button { pointer-events: auto; }
+#cmd:not(:placeholder-shown) ~ .ghost { display: none; }
+#cmd::placeholder { color: transparent; }
+
 #prompt:not(:focus-within) .cursor {
   background: transparent;
   outline: 1px solid var(--accent);
