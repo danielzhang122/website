@@ -500,7 +500,9 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
 }
 
 /* No bare prompt on an empty screen while the first screen prints. */
-#console.is-booting #prompt { visibility: hidden; }
+#console.is-booting #prompt,
+#console.is-booting #prompt-hints { visibility: hidden; }
+#prompt-hints { margin-top: var(--gap); }
 
 #prompt {
   display: flex;

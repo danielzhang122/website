@@ -109,7 +109,7 @@
     interests: 'Curious what else I do?',
     media: 'Looking for favourites?',
   };
-  const clearHint = document.querySelector('.banner [data-run="clear"]');
+  const clearHint = document.querySelector('#prompt-hints [data-run="clear"]');
   const sinceHint = Number(saved('banner-hint-wait') ?? 4) || 0;
   save('banner-hint-wait', sinceHint + 1);
   if (clearHint && sinceHint >= 4 && Math.random() < 1 / 3) {
