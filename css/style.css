@@ -549,7 +549,9 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
   text-overflow: ellipsis;
   pointer-events: none;
 }
+.ghost { color: color-mix(in srgb, var(--dim) 70%, var(--bg)); }
 .ghost button { pointer-events: auto; }
+.ghost button.cmd:not(:hover) { color: inherit; }
 #cmd:not(:placeholder-shown) ~ .ghost { display: none; }
 #cmd::placeholder { color: transparent; }
 
