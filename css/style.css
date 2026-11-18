@@ -693,6 +693,8 @@ html.superhot:not(.no-retro) .chrome-art {
 article > * + * { margin-top: var(--gap-s); }
 
 .tags { color: var(--dim); }
+/* One-line skim of each project, under its title. */
+.tldr { color: var(--accent); }
 .tags a { margin-left: 1ch; }
 
 /* key / value lines: experience dates, skill groups, help */
