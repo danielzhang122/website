@@ -105,7 +105,7 @@
     superhot: 'Too cold in here?',
     vga: 'Miss DOS?',
     mercury: 'Want something shiny?',
-    name: "What's in a name?",
+    name: "What's in a {cmd}?",
     interests: 'Curious what else I do?',
     media: 'Looking for favourites?',
   };
@@ -118,7 +118,10 @@
     const name = names[Math.floor(Math.random() * names.length)];
     clearHint.dataset.run = name;
     clearHint.textContent = name;
-    clearHint.parentElement.previousSibling.data = ` ${BANNER_HINTS[name]} `;
+    // A hint with {cmd} puts the command inside the question ("What's in a name?") instead of after it.
+    const [before, after] = BANNER_HINTS[name].split('{cmd}');
+    clearHint.parentElement.previousSibling.data = after === undefined ? ` ${before} ` : ` ${before}`;
+    if (after !== undefined) clearHint.nextSibling.data = `${after}`;
   }
 
   const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
