@@ -202,7 +202,8 @@ a {
   transition: color .15s, text-decoration-color .15s;
 }
 
-a:hover {
+a:not(html.fx-live #console *):hover,
+a.fx-hover {
   color: var(--accent);
   text-decoration-color: var(--accent);
 }
@@ -244,27 +245,14 @@ html.plex {
 }
 
 /* SUPERHOT, the hidden `superhot` command: always set together with .vga, which supplies the pixel
-   grid. Light blue text and blue-grey dim text, with the site's strongest glow in retro: a halo and a
-   horizontal glare in each text's own colour. --glow-colour sets the strength from that colour:
-   brightness, plus how much redder than blue it is, gives about .38 on light blue, .05 on blue-grey
-   and .5 on red (saturation can't tell them apart, as light blue is saturated too). currentColor
-   stays unresolved in a custom property, so each text gets its own. CSS can't blur sideways only,
-   so the glare is blurred copies of the text to each side. */
+   grid, and SUPERHOT's font in capitals. Its colours and strong glow are every retro font's now
+   (see :root and "The effect's strength"). */
 html.superhot {
   --text: 'Perfect DOS VGA 437', var(--px-text);
   --art: 'Perfect DOS VGA 437', var(--px);
   --ink: #cfe8ff;
   --bright: #cfe8ff;
   --dim: #747d88;
-  --glow-colour: rgb(from currentColor r g b / calc((2 * max(r, g, b) + max(0, r - b) - 181) / 867));
-  --glow-shadow:
-    0 0 6px var(--glow-colour),
-    -5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent),
-    5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent),
-    -11px 0 5px color-mix(in srgb, var(--glow-colour) 20%, transparent),
-    11px 0 5px color-mix(in srgb, var(--glow-colour) 20%, transparent),
-    -18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent),
-    18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent);
 }
 
 /* The light blue and red text in capitals, as in SUPERHOT. The blue-grey dim text keeps its case, and so
@@ -301,7 +289,7 @@ html {
   --streak: .03;     /* rolling streak brightness */
   --streak-trail: .015; /* the fainter streak trailing it */
   --fringe: .2;      /* RGB fringe opacity */
-  --glare: .16;      /* horizontal glare strength, near the text; superhot has its own */
+  --glare: .16;      /* horizontal glare strength, near the text (modern's default; retro uses the glow below) */
   /* In each text's own colour, stronger the redder it is, as red is darker and would barely show. */
   --glare-colour: rgb(from currentColor r g b / calc(var(--glare) + max(0, r - b) / 760));
   --glare-near:
@@ -313,6 +301,23 @@ html {
     24px 0 10px color-mix(in srgb, var(--glare-colour) 50%, transparent);
 }
 html.vga { --glare: .11; }
+
+/* Retro's glow, SUPERHOT's strength in every font: a halo and a horizontal glare in each text's own
+   colour. --glow-colour sets the strength from that colour: brightness, plus how much redder than blue
+   it is, gives about .38 on light blue, .05 on blue-grey and .5 on red (saturation can't tell them
+   apart, as light blue is saturated too). currentColor stays unresolved in a custom property, so each
+   text gets its own. CSS can't blur sideways only, so the glare is blurred copies of the text to each side. */
+html:not(.no-retro) {
+  --glow-colour: rgb(from currentColor r g b / calc((2 * max(r, g, b) + max(0, r - b) - 181) / 867));
+  --glow-shadow:
+    0 0 6px var(--glow-colour),
+    -5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent),
+    5px 0 3px color-mix(in srgb, var(--glow-colour) 50%, transparent),
+    -11px 0 5px color-mix(in srgb, var(--glow-colour) 20%, transparent),
+    11px 0 5px color-mix(in srgb, var(--glow-colour) 20%, transparent),
+    -18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent),
+    18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent);
+}
 html:not(.vga) { --fringe: .4; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
@@ -558,7 +563,7 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
 }
 .ghost { color: color-mix(in srgb, var(--dim) 70%, var(--bg)); }
 .ghost button { pointer-events: auto; }
-.ghost button.cmd:not(:hover) { color: inherit; }
+.ghost button.cmd:not(.fx-hover):not(:hover:not(html.fx-live #console *)) { color: inherit; }
 #cmd:not(:placeholder-shown) ~ .ghost { display: none; }
 #cmd::placeholder { color: transparent; }
 
@@ -608,7 +613,8 @@ button.cmd {
 
 #shortcuts button { color: var(--dim); }
 #shortcuts button:hover,
-button.cmd:hover { color: var(--accent); }
+button.cmd:not(html.fx-live #console *):hover,
+button.cmd.fx-hover { color: var(--accent); }
 
 /* help and clear are utilities, not sections: a thin rule and extra room set them apart.
    The rule sits centred in the space before the first one. */
@@ -657,14 +663,8 @@ html.vga .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var
 /* Superhot's font is 9px wide (0.5625em): a 9x15 cell keeps the art's 0.6:1. */
 html.superhot .chrome-art { line-height: calc(15 * var(--pxu)); }
 
-/* The art repaints every frame, so it skips superhot's far glare; it keeps the RGB fringe like all other text. */
+/* The art repaints every frame, so it skips the far glare; it keeps the RGB fringe like all other text. */
 html:not(.no-retro) .chrome-art {
-  text-shadow:
-    calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
-    var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
-    var(--glare-near);
-}
-html.superhot:not(.no-retro) .chrome-art {
   text-shadow:
     calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
     var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
@@ -717,7 +717,8 @@ article > * + * { margin-top: var(--gap-s); }
 }
 
 .row button.key { color: var(--ink); }
-.row button.key:hover { color: var(--accent); }
+.row button.key:not(html.fx-live #console *):hover,
+.row button.key.fx-hover { color: var(--accent); }
 .row > div > * + * { margin-top: var(--gap-s); }
 /* Key/value lists (skills, certs, contact) are one item per row: half a line apart.
    Experience entries are blocks of their own (a title and a paragraph): a full line. */
@@ -739,7 +740,8 @@ article > * + * { margin-top: var(--gap-s); }
   cursor: zoom-in;
 }
 
-.thumb:hover { outline: 1px solid var(--accent); }
+.thumb:not(html.fx-live #console *):hover,
+.thumb.fx-hover { outline: 1px solid var(--accent); }
 
 .thumb > :is(img, video) {
   display: block;
@@ -789,10 +791,13 @@ article > * + * { margin-top: var(--gap-s); }
   transition: opacity .15s;
 }
 
-.thumbs > :is(img, video):hover,
-.thumbs figure:hover > :is(img, video) { opacity: .8; outline: 1px solid var(--accent); }
+.thumbs > :is(img, video):not(html.fx-live #console *):hover,
+.thumbs > :is(img, video).fx-hover,
+.thumbs figure:not(html.fx-live #console *):hover > :is(img, video),
+.thumbs figure.fx-hover > :is(img, video) { opacity: .8; outline: 1px solid var(--accent); }
 
-.thumbs figure:hover figcaption { color: var(--accent); }
+.thumbs figure:not(html.fx-live #console *):hover figcaption,
+.thumbs figure.fx-hover figcaption { color: var(--accent); }
 
 .thumbs .fit-whole { object-fit: contain; }
 
@@ -1036,3 +1041,8 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 /* Fisheye: the console bulges like an old curved TV tube, in retro only. js/fisheye.js builds the
    displacement map and keeps the lens on the visible part of the page as it scrolls. */
 html.fisheye:not(.no-retro) #console { filter: url(#fisheye); }
+/* The browser hit-tests the unbent layout, so while the bend shows, js/fisheye.js sends clicks on to
+   what's drawn under the pointer and marks it .fx-hover in place of :hover (each :hover rule above
+   skips the bent console, :not(html.fx-live #console *)). The cursor comes from there too. */
+html.fx-live #console,
+html.fx-live #console * { cursor: var(--fx-cursor, auto) !important; }
