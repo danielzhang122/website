@@ -89,6 +89,8 @@
     return [cx + shift(x), cy + shift(y)];
   }
 
+  let hovered = [];   // the elements marked .fx-hover (see hover below)
+
   // On only while the bend shows (retro). Kept in sync with .no-retro, which the retro command flips.
   const sync = () => {
     const live = !root.classList.contains('no-retro');
@@ -123,7 +125,6 @@
   }, true);
 
   // Hover: .fx-hover on the element under the bent pointer and its ancestors, and its cursor.
-  let hovered = [];
   function hover(el) {
     for (const a of hovered) a.classList.remove('fx-hover');
     hovered = [];

@@ -567,7 +567,8 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
 }
 .ghost { color: color-mix(in srgb, var(--dim) 70%, var(--bg)); }
 .ghost button { pointer-events: auto; }
-.ghost button.cmd:not(.fx-hover):not(:hover:not(html.fx-live #console *)) { color: inherit; }
+/* Its commands in the usual text colour, like the More: line's, so they read as clickable. */
+.ghost button.cmd:not(.fx-hover):not(:hover:not(html.fx-live #console *)) { color: var(--ink); }
 #cmd:not(:placeholder-shown) ~ .ghost { display: none; }
 #cmd::placeholder { color: transparent; }
 
