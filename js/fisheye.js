@@ -145,11 +145,12 @@
   // The labels run along the bent top edge (#crt-top), so they curve with it. A mask cuts the line
   // and its glow behind each one: a soft-ended stroke along the same curve, cut to the label's
   // length, so the line fades out around it (a painted black box, or a hard cut through the glow,
-  // shows as a dark rectangle).
+  // shows as a dark rectangle). The blur's region is the whole screen: sized to the stroke's own
+  // box, it would have no height when the outline is flat (no fisheye), and the gaps would vanish.
   frame.innerHTML =
     `<defs>
       <path id="crt-top"/>
-      <filter id="crt-soft"><feGaussianBlur stdDeviation="2.5"/></filter>
+      <filter id="crt-soft" filterUnits="userSpaceOnUse" x="-10%" y="-10%" width="120%" height="120%"><feGaussianBlur stdDeviation="2.5"/></filter>
       <mask id="crt-gaps" maskUnits="userSpaceOnUse"><rect class="crt-mask-all"/><path class="crt-gap"/><path class="crt-gap"/></mask>
     </defs>
     <path class="crt-outside" fill-rule="evenodd"/>

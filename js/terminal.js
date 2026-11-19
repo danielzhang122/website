@@ -205,8 +205,15 @@
     const bar = document.getElementById('shortcuts').offsetHeight;
     const overflow = box.bottom + bar + 24 - innerHeight;
     const room = box.top - 64;   // leaves the "> command" line just above the output visible
-    const by = Math.min(overflow, room);
-    if (by > 0) scrollBy(0, by);
+    let by = Math.min(overflow, room);
+    // In retro, whole lines, like a terminal (see stepScrollTo): enough to show the line, unless
+    // that would take the command line off the top.
+    if (by > 0 && steppedScroll()) {
+      const line = lineHeight();
+      by = Math.ceil(by / line) * line;
+      if (by > room) by -= line;
+    }
+    if (by > 0) scrollBy({ top: by, behavior: 'instant' });
   }
 
   // Autoplaying videos only decode while they're on screen.
@@ -878,6 +885,47 @@
   }
   let queue = Promise.resolve();
 
+  /* Scrolling like an old terminal, in retro with a mouse or trackpad: the page moves a whole line
+     of text at a time, never in between. The wheel and trackpad add up to whole lines and jump by
+     them; the page's own scrolls (after a command, to an item) step down line by line. */
+  const lineHeight = () => parseFloat(getComputedStyle(document.body).lineHeight) || 19;
+  const steppedScroll = () => retroOn() && finePointer && !reduceMotion;
+  let stepping = 0;   // the running stepScrollTo's id; a new scroll or the wheel stops it
+  function stepScrollTo(top) {
+    const id = ++stepping;
+    const line = lineHeight();
+    return new Promise((resolve) => {
+      const step = () => {
+        const left = top - scrollY;
+        const whole = Math.round(Math.abs(left) / line);   // whole lines to go, to the nearest
+        if (id !== stepping || !whole) return resolve();
+        // A few lines a frame while far off, one at a time near the end, always whole lines, so it
+        // stops within half a line of the target.
+        const lines = Math.min(whole, Math.max(1, Math.round(whole / 5)));
+        const before = scrollY;
+        scrollTo({ top: scrollY + Math.sign(left) * lines * line, behavior: 'instant' });
+        if (scrollY === before) return resolve();   // at the end of the page
+        requestAnimationFrame(step);
+      };
+      step();
+    });
+  }
+  let wheelLeft = 0;   // wheel movement not yet a whole line
+  addEventListener('wheel', (e) => {
+    if (!steppedScroll() || e.ctrlKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+    if (document.getElementById('lightbox')?.classList.contains('is-open')) return;
+    e.preventDefault();
+    stepping++;
+    const line = lineHeight();
+    const px = e.deltaY * (e.deltaMode === 1 ? line : e.deltaMode === 2 ? innerHeight : 1);
+    if (Math.sign(px) !== Math.sign(wheelLeft)) wheelLeft = 0;
+    wheelLeft += px;
+    const lines = Math.trunc(wheelLeft / line);
+    if (!lines) return;
+    wheelLeft -= lines * line;
+    scrollBy({ top: lines * line, behavior: 'instant' });
+  }, { passive: false });
+
   // Keeps the new output readable: a long one starts at the top of the screen,
   // a short one just scrolls far enough to show the prompt again. Resolves once the scroll ends.
   function scrollAfter(line) {
@@ -891,6 +939,7 @@
     const target = Math.min(lineTop, promptBottom + bar + 24 - innerHeight);
     const top = Math.min(Math.max(0, target), document.documentElement.scrollHeight - innerHeight);
     if (Math.abs(top - scrollY) < 1) return Promise.resolve();
+    if (steppedScroll()) return stepScrollTo(top);
     return new Promise((resolve) => {
       // scrollend, or a timeout where it isn't supported or another scroll cuts this one short.
       const done = () => { clearTimeout(timer); removeEventListener('scrollend', done); resolve(); };
@@ -1048,7 +1097,12 @@
     const matches = screen.querySelectorAll(`[data-id="${id}"]`);
     const item = matches[matches.length - 1];
     if (!item) return;
-    item.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+    if (steppedScroll()) {
+      const top = item.getBoundingClientRect().top + scrollY - (parseFloat(getComputedStyle(item).scrollMarginTop) || 0);
+      stepScrollTo(Math.min(Math.max(0, top), document.documentElement.scrollHeight - innerHeight));
+    } else {
+      item.scrollIntoView({ block: 'start', behavior: reduceMotion ? 'auto' : 'smooth' });
+    }
     item.classList.remove('is-shown');
     void item.offsetWidth;   // restart the flash if it's already running
     item.classList.add('is-shown');
