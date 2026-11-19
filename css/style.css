@@ -1011,14 +1011,15 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 }
 
 /* The line highlight: off the prompt, the arrow keys move it through the printed lines (see moveMark
-   in js/terminal.js). An inverted bar, like a DOS menu: white, and difference flips what's under it,
-   so the text turns dark on light. */
+   in js/terminal.js). An inverted bar, like a DOS menu, in the text colour: with difference, text in
+   that colour turns black and the dark background turns the bar's colour. (A white bar would flip
+   light blue to yellow.) */
 .line-mark {
   display: none;
   position: absolute;
   z-index: 1;
   pointer-events: none;
-  background: #fff;
+  background: var(--ink);
   mix-blend-mode: difference;
 }
 .line-mark.is-on { display: block; }
