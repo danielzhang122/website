@@ -1033,6 +1033,5 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   body::after { display: none !important; }
 }
 
-/* Fisheye: the console bulges like an old curved TV tube, in retro only. js/fisheye.js builds the
-   displacement map and keeps the lens on the visible part of the page as it scrolls. */
-html.fisheye:not(.no-retro) #console { filter: url(#fisheye); }
+/* Fisheye: the console bulges like an old curved TV tube, in retro only. js/fisheye.js scales and
+   shifts each line by where it sits on screen; transforms keep the text sharp. */
