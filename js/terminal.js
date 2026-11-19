@@ -32,7 +32,7 @@
     resume: { help: 'one-page pdf', run: () => printSection('resume') },
     contact: { help: 'email and links', run: () => printSection('contact') },
     art: { help: 'painting, drawing, carving', run: () => printSection('art') },
-    misc: { help: 'bench tests, cad and side builds', run: () => printSection('misc') },
+    misc: { help: 'side builds, cool but not quite projects', run: () => printSection('misc') },
     interests: { help: 'what i do outside work', run: () => printSection('interests') },
     skills: { help: 'tools and standards', run: () => printSection('skills') },
     certs: { help: 'certifications', run: () => printSection('certs') },
