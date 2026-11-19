@@ -103,9 +103,13 @@
   --plex: 'IBM Plex Mono', var(--mono);
   --text: var(--mono);
   --art: var(--mono);   /* the ASCII art's font: each font mode draws its art in its own font */
+  /* The site's size, 90% on desktop (below): text, lines and the gaps between them, the column, the
+     thumbnails and the ASCII art. VGA's pixel font keeps its native size, as it's only sharp there,
+     and phones have their own sizes. */
+  --scale: 1;
   /* A terminal's text grid: 9x19px cells, as in Windows Terminal. Cascadia Mono is 0.5859375em
-     (1200/2048) wide, so 15.36px gives exactly 9px columns. */
-  --fs: 15.36px;
+     (1200/2048) wide, so 15.36px gives exactly 9px columns (8.1x17.1 at 90%). */
+  --fs: calc(15.36px * var(--scale));
   --lh: calc(19 / 15.36);     /* 19px at 15.36px */
   /* One size and one line height for all text, as in a terminal: nothing sets its own
      (only the ASCII art, whose grids need theirs). */
@@ -119,8 +123,11 @@
   --pxu: 1px;   /* one pixel of the retro font; see index.html */
   --dpx: 1px;   /* one screen pixel */
 
-  --column: 810px;   /* 90 characters */
+  --column: calc(810px * var(--scale));   /* 90 characters */
   --gutter: 1.5rem;
+}
+@media (min-width: 641px) {
+  :root { --scale: .9; }
 }
 
 /* SUPERHOT's look, in retro only: four hidden commands, each one class on <html> (js/terminal.js),
@@ -240,7 +247,7 @@ html.vga body { line-height: var(--text-line); }
 html.plex {
   --text: var(--plex);
   --art: var(--plex);
-  --fs: 15px;
+  --fs: calc(15px * var(--scale));
   --lh: calc(19 / 15);
 }
 
@@ -455,7 +462,7 @@ html:not(.no-retro) [data-retro-label="off"] { display: none; }
   overflow: hidden;
   margin: 0;
   color: var(--ink);
-  font: 400 13px/1.15 var(--art);
+  font: 400 calc(13px * var(--scale))/1.15 var(--art);
   white-space: pre;
 }
 
@@ -624,7 +631,7 @@ button.cmd.fx-hover { color: var(--accent); }
   width: max-content;
   max-width: 100%;
   margin: 0 auto var(--gap-2);
-  font: 400 13px/1 var(--art);
+  font: 400 calc(13px * var(--scale))/1 var(--art);
   color: var(--ink);
   contain: content;
   -webkit-mask-image: radial-gradient(ellipse closest-side, #000 92%, transparent 100%);
@@ -712,7 +719,7 @@ article > * + * { margin-top: var(--gap-s); }
    height) sets its width, so media keeps its own shape, uncropped, and never runs wider
    than the column. */
 .thumb {
-  --thumb-h: 210px;
+  --thumb-h: calc(210px * var(--scale));
   width: min(100%, calc(var(--ar) * var(--thumb-h)));
   margin-top: var(--gap) !important;
   cursor: zoom-in;
@@ -761,8 +768,8 @@ article > * + * { margin-top: var(--gap-s); }
 
 .thumbs > :is(img, video),
 .thumbs figure > :is(img, video) {
-  width: 120px;
-  height: 120px;
+  width: calc(120px * var(--scale));
+  height: calc(120px * var(--scale));
   background: #000;
   object-fit: cover;
   cursor: zoom-in;
@@ -782,19 +789,19 @@ article > * + * { margin-top: var(--gap-s); }
 /* Art shows each piece whole: one row height, natural widths, like a photo strip. */
 .thumbs.whole > :is(img, video) {
   width: auto;
-  height: 160px;
+  height: calc(160px * var(--scale));
   object-fit: contain;
 }
 
 /* The resume page is the one thumb worth reading at a glance. */
-.thumbs.whole > .resume-thumb { height: 320px; }
+.thumbs.whole > .resume-thumb { height: calc(320px * var(--scale)); }
 
-.thumbs figure { width: 120px; }
+.thumbs figure { width: calc(120px * var(--scale)); }
 
 /* Media covers and artwork keep their original proportions. */
 .thumbs.media-gallery { column-gap: var(--gap-s); }
 .thumbs.media-gallery figure { width: auto; max-width: 100%; }
-.thumbs.media-gallery figure > img { width: auto; height: 160px; max-width: 100%; object-fit: contain; }
+.thumbs.media-gallery figure > img { width: auto; height: calc(160px * var(--scale)); max-width: 100%; object-fit: contain; }
 
 .thumbs figcaption {
   margin-top: var(--gap-s);
@@ -810,7 +817,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
    screen shows real builds before anyone types a command. */
 /* "Featured:" labels the strip, so it sits with it. */
 .output > * + .thumbs.featured { margin-top: var(--gap-s); }
-.thumbs.featured figure { width: 180px; cursor: pointer; }
+.thumbs.featured figure { width: calc(180px * var(--scale)); cursor: pointer; }
 .thumbs.featured figure > :is(img, video) { cursor: pointer; }
 
 /* A project jumped to from Featured flashes briefly. */

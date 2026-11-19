@@ -657,7 +657,7 @@
   }
 
   // Easter egg: prints the intro's 张卓远 animation into the console as text, at the
-  // same 13px as the Liquid Chrome art, and leaves the finished frame in the scrollback.
+  // same size as the Liquid Chrome art, and leaves the finished frame in the scrollback.
   function printNameArt(line) {
     const art = window.IntroArt;
     if (!art) return printLine('name art is unavailable.', 'dim');
@@ -665,11 +665,13 @@
 
     // The art is drawn for 13px characters; when the console is too narrow for the
     // row of three (phones), the glyphs stack vertically.
-    // The art font's advance width (see .name-art): vga's 8px pixel font at 16px (superhot too),
-    // or Plex (0.6em) or Cascadia (1200/2048 em) at 13px.
-    const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
+    // The art font's advance width (see .name-art): vga's 8px pixel font at 16px, or Plex (0.6em)
+    // or Cascadia (1200/2048 em) at 13px times the site's --scale.
+    const rootStyle = getComputedStyle(document.documentElement);
+    const pxu = parseFloat(rootStyle.getPropertyValue('--pxu')) || 1;
+    const scale = parseFloat(rootStyle.getPropertyValue('--scale')) || 1;
     const cls = document.documentElement.classList;
-    const charW = cls.contains('vga') ? 8 * pxu : 13 * (cls.contains('plex') ? 0.6 : 1200 / 2048);
+    const charW = cls.contains('vga') ? 8 * pxu : 13 * scale * (cls.contains('plex') ? 0.6 : 1200 / 2048);
     const vertical = screen.clientWidth < art.nameArt().cols * charW;
     const { cols, rows, cells, fillEnd } = art.nameArt({ vertical });
     const labelPad = ' '.repeat(Math.max(0, Math.floor((cols - LABEL.length) / 2)));
