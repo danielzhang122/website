@@ -275,6 +275,10 @@ html.superhot .gate-art { text-transform: none; }
 html.superhot .row button.key,
 html.superhot :is(.dim, .tags, .lightbox-caption) :is(a, b, strong) { text-transform: uppercase; }
 
+/* VGA: commands in the dim lines (More: under whoami, the prompt's Lost? hint) in capitals, as in
+   SUPERHOT (which already capitalises every button). */
+html.vga .dim button.cmd { text-transform: uppercase; }
+
 /* The prompt's sliver of space after > would put the command between pixels. */
 html.vga .ps { margin-right: 0; }
 
