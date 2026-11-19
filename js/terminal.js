@@ -1125,9 +1125,11 @@
      Off the prompt (Esc leaves it), Up and Down move an inverted bar through the printed lines,
      like a console's selection, scrolling a line at a time to keep it in view; Enter opens the
      command, link or photo on that line, and Esc or typing goes back to the prompt. A line is a
-     line of text as laid out on screen, so a wrapped paragraph is several. The bar sits in
-     #console, so the fisheye bends it with the text, and inverts what's under it
-     (mix-blend-mode: difference, see .line-mark in css/style.css). */
+     line of text as laid out on screen, so a wrapped paragraph is several. It looks exactly like
+     selected text: a CSS highlight styled as ::selection is (::highlight(line-mark) in
+     css/style.css), over just that line's characters. Browsers without CSS highlights get an
+     inverted bar instead (.line-mark). */
+  const highlights = typeof Highlight === 'function' && CSS.highlights;
   const mark = Object.assign(document.createElement('div'), { className: 'line-mark' });
   mark.setAttribute('aria-hidden', 'true');
   document.getElementById('console').append(mark);
@@ -1187,16 +1189,42 @@
       left: `${column.left - box.left - 4}px`,
       width: `${column.width + 8}px`,
     });
-    mark.classList.add('is-on');
+    if (highlights) highlights.set('line-mark', new Highlight(...lineRanges(marked)));
+    else mark.classList.add('is-on');
     // Keeps it on screen, a whole line at a time.
     const line = lineHeight();
     const by = marked.bottom > viewBottom ? Math.ceil((marked.bottom - viewBottom) / line) * line
       : marked.top < viewTop ? -Math.ceil((viewTop - marked.top) / line) * line : 0;
     if (by) scrollBy({ top: by, behavior: 'instant' });
   }
+  // The line's characters: of each text node on it, the run whose boxes sit on the line.
+  function lineRanges(line) {
+    const probe = document.createRange();
+    return line.nodes.map((node) => {
+      let first = -1, last = -1;
+      for (let i = 0; i < node.data.length; i++) {
+        probe.setStart(node, i);
+        probe.setEnd(node, i + 1);
+        const box = probe.getClientRects()[0];
+        if (!box) continue;
+        const mid = (box.top + box.bottom) / 2 + scrollY;
+        if (mid > line.top && mid < line.bottom) {
+          if (first < 0) first = i;
+          last = i;
+        } else if (first >= 0) {
+          break;
+        }
+      }
+      const range = document.createRange();
+      range.setStart(node, Math.max(0, first));
+      range.setEnd(node, last + 1);
+      return range;
+    });
+  }
   function clearMark() {
     marked = null;
     mark.classList.remove('is-on');
+    if (highlights) highlights.delete('line-mark');
   }
   // Enter: the first command, link or photo on the line.
   function openMark() {

@@ -161,6 +161,12 @@ body {
   background: var(--ink);
   color: var(--bg);
 }
+/* The arrow keys' line highlight looks like selected text (see moveMark in js/terminal.js). Its own
+   rule, so a browser that doesn't know ::highlight still reads the one above. */
+::highlight(line-mark) {
+  background: var(--ink);
+  color: var(--bg);
+}
 
 :focus-visible {
   outline: 1px dashed var(--accent);
@@ -1010,10 +1016,9 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   body::after { display: none !important; }
 }
 
-/* The line highlight: off the prompt, the arrow keys move it through the printed lines (see moveMark
-   in js/terminal.js). An inverted bar, like a DOS menu, in the text colour: with difference, text in
-   that colour turns black and the dark background turns the bar's colour. (A white bar would flip
-   light blue to yellow.) */
+/* The line highlight where CSS highlights aren't supported (elsewhere it's ::highlight(line-mark),
+   styled with ::selection): an inverted bar in the text colour; with difference, text in that colour
+   turns black and the dark background turns the bar's colour. */
 .line-mark {
   display: none;
   position: absolute;
@@ -1044,8 +1049,12 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   }
   html.fisheye.sh-outline:not(.no-retro) .crt-frame { display: block; }
   /* The fisheye without the outline: the bend pushes the middle of the bottom edge off screen
-     (js/fisheye.js sets how far as --fx-lift), so the bar's commands are lifted by as much. */
+     (js/fisheye.js sets how far as --fx-lift), so the bar's commands are lifted by as much, and
+     the top edge's, so the console starts lower by as much. */
   html.fisheye.sh-fisheye:not(.sh-outline):not(.no-retro) #shortcuts { padding-bottom: calc(.7rem + var(--fx-lift, 0px)); }
+  /* The bend pushes the middle of the top edge off by as much: the console starts lower, so the
+     first thing on screen at startup (the ASCII art, playing) isn't cut off. */
+  html.fisheye.sh-fisheye:not(.sh-outline):not(.no-retro) #console { padding-top: calc(var(--gap-2) + var(--fx-lift, 0px)); }
   /* Off through the intro, then switching on (see powerOn in js/fisheye.js). */
   html.fisheye.sh-outline:not(.no-retro) .crt-frame.is-off { display: none; }
 }
