@@ -792,9 +792,10 @@
       // storage blocked: the reload starts fresh anyway
     }
     // With superhot's screen outline up, the screen switches off like an old TV (js/fisheye.js);
-    // otherwise the text crumbles away. Then the page starts over.
+    // otherwise the text crumbles away. Then the page starts over, superhot's features off.
     if (window.Fisheye?.outlineShown()) await window.Fisheye.powerOff();
     else await crumbleScreen();
+    for (const name of FEATURES) save(name, null);
     location.reload();
     // Never resolves, so run() can't save the session again before the page goes.
     return new Promise(() => {});

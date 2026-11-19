@@ -174,6 +174,9 @@
   function drawFrame() {
     const w = innerWidth, h = innerHeight;
     root.style.setProperty('--fx-inset', `${inset(w, h)}px`);
+    // The bend pushes the middle of the bottom edge this far off screen: without the outline, the
+    // command bar lifts its commands by as much (--fx-lift, css/style.css), or they'd be cut off.
+    root.style.setProperty('--fx-lift', `${(-shiftAt(0, 1, w, h)[1]).toFixed(1)}px`);
     // Switching off without the outline, the whole screen closes.
     const m = closing && !shows('outline') ? 0 : inset(w, h);
     const key = `${w}x${h}x${open}x${m}x${shows('fisheye')}x${closing}`;

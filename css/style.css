@@ -1028,6 +1028,9 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
     padding: calc(var(--gap-2) + var(--fx-inset, 0px)) calc(var(--gutter) + var(--fx-inset, 0px)) calc(6rem + var(--fx-inset, 0px));
   }
   html.fisheye.sh-outline:not(.no-retro) .crt-frame { display: block; }
+  /* The fisheye without the outline: the bend pushes the middle of the bottom edge off screen
+     (js/fisheye.js sets how far as --fx-lift), so the bar's commands are lifted by as much. */
+  html.fisheye.sh-fisheye:not(.sh-outline):not(.no-retro) #shortcuts { padding-bottom: calc(.7rem + var(--fx-lift, 0px)); }
   /* Off through the intro, then switching on (see powerOn in js/fisheye.js). */
   html.fisheye.sh-outline:not(.no-retro) .crt-frame.is-off { display: none; }
 }
