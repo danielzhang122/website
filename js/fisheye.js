@@ -1,23 +1,23 @@
 // A vintage TV's bulging glass, in retro only: an SVG displacement filter on the console, the command
 // bar and the intro (see the end of css/style.css). It magnifies the middle of the screen and bows
-// straight lines outward, while the screen's four edges stay put, so nothing is pushed off screen.
+// straight lines outward, leaving the corners put.
 (() => {
   const K = 0.065;     // bulge strength: the centre is magnified by 1 / (1 - K)
-  const SHIFT = 0.15;   // device px each way for the two averaged bends that halve the steps (see place)
+  const SHIFT = 0.3;   // device px each way for the two averaged bends that halve the steps (see place)
   const N = 512;       // map resolution; the browser smooths it up to screen size
   const root = document.documentElement;
   const consoleEl = document.getElementById('console');
   if (!consoleEl || !CSS.supports('filter', 'url(#a)')) return;
 
-  // Where the picture at screen point (cx, cy) comes from. In half-screens from the middle (x, y in
-  // -1..1), each axis's shift is zero at both its edges and largest a little way in, and shrinks
-  // toward the other axis's edges, which is what bows the lines:
-  //   shift x = -K * x * (1 - x²) * (1 - y² / 2), and the same for y with x and y swapped.
+  // Where the picture at screen point (cx, cy) comes from: x, y run -1..1 across the screen, and the
+  // picture comes from p * (1 - K * (1 - r² / 2)) of the way out, r being the distance from the
+  // middle, in half the screen's longer side (M / 2). So the middle is magnified and the corners
+  // (r² = 2) stay put; the middles of the edges are pushed off screen by K / 2 of a half-screen.
+  // (The 254/255 and 0.5/255 are the map's own rounding: channel 128 + 254 * shift, as first drawn.)
   function shiftAt(x, y, w, h) {
-    return [
-      -K * x * (1 - x * x) * (1 - y * y / 2) * (w / 2),
-      -K * y * (1 - y * y) * (1 - x * x / 2) * (h / 2),
-    ];
+    const f = -(1 - (x * x + y * y) / 2);   // in units of K
+    const scale = K * Math.max(w, h) / 2;
+    return [x, y].map((v) => scale * (0.5 / 255 + (254 / 255) * v * f));
   }
   function source(cx, cy) {
     const w = innerWidth, h = innerHeight;
@@ -26,12 +26,12 @@
   }
 
   // feDisplacementMap shifts by scale * (C / 255 - 0.5), C being the map's channel value. The largest
-  // shift is K * (2 / 3√3) of a half-screen (where x² = 1/3), so scale = K * M / 2 leaves room for it.
+  // shift is K / 2 of a half-screen (at the middle of an edge), so scale = K * M / 2 fits it exactly.
   const scaleFor = (w, h) => K * Math.max(w, h) / 2;
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = N;
-  // The map depends on the screen's shape (each axis's shift is in its own half-width), so it's
-  // redrawn when that changes.
+  // The map depends on the screen's shape (it's stretched across the screen), so it's redrawn when
+  // that changes.
   function drawMap(w, h) {
     const ctx = canvas.getContext('2d');
     const img = ctx.createImageData(N, N);
