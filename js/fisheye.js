@@ -9,15 +9,17 @@
   const consoleEl = document.getElementById('console');
   if (!consoleEl || !CSS.supports('filter', 'url(#a)')) return;
 
-  // Where the picture at screen point (cx, cy) comes from: x, y run -1..1 across the screen, and the
-  // picture comes from p * (1 - K * (1 - r² / 2)) of the way out, r being the distance from the
-  // middle, in half the screen's longer side (M / 2). So the middle is magnified and the corners
-  // (r² = 2) stay put; the middles of the edges are pushed off screen by K / 2 of a half-screen.
-  // (The 254/255 and 0.5/255 are the map's own rounding: channel 128 + 254 * shift, as first drawn.)
+  // Where the picture at screen point (cx, cy) comes from. Measured in pixels from the middle, so
+  // the bulge is round whatever the screen's shape (a wide screen measured in half-widths and
+  // half-heights would stretch it, magnifying more up and down than across): a point p pixels out
+  // shows the picture from p * (1 - K * (1 - r²)) out, r being p over the half-diagonal R. The
+  // middle is magnified by 1 / (1 - K) both ways, the corners (r = 1) stay put, and the middles of
+  // the edges are pushed a little off screen (see lift).
+  // x, y run -1..1 across the screen.
   function shiftAt(x, y, w, h) {
-    const f = -(1 - (x * x + y * y) / 2);   // in units of K
-    const scale = K * Math.max(w, h) / 2;
-    return [x, y].map((v) => scale * (0.5 / 255 + (254 / 255) * v * f));
+    const X = x * w / 2, Y = y * h / 2, R2 = (w * w + h * h) / 4;
+    const f = -K * (1 - (X * X + Y * Y) / R2);
+    return [X * f, Y * f];
   }
   function source(cx, cy) {
     const w = innerWidth, h = innerHeight;
@@ -26,8 +28,11 @@
   }
 
   // feDisplacementMap shifts by scale * (C / 255 - 0.5), C being the map's channel value. The largest
-  // shift is K / 2 of a half-screen (at the middle of an edge), so scale = K * M / 2 fits it exactly.
-  const scaleFor = (w, h) => K * Math.max(w, h) / 2;
+  // shift is K * R * 2 / (3√3), about 0.385 K R (at p = R / √3), so scale = K * R covers both ways.
+  const scaleFor = (w, h) => K * Math.hypot(w, h) / 2;
+  // How far the middle of the bottom edge is pushed off screen: the command bar lifts its commands
+  // by as much (--fx-lift, see the end of css/style.css), or they'd be cut in half.
+  const lift = (w, h) => -shiftAt(0, 1, w, h)[1];
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = N;
   // The map depends on the screen's shape (it's stretched across the screen), so it's redrawn when
@@ -96,6 +101,7 @@
       for (const l of lenses) l.image.setAttribute('href', href);
     }
     const scale = scaleFor(w, h);
+    root.style.setProperty('--fx-lift', `${lift(w, h).toFixed(1)}px`);
     // feDisplacementMap moves whole device pixels, so bent lines step. Two bends, offset by SHIFT
     // device pixels each way, put their steps in different places; averaged, each step becomes two
     // half steps. No blur on top: it softened the text more than it smoothed the steps.
@@ -117,6 +123,9 @@
   for (const l of lenses) resized.observe(l.el);
   place();
   root.classList.add('fisheye');
+
+  // The tube's rounded screen: a frame over everything, styled at the end of css/style.css.
+  document.body.appendChild(Object.assign(document.createElement('div'), { className: 'crt-frame', ariaHidden: 'true' }));
 
   /* ---------- pointing at the bent picture ----------
      The filter only moves what's drawn: the browser still hit-tests the unbent layout, so a click

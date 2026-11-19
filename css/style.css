@@ -1047,12 +1047,31 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 /* Fisheye: the console, command bar and intro bulge like an old curved TV tube, in retro only.
    js/fisheye.js builds each one's filter (--fx-filter) and keeps it lined up with the screen. */
 html.fisheye:not(.no-retro) :is(#console, #shortcuts, #gate) { filter: var(--fx-filter); }
-/* The bend pushes the middle of the bottom edge K / 2 of a half-screen off screen (1.625vmax at
-   K = .065, see js/fisheye.js), which would cut the bar's commands in half; lift them by as much. */
-html.fisheye:not(.no-retro) #shortcuts { padding-bottom: calc(.7rem + 1.625vmax); }
+/* The bend pushes the middle of the bottom edge a little off screen (js/fisheye.js sets how far as
+   --fx-lift), which would cut the bar's commands in half; lift them by as much. */
+html.fisheye:not(.no-retro) #shortcuts { padding-bottom: calc(.7rem + var(--fx-lift, 0px)); }
 /* The browser hit-tests the unbent layout, so while the bend shows, js/fisheye.js sends clicks on to
    what's drawn under the pointer and marks it .fx-hover in place of :hover (each :hover rule above
    skips the bent console and bar: :not(html.fx-live :is(#console, #shortcuts) *)). The cursor
    comes from there too. */
 html.fx-live :is(#console, #shortcuts),
 html.fx-live :is(#console, #shortcuts) * { cursor: var(--fx-cursor, auto) !important; }
+
+/* An old TV's rounded screen, in retro: the picture's corners rounded off into a black bezel, with
+   the glass darkening toward its edge. Over everything on screen (the intro and photo viewer too)
+   and under the scanlines and static, which sit on the glass. */
+.crt-frame { display: none; }
+html.fisheye:not(.no-retro) .crt-frame {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 199;
+  pointer-events: none;
+  border-radius: 7vmin / 8vmin;
+  /* The bezel, a faint rim of light where the glass meets it, then the glass's dark edge. */
+  box-shadow:
+    0 0 0 100vmax #000,
+    inset 0 0 0 1px rgba(207, 232, 255, .07),
+    inset 0 0 2vmin 0.6vmin rgba(0, 0, 0, .85),
+    inset 0 0 9vmin rgba(0, 0, 0, .45);
+}
