@@ -261,7 +261,9 @@
     // The art's characters are f.w em wide and about 1.15em tall; leave room for the label below.
     const f = artFont();
     const fit = Math.min((width * (narrow ? 0.9 : 0.8)) / (art.cols * f.w), (height * 0.8) / ((art.rows + 3) * 1.15));
-    const fontSize = Math.max(6, Math.min(16, Math.floor(fit)));
+    // At most 16px times the site's --scale (css/style.css), like the rest of the page.
+    const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--scale')) || 1;
+    const fontSize = Math.max(6, Math.min(16 * scale, Math.floor(fit)));
     labelPad = ' '.repeat(Math.max(0, Math.floor((art.cols - LABEL.length) / 2)));
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
     if (f.pixelLine && fit >= 16 * pxu) {

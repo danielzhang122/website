@@ -593,10 +593,10 @@
   // Easter eggs: SUPERHOT's look in retro, in any font, one feature per command, each saved and
   // shown as an sh-<name> class on <html> (css/style.css, js/fisheye.js; index.html applies them
   // before first paint): blue text, its strong glow, the fisheye bend and the screen outline.
-  // superhot switches all four. Turning one on turns retro on too. blue and fisheye are on by
-  // default: each is saved as 'on' or 'off' once switched, and unsaved means its default.
+  // superhot switches all four. Turning one on turns retro on too. blue is on by default: each is
+  // saved as 'on' or 'off' once switched, and unsaved means its default.
   const FEATURES = ['blue', 'glow', 'fisheye', 'outline'];
-  const DEFAULT_ON = ['blue', 'fisheye'];
+  const DEFAULT_ON = ['blue'];
   const featureOn = (name) => document.documentElement.classList.contains(`sh-${name}`);
   async function setFeatures(names, on) {
     if (on && !retroOn()) {
@@ -638,7 +638,7 @@
     save('font-retro', null);
     save('font-modern', null);
     // superhot's features back to their defaults: the others off first (the outline switching the
-    // TV off and on), then blue and fisheye on, without turning retro on.
+    // TV off and on), then blue on, without turning retro on.
     await setFeatures(FEATURES.filter((name) => !DEFAULT_ON.includes(name)), false);
     for (const name of FEATURES) save(name, null);
     for (const name of DEFAULT_ON) document.documentElement.classList.add(`sh-${name}`);
@@ -813,7 +813,7 @@
     }
     // With superhot's screen outline up, the screen switches off like an old TV (js/fisheye.js);
     // otherwise the text crumbles away. Then the page starts over, superhot's features at their
-    // defaults (blue and fisheye on).
+    // defaults (blue on).
     if (window.Fisheye?.outlineShown()) await window.Fisheye.powerOff();
     else await crumbleScreen();
     for (const name of FEATURES) save(name, null);

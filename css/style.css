@@ -103,10 +103,10 @@
   --plex: 'IBM Plex Mono', var(--mono);
   --text: var(--mono);
   --art: var(--mono);   /* the ASCII art's font: each font mode draws its art in its own font */
-  /* The site's size, 90% on desktop (below): text, lines and the gaps between them, the column, the
-     thumbnails and the ASCII art. VGA's pixel font keeps its native size, as it's only sharp there,
-     and phones have their own sizes. */
-  --scale: 1;
+  /* The site's size, 90% everywhere: text, lines and the gaps between them, the column, the
+     thumbnails, the ASCII art and, through the root font size (below), everything in rem. VGA's pixel
+     font keeps its native size, as it's only sharp there. */
+  --scale: .9;
   /* A terminal's text grid: 9x19px cells, as in Windows Terminal. Cascadia Mono is 0.5859375em
      (1200/2048) wide, so 15.36px gives exactly 9px columns (8.1x17.1 at 90%). */
   --fs: calc(15.36px * var(--scale));
@@ -126,12 +126,10 @@
   --column: calc(810px * var(--scale));   /* 90 characters */
   --gutter: 1.5rem;
 }
-@media (min-width: 641px) {
-  :root { --scale: .9; }
-}
+html { font-size: calc(var(--scale) * 100%); }
 
 /* SUPERHOT's look, in retro only: four hidden commands, each one class on <html> (js/terminal.js),
-   and `superhot` switches all four. blue and fisheye are on by default. blue (.sh-blue): light blue text, with blue-grey dim text.
+   and `superhot` switches all four. blue is on by default. blue (.sh-blue): light blue text, with blue-grey dim text.
    glow (.sh-glow): a strong glow (below). fisheye (.sh-fisheye) and outline (.sh-outline): the
    bend and the screen outline (end of this file). */
 html.sh-blue:not(.no-retro) {
@@ -319,7 +317,7 @@ html:not(.no-retro) body::after {
 
 html:not(.no-retro) body::before {
   background:
-    repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, var(--scan)) 0 var(--pxu), transparent var(--pxu) calc(3 * var(--pxu))),
     radial-gradient(ellipse at center, rgba(255, 255, 255, .035), transparent 50%, rgba(0, 0, 0, .65));
   animation: crt-flicker 4s steps(1) infinite;
 }
@@ -373,7 +371,7 @@ html:not(.no-retro) :is(.dim, .tags, .row .key, .thumbs figcaption, .lightbox-ca
 
 /* Scanlines over a zoomed-in photo, light ones especially, are the most jarring; keep them barely there. */
 html:not(.no-retro) body:has(#lightbox.is-open)::before {
-  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 1px, transparent 1px 3px);
+  background: repeating-linear-gradient(to bottom, rgba(0, 0, 0, .025) 0 var(--pxu), transparent var(--pxu) calc(3 * var(--pxu)));
 }
 
 html:not(.no-retro):has(#lightbox.is-open)::before { display: none; }
@@ -753,10 +751,10 @@ article > * + * { margin-top: var(--gap-s); }
 }
 
 @media (max-width: 640px) {
-  .thumb { --thumb-h: 135px; }
+  .thumb { --thumb-h: calc(135px * var(--scale)); }
   .thumb-row > .thumb {
-    flex-basis: calc(var(--ar) * 120px);
-    max-width: min(100%, calc(var(--ar) * 150px));
+    flex-basis: calc(var(--ar) * 120px * var(--scale));
+    max-width: min(100%, calc(var(--ar) * 150px * var(--scale)));
   }
 }
 
@@ -985,7 +983,7 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 @media (max-width: 640px) {
   :root { --gutter: 1rem; }
 
-  :root { --fs: 14px; }
+  :root { --fs: calc(14px * var(--scale)); }
 
   .row {
     grid-template-columns: 1fr;
@@ -1001,16 +999,16 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   .thumbs > :is(img, video),
   .thumbs figure > :is(img, video),
   .thumbs figure {
-    width: 96px;
+    width: calc(96px * var(--scale));
   }
 
   .thumbs > :is(img, video),
-  .thumbs figure > :is(img, video) { height: 96px; }
+  .thumbs figure > :is(img, video) { height: calc(96px * var(--scale)); }
 
-  .thumbs.whole > :is(img, video) { width: auto; height: 110px; }
+  .thumbs.whole > :is(img, video) { width: auto; height: calc(110px * var(--scale)); }
 
   .thumbs.media-gallery figure { width: auto; }
-  .thumbs.media-gallery figure > img { width: auto; height: 110px; }
+  .thumbs.media-gallery figure > img { width: auto; height: calc(110px * var(--scale)); }
 
   /* Two across on a phone; the third wraps underneath. */
   .thumbs.featured figure { width: calc(50% - var(--gap) / 2); }
