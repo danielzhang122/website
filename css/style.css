@@ -202,7 +202,7 @@ a {
   transition: color .15s, text-decoration-color .15s;
 }
 
-a:not(html.fx-live #console *):hover,
+a:not(html.fx-live :is(#console, #shortcuts) *):hover,
 a.fx-hover {
   color: var(--accent);
   text-decoration-color: var(--accent);
@@ -568,7 +568,7 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
 .ghost { color: color-mix(in srgb, var(--dim) 70%, var(--bg)); }
 .ghost button { pointer-events: auto; }
 /* Its commands in the usual text colour, like the More: line's, so they read as clickable. */
-.ghost button.cmd:not(.fx-hover):not(:hover:not(html.fx-live #console *)) { color: var(--ink); }
+.ghost button.cmd:not(.fx-hover):not(:hover:not(html.fx-live :is(#console, #shortcuts) *)) { color: var(--ink); }
 #cmd:not(:placeholder-shown) ~ .ghost { display: none; }
 #cmd::placeholder { color: transparent; }
 
@@ -617,8 +617,9 @@ button.cmd {
 }
 
 #shortcuts button { color: var(--dim); }
-#shortcuts button:hover,
-button.cmd:not(html.fx-live #console *):hover,
+#shortcuts button:not(html.fx-live #shortcuts *):hover,
+#shortcuts button.fx-hover,
+button.cmd:not(html.fx-live :is(#console, #shortcuts) *):hover,
 button.cmd.fx-hover { color: var(--accent); }
 
 /* help and clear are utilities, not sections: a thin rule and extra room set them apart.
@@ -722,7 +723,7 @@ article > * + * { margin-top: var(--gap-s); }
 }
 
 .row button.key { color: var(--ink); }
-.row button.key:not(html.fx-live #console *):hover,
+.row button.key:not(html.fx-live :is(#console, #shortcuts) *):hover,
 .row button.key.fx-hover { color: var(--accent); }
 .row > div > * + * { margin-top: var(--gap-s); }
 /* Key/value lists (skills, certs, contact) are one item per row: half a line apart.
@@ -745,7 +746,7 @@ article > * + * { margin-top: var(--gap-s); }
   cursor: zoom-in;
 }
 
-.thumb:not(html.fx-live #console *):hover,
+.thumb:not(html.fx-live :is(#console, #shortcuts) *):hover,
 .thumb.fx-hover { outline: 1px solid var(--accent); }
 
 .thumb > :is(img, video) {
@@ -796,12 +797,12 @@ article > * + * { margin-top: var(--gap-s); }
   transition: opacity .15s;
 }
 
-.thumbs > :is(img, video):not(html.fx-live #console *):hover,
+.thumbs > :is(img, video):not(html.fx-live :is(#console, #shortcuts) *):hover,
 .thumbs > :is(img, video).fx-hover,
-.thumbs figure:not(html.fx-live #console *):hover > :is(img, video),
+.thumbs figure:not(html.fx-live :is(#console, #shortcuts) *):hover > :is(img, video),
 .thumbs figure.fx-hover > :is(img, video) { opacity: .8; outline: 1px solid var(--accent); }
 
-.thumbs figure:not(html.fx-live #console *):hover figcaption,
+.thumbs figure:not(html.fx-live :is(#console, #shortcuts) *):hover figcaption,
 .thumbs figure.fx-hover figcaption { color: var(--accent); }
 
 .thumbs .fit-whole { object-fit: contain; }
@@ -1043,11 +1044,12 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   body::after { display: none !important; }
 }
 
-/* Fisheye: the console bulges like an old curved TV tube, in retro only. js/fisheye.js builds the
-   displacement map and keeps the lens on the visible part of the page as it scrolls. */
-html.fisheye:not(.no-retro) #console { filter: url(#fisheye); }
+/* Fisheye: the console, command bar and intro bulge like an old curved TV tube, in retro only.
+   js/fisheye.js builds each one's filter (--fx-filter) and keeps it lined up with the screen. */
+html.fisheye:not(.no-retro) :is(#console, #shortcuts, #gate) { filter: var(--fx-filter); }
 /* The browser hit-tests the unbent layout, so while the bend shows, js/fisheye.js sends clicks on to
    what's drawn under the pointer and marks it .fx-hover in place of :hover (each :hover rule above
-   skips the bent console, :not(html.fx-live #console *)). The cursor comes from there too. */
-html.fx-live #console,
-html.fx-live #console * { cursor: var(--fx-cursor, auto) !important; }
+   skips the bent console and bar: :not(html.fx-live :is(#console, #shortcuts) *)). The cursor
+   comes from there too. */
+html.fx-live :is(#console, #shortcuts),
+html.fx-live :is(#console, #shortcuts) * { cursor: var(--fx-cursor, auto) !important; }

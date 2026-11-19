@@ -1,93 +1,128 @@
-// A vintage TV's bulging glass: an SVG displacement filter on #console (see the end of css/style.css).
-// The map pushes each pixel toward the screen's middle, magnifying the centre and leaving the corners put.
+// A vintage TV's bulging glass, in retro only: an SVG displacement filter on the console, the command
+// bar and the intro (see the end of css/style.css). It magnifies the middle of the screen and bows
+// straight lines outward, while the screen's four edges stay put, so nothing is pushed off screen.
 (() => {
   const K = 0.065;     // bulge strength: the centre is magnified by 1 / (1 - K)
-  const SHIFT = 0.3;   // device px each way for the two averaged bends that halve the steps (see place)
+  const SHIFT = 0.15;   // device px each way for the two averaged bends that halve the steps (see place)
   const N = 512;       // map resolution; the browser smooths it up to screen size
   const root = document.documentElement;
   const consoleEl = document.getElementById('console');
   if (!consoleEl || !CSS.supports('filter', 'url(#a)')) return;
 
-  // Displacement in half-screens: d = -K * p * (1 - r^2 / 2); its largest value is K / 2.
-  const c = document.createElement('canvas');
-  c.width = c.height = N;
-  const ctx = c.getContext('2d');
-  const img = ctx.createImageData(N, N);
-  for (let j = 0; j < N; j++) {
-    for (let i = 0; i < N; i++) {
-      const x = (i + 0.5) / N * 2 - 1, y = (j + 0.5) / N * 2 - 1;
-      const f = -K * (1 - (x * x + y * y) / 2);
-      const o = (j * N + i) * 4;
-      // Channel value 0..255 maps to -1..1 of the maximum shift (K / 2).
-      img.data[o] = Math.round(128 + 127 * (x * f) / (K / 2));
-      img.data[o + 1] = Math.round(128 + 127 * (y * f) / (K / 2));
-      img.data[o + 2] = 128;
-      img.data[o + 3] = 255;
-    }
+  // Where the picture at screen point (cx, cy) comes from. In half-screens from the middle (x, y in
+  // -1..1), each axis's shift is zero at both its edges and largest a little way in, and shrinks
+  // toward the other axis's edges, which is what bows the lines:
+  //   shift x = -K * x * (1 - x²) * (1 - y² / 2), and the same for y with x and y swapped.
+  function shiftAt(x, y, w, h) {
+    return [
+      -K * x * (1 - x * x) * (1 - y * y / 2) * (w / 2),
+      -K * y * (1 - y * y) * (1 - x * x / 2) * (h / 2),
+    ];
   }
-  ctx.putImageData(img, 0, 0);
+  function source(cx, cy) {
+    const w = innerWidth, h = innerHeight;
+    const [dx, dy] = shiftAt(cx / w * 2 - 1, cy / h * 2 - 1, w, h);
+    return [cx + dx, cy + dy];
+  }
 
+  // feDisplacementMap shifts by scale * (C / 255 - 0.5), C being the map's channel value. The largest
+  // shift is K * (2 / 3√3) of a half-screen (where x² = 1/3), so scale = K * M / 2 leaves room for it.
+  const scaleFor = (w, h) => K * Math.max(w, h) / 2;
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = N;
+  // The map depends on the screen's shape (each axis's shift is in its own half-width), so it's
+  // redrawn when that changes.
+  function drawMap(w, h) {
+    const ctx = canvas.getContext('2d');
+    const img = ctx.createImageData(N, N);
+    const scale = scaleFor(w, h);
+    for (let j = 0; j < N; j++) {
+      for (let i = 0; i < N; i++) {
+        const [dx, dy] = shiftAt((i + 0.5) / N * 2 - 1, (j + 0.5) / N * 2 - 1, w, h);
+        const o = (j * N + i) * 4;
+        img.data[o] = Math.round(255 * (dx / scale + 0.5));
+        img.data[o + 1] = Math.round(255 * (dy / scale + 0.5));
+        img.data[o + 2] = 128;
+        img.data[o + 3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    return canvas.toDataURL();
+  }
+
+  // One filter per bent element: each lines its lens up with the screen in its own coordinates.
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('aria-hidden', 'true');
   svg.style.cssText = 'position:absolute;width:0;height:0';
-  svg.innerHTML =
-    `<filter id="fisheye" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-      <feFlood flood-color="rgb(128,128,128)" result="flat"/>
-      <feImage href="${c.toDataURL()}" preserveAspectRatio="none" result="lens"/>
-      <feMerge result="map"><feMergeNode in="flat"/><feMergeNode in="lens"/></feMerge>
-      <feComponentTransfer in="map" result="mapA"><feFuncR type="linear" slope="1"/><feFuncG type="linear" slope="1"/></feComponentTransfer>
-      <feComponentTransfer in="map" result="mapB"><feFuncR type="linear" slope="1"/><feFuncG type="linear" slope="1"/></feComponentTransfer>
-      <feDisplacementMap in="SourceGraphic" in2="mapA" xChannelSelector="R" yChannelSelector="G" result="bentA"/>
-      <feDisplacementMap in="SourceGraphic" in2="mapB" xChannelSelector="R" yChannelSelector="G" result="bentB"/>
-      <feComposite in="bentA" in2="bentB" operator="arithmetic" k1="0" k2="0.5" k3="0.5" k4="0"/>
-    </filter>`;
   document.body.appendChild(svg);
-  const filter = svg.querySelector('filter');
-  const lens = svg.querySelector('feImage');
-  const bends = svg.querySelectorAll('feDisplacementMap');
-  const funcs = svg.querySelectorAll('feFuncR, feFuncG');   // mapA's R and G, then mapB's
+  const lenses = [['console', consoleEl], ['bar', document.getElementById('shortcuts')], ['gate', document.getElementById('gate')]]
+    .filter(([, el]) => el)
+    .map(([name, el]) => {
+      const id = `fisheye-${name}`;
+      svg.insertAdjacentHTML('beforeend',
+        `<filter id="${id}" filterUnits="userSpaceOnUse" primitiveUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+          <feFlood flood-color="rgb(128,128,128)" result="flat"/>
+          <feImage preserveAspectRatio="none" result="lens"/>
+          <feMerge result="map"><feMergeNode in="flat"/><feMergeNode in="lens"/></feMerge>
+          <feComponentTransfer in="map" result="mapA"><feFuncR type="linear" slope="1"/><feFuncG type="linear" slope="1"/></feComponentTransfer>
+          <feComponentTransfer in="map" result="mapB"><feFuncR type="linear" slope="1"/><feFuncG type="linear" slope="1"/></feComponentTransfer>
+          <feDisplacementMap in="SourceGraphic" in2="mapA" xChannelSelector="R" yChannelSelector="G" result="bentA"/>
+          <feDisplacementMap in="SourceGraphic" in2="mapB" xChannelSelector="R" yChannelSelector="G" result="bentB"/>
+          <feComposite in="bentA" in2="bentB" operator="arithmetic" k1="0" k2="0.5" k3="0.5" k4="0"/>
+        </filter>`);
+      const filter = svg.lastElementChild;
+      el.style.setProperty('--fx-filter', `url(#${id})`);
+      return {
+        el,
+        filter,
+        image: filter.querySelector('feImage'),
+        bends: filter.querySelectorAll('feDisplacementMap'),
+        funcs: filter.querySelectorAll('feFuncR, feFuncG'),   // mapA's R and G, then mapB's
+        // The console scrolls, so its filter reaches a screen above and below the lens: a fast
+        // scroll never outruns it and clips the text. The bar and intro are fixed to the screen.
+        reach: el === consoleEl ? 1 : 0,
+      };
+    });
 
-  // The lens covers the viewport, in #console's own coordinates. The filter's region reaches a
-  // screen above and below, so a fast scroll never outruns it and clips the text.
+  let mapFor = '';   // the screen size the map was drawn for
   let queued = false;
   function place() {
     queued = false;
-    const r = consoleEl.getBoundingClientRect();
     const w = innerWidth, h = innerHeight;
-    // feDisplacementMap's scale is the full range of shift: twice the largest shift, in pixels.
-    const scale = K * Math.max(w, h) / 2;
-    for (const bend of bends) bend.setAttribute('scale', scale.toFixed(1));
+    if (mapFor !== `${w}x${h}`) {
+      mapFor = `${w}x${h}`;
+      const href = drawMap(w, h);
+      for (const l of lenses) l.image.setAttribute('href', href);
+    }
+    const scale = scaleFor(w, h);
     // feDisplacementMap moves whole device pixels, so bent lines step. Two bends, offset by SHIFT
     // device pixels each way, put their steps in different places; averaged, each step becomes two
     // half steps. No blur on top: it softened the text more than it smoothed the steps.
     const d = SHIFT / devicePixelRatio / scale;   // SHIFT device px in the map's 0..1 units
-    funcs.forEach((f, i) => f.setAttribute('intercept', (i < 2 ? -d : d).toFixed(4)));
-    for (const [k, v] of Object.entries({ x: -r.left, y: -r.top, width: w, height: h })) lens.setAttribute(k, v);
-    for (const [k, v] of Object.entries({ x: -r.left, y: -r.top - h, width: w, height: 3 * h })) filter.setAttribute(k, v);
+    for (const l of lenses) {
+      if (!l.el.isConnected) continue;   // the intro removes itself when done
+      const r = l.el.getBoundingClientRect();
+      for (const bend of l.bends) bend.setAttribute('scale', scale.toFixed(1));
+      l.funcs.forEach((f, i) => f.setAttribute('intercept', (i < 2 ? -d : d).toFixed(4)));
+      for (const [k, v] of Object.entries({ x: -r.left, y: -r.top, width: w, height: h })) l.image.setAttribute(k, v);
+      const reach = l.reach * h;
+      for (const [k, v] of Object.entries({ x: -r.left, y: -r.top - reach, width: w, height: h + 2 * reach })) l.filter.setAttribute(k, v);
+    }
   }
   const queue = () => { if (!queued) { queued = true; requestAnimationFrame(place); } };
   addEventListener('scroll', queue, { passive: true });
   addEventListener('resize', queue);
-  new ResizeObserver(queue).observe(consoleEl);
+  const resized = new ResizeObserver(queue);
+  for (const l of lenses) resized.observe(l.el);
   place();
   root.classList.add('fisheye');
 
   /* ---------- pointing at the bent picture ----------
      The filter only moves what's drawn: the browser still hit-tests the unbent layout, so a click
-     or hover would land on whatever sits there instead of what's under the pointer. The map says
-     where each screen pixel's picture comes from, so each click is sent on to that element, and
+     or hover would land on whatever sits there instead of what's under the pointer. source() says
+     where each screen point's picture comes from, so each click is sent on to that element, and
      hover is shown on it with .fx-hover (see the end of css/style.css), along with its cursor. */
-
-  // Where the picture at a screen point comes from: the same sum feDisplacementMap does.
-  // Its shift is scale * (C / 255 - 0.5), with scale = K * M / 2 and C from the map above.
-  function source(cx, cy) {
-    const w = innerWidth, h = innerHeight, M = Math.max(w, h);
-    const x = cx / w * 2 - 1, y = cy / h * 2 - 1;
-    const f = -K * (1 - (x * x + y * y) / 2);
-    const shift = (v) => (K * M / 2) * ((128 + 127 * (v * f) / (K / 2)) / 255 - 0.5);
-    return [cx + shift(x), cy + shift(y)];
-  }
 
   let hovered = [];   // the elements marked .fx-hover (see hover below)
 
@@ -100,14 +135,15 @@
   new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['class'] });
   sync();
 
-  // Elements drawn over the console (the command bar, the photo viewer, the intro) aren't bent.
-  const OVER = '#shortcuts, #lightbox, #gate';
+  // Bent elements whose clicks and hover are redirected. The intro skips on a click anywhere, and
+  // the photo viewer isn't bent, so both keep the browser's own.
+  const BENT = '#console, #shortcuts';
   const live = () => root.classList.contains('fx-live');
   function bentTarget(e) {
-    if (!live() || e.target.closest?.(OVER)) return null;
+    if (!live() || !e.target.closest?.(BENT)) return null;
     const [x, y] = source(e.clientX, e.clientY);
     const el = document.elementFromPoint(x, y);
-    return el && !el.closest(OVER) ? { el, x, y } : null;
+    return el && el.closest(BENT) ? { el, x, y } : null;
   }
 
   let resending = false;
@@ -132,7 +168,7 @@
       a.classList.add('fx-hover');
       hovered.push(a);
     }
-    consoleEl.style.setProperty('--fx-cursor', cursorFor(el));
+    root.style.setProperty('--fx-cursor', cursorFor(el));
   }
   function cursorFor(el) {
     if (!el) return 'auto';
@@ -145,7 +181,7 @@
   addEventListener('pointermove', (e) => {
     if (e.pointerType !== 'mouse') return;
     const t = bentTarget(e);
-    hover(t && consoleEl.contains(t.el) ? t.el : null);
+    hover(t ? t.el : null);
   }, { passive: true });
   document.addEventListener('pointerleave', () => hover(null));
 })();
