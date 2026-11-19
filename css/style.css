@@ -100,10 +100,9 @@
   --bg: #0b0b0b;
   /* Text a step softer than full white. Contrast on --bg: --bright 13:1, --ink 9.9:1,
      --dim 5.2:1 (above the WCAG AA minimum of 4.5:1 for body text). */
-  /* SUPERHOT's light blue everywhere, with blue-grey dim text. */
-  --ink: #cfe8ff;
-  --bright: #cfe8ff;
-  --dim: #747d88;
+  --ink: #b8b8b8;
+  --bright: #d2d2d2;
+  --dim: #747474;
   --line: #262626;
   --accent: #e5484d;
 
@@ -131,6 +130,13 @@
 
   --column: 810px;   /* 90 characters */
   --gutter: 1.5rem;
+}
+
+/* Retro (vintage) mode: SUPERHOT's light blue text, with blue-grey dim text. Modern stays grey. */
+html:not(.no-retro) {
+  --ink: #cfe8ff;
+  --bright: #cfe8ff;
+  --dim: #747d88;
 }
 
 
