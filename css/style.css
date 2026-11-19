@@ -1088,10 +1088,18 @@ html.fisheye:not(.no-retro) .crt-frame {
   stroke-width: 1.5px;
   filter: drop-shadow(0 0 2px var(--ink)) drop-shadow(0 0 6px color-mix(in srgb, var(--ink) 45%, transparent));
 }
-.crt-label rect { fill: #000; }
-.crt-label text {
+.crt-gap {
+  fill: none;
+  stroke: #000;
+  stroke-width: calc(1.4 * var(--fs));
+}
+.crt-label {
   fill: var(--bright);
   font: 400 var(--fs) var(--text);
   dominant-baseline: central;
   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--bright) 60%, transparent));
+}
+/* Phones have no room for the outline: js/fisheye.js leaves --fx-inset at 0 there too. */
+@media (max-width: 640px) {
+  html.fisheye:not(.no-retro) .crt-frame { display: none; }
 }

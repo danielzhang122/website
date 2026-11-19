@@ -133,17 +133,28 @@
   const frame = document.createElementNS(NS, 'svg');
   frame.setAttribute('class', 'crt-frame');
   frame.setAttribute('aria-hidden', 'true');
+  // The labels run along the bent top edge (#crt-top), so they curve with it; a thick black stroke
+  // along the same curve, cut to each label's length, breaks the line behind it.
   frame.innerHTML =
-    `<path class="crt-outside" fill-rule="evenodd"/>
+    `<defs><path id="crt-top"/></defs>
+    <path class="crt-outside" fill-rule="evenodd"/>
     <path class="crt-line"/>
-    <g class="crt-label"><rect/><text>zhangdz.ca</text></g>
-    <g class="crt-label crt-clock"><rect/><text text-anchor="end"></text></g>`;
+    <path class="crt-gap"/><path class="crt-gap"/>
+    <text class="crt-label"><textPath href="#crt-top">zhangdz.ca</textPath></text>
+    <text class="crt-label" text-anchor="end"><textPath href="#crt-top"></textPath></text>`;
   document.body.appendChild(frame);
-  const [outside, line] = frame.querySelectorAll('path');
-  const [label, clock] = frame.querySelectorAll('.crt-label');
+  const top = frame.querySelector('#crt-top');
+  const outside = frame.querySelector('.crt-outside');
+  const line = frame.querySelector('.crt-line');
+  const gaps = frame.querySelectorAll('.crt-gap');
+  const [label, clock] = frame.querySelectorAll('textPath');
 
   // The line follows the unbent rectangle INSET px in from the screen's edges, bent like the page.
-  const inset = (w, h) => Math.round(Math.max(14, Math.min(w, h) * 0.06));
+  // Phones have no room for it (css/style.css hides it there too), so the page keeps its full width.
+  const phone = matchMedia('(max-width: 640px)');
+  const inset = (w, h) => (phone.matches ? 0 : Math.round(Math.max(14, Math.min(w, h) * 0.06)));
+  const LABEL_IN = 27;   // px from each end of the top edge to its label
+  const GAP = 6;         // px of broken line either side of a label
   let frameFor = '';
   function drawFrame() {
     const w = innerWidth, h = innerHeight;
@@ -151,6 +162,7 @@
     frameFor = `${w}x${h}`;
     const m = inset(w, h);
     root.style.setProperty('--fx-inset', `${m}px`);
+    if (!m) return;
     frame.setAttribute('viewBox', `0 0 ${w} ${h}`);
     const STEPS = 96;   // points per side: enough that the curve reads as smooth
     const corners = [[m, m], [w - m, m], [w - m, h - m], [m, h - m]];
@@ -159,39 +171,38 @@
       const [bx, by] = corners[(i + 1) % 4];
       for (let k = 0; k < STEPS; k++) pts.push(drawnAt(ax + (bx - ax) * k / STEPS, ay + (by - ay) * k / STEPS));
     });
-    const d = `M${pts.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join('L')}Z`;
+    const path = (ps) => `M${ps.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join('L')}`;
+    const d = `${path(pts)}Z`;
     line.setAttribute('d', d);
     outside.setAttribute('d', `M0 0H${w}V${h}H0Z${d}`);
-    // The labels sit on the top edge, 3 characters in from each end.
-    const ch = 9;
-    placeLabel(label, drawnAt(m + 3 * ch, m));
-    placeLabel(clock, drawnAt(w - m - 3 * ch, m));
+    top.setAttribute('d', path([...pts.slice(0, STEPS), pts[STEPS]]));
+    fitLabels();
   }
-  function placeLabel(g, [x, y]) {
-    const text = g.querySelector('text');
-    text.setAttribute('x', x.toFixed(1));
-    text.setAttribute('y', y.toFixed(1));
-    fitLabel(g);
-  }
-  // A black box behind each label breaks the line, as in SUPERHOT's title bars.
-  function fitLabel(g) {
-    const text = g.querySelector('text'), rect = g.querySelector('rect');
-    let b;
-    try { b = text.getBBox(); } catch { return; }
-    if (!b.width) return;
-    for (const [k, v] of Object.entries({ x: b.x - 6, y: b.y, width: b.width + 12, height: b.height })) rect.setAttribute(k, v.toFixed(1));
+  // Each label starts LABEL_IN along the top edge (the clock ends LABEL_IN from its far end).
+  function fitLabels() {
+    if (!inset(innerWidth, innerHeight)) return;
+    let total;
+    try { total = top.getTotalLength(); } catch { return; }
+    label.setAttribute('startOffset', LABEL_IN);
+    clock.setAttribute('startOffset', (total - LABEL_IN).toFixed(1));
+    [[label, LABEL_IN], [clock, total - LABEL_IN - clock.getComputedTextLength()]].forEach(([t, start], i) => {
+      const len = t.getComputedTextLength();
+      gaps[i].setAttribute('d', top.getAttribute('d'));
+      gaps[i].setAttribute('stroke-dasharray', `0 ${(start - GAP).toFixed(1)} ${(len + 2 * GAP).toFixed(1)} ${total.toFixed(0)}`);
+    });
   }
   function tick() {
     const now = new Date();
-    clock.querySelector('text').textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-    fitLabel(clock);
+    clock.textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    fitLabels();
     setTimeout(tick, (60 - now.getSeconds()) * 1000 + 50);
   }
   addEventListener('resize', drawFrame);
   drawFrame();
   tick();
-  // The labels take the page font, which may still be loading.
-  document.fonts?.ready.then(() => { fitLabel(label); fitLabel(clock); });
+  // The labels take the page font, which may still be loading or change with the font commands.
+  document.fonts?.ready.then(fitLabels);
+  new MutationObserver(() => requestAnimationFrame(fitLabels)).observe(root, { attributes: true, attributeFilter: ['class'] });
 
   /* ---------- pointing at the bent picture ----------
      The filter only moves what's drawn: the browser still hit-tests the unbent layout, so a click
