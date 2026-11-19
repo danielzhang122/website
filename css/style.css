@@ -265,7 +265,7 @@ html {
   --scan: .12;       /* scanline darkness */
   --streak: .03;     /* rolling streak brightness */
   --streak-trail: .015; /* the fainter streak trailing it */
-  --fringe: .2;      /* RGB fringe opacity */
+  --fringe: .22;     /* RGB fringe opacity */
   --glare: .16;      /* horizontal glare strength, near the text; the glow command has its own */
   /* In each text's own colour, stronger the redder it is, as red is darker and would barely show. */
   --glare-colour: rgb(from currentColor r g b / calc(var(--glare) + max(0, r - b) / 760));
@@ -295,15 +295,15 @@ html.sh-glow:not(.no-retro) {
     -18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent),
     18px 0 7px color-mix(in srgb, var(--glow-colour) 20%, transparent);
 }
-html:not(.vga) { --fringe: .4; }
+html:not(.vga) { --fringe: .45; }
 /* Desktop screens have fewer pixels per inch than phones, so the effect reads weaker there; boost it. */
 @media (min-width: 641px) {
   html { --scan: .15; }
 }
 /* The fringe is one screen pixel, a third as wide on a 3x phone as on a desktop; make it bolder there. */
 @media (max-width: 640px) {
-  html { --fringe: .3; }
-  html:not(.vga) { --fringe: .55; }
+  html { --fringe: .33; }
+  html:not(.vga) { --fringe: .62; }
 }
 
 html:not(.no-retro) body::before,
@@ -352,7 +352,7 @@ button,
 input { text-shadow: inherit; }
 
 /* The RGB fringe: exactly one screen pixel (--dpx) each side, faint, so it tints the edges of
-   each stroke without smearing them. On the VGA font it's kept at .2: at .3 it doubles the width
+   each stroke without smearing them. On the VGA font it's kept at .22: at .3 it doubles the width
    of the font's 1px strokes and grey text reads as smudged bold. */
 html:not(.no-retro) body {
   text-shadow:
