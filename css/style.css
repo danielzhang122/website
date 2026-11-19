@@ -422,6 +422,7 @@ html:not(.no-retro) [data-retro-label="off"] { display: none; }
    ========================================================================== */
 
 #console {
+  position: relative;   /* for the line highlight (.line-mark) */
   max-width: calc(var(--column) + 2 * var(--gutter));
   margin: 0 auto;
   /* Room at the bottom so the prompt never hides behind the shortcut bar. */
@@ -1008,6 +1009,19 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   html::before, body::before { animation: none !important; }
   body::after { display: none !important; }
 }
+
+/* The line highlight: off the prompt, the arrow keys move it through the printed lines (see moveMark
+   in js/terminal.js). An inverted bar, like a DOS menu: white, and difference flips what's under it,
+   so the text turns dark on light. */
+.line-mark {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  pointer-events: none;
+  background: #fff;
+  mix-blend-mode: difference;
+}
+.line-mark.is-on { display: block; }
 
 /* Desktop only: phones get no fisheye or outline (js/fisheye.js leaves fx-live off there too). */
 @media (min-width: 641px) {

@@ -1085,6 +1085,8 @@
     } else if (e.key === 'l' && e.ctrlKey) {
       e.preventDefault();
       submit('clear'); // queued, so it can't interleave with a print in progress
+    } else if (e.key === 'Escape') {
+      input.blur();   // off the prompt, the arrow keys move the line highlight (see moveMark)
     }
     requestAnimationFrame(updateCursor);
   });
@@ -1118,6 +1120,118 @@
     const target = e.key === 'Enter' && document.activeElement?.closest?.('[data-show]');
     if (target) showFrom(target);
   });
+
+  /* ---------- the line highlight ----------
+     Off the prompt (Esc leaves it), Up and Down move an inverted bar through the printed lines,
+     like a console's selection, scrolling a line at a time to keep it in view; Enter opens the
+     command, link or photo on that line, and Esc or typing goes back to the prompt. A line is a
+     line of text as laid out on screen, so a wrapped paragraph is several. The bar sits in
+     #console, so the fisheye bends it with the text, and inverts what's under it
+     (mix-blend-mode: difference, see .line-mark in css/style.css). */
+  const mark = Object.assign(document.createElement('div'), { className: 'line-mark' });
+  mark.setAttribute('aria-hidden', 'true');
+  document.getElementById('console').append(mark);
+  let marked = null;   // the highlighted line: { top, bottom, nodes } in page pixels
+
+  // The screen's lines of text, top to bottom, each with the text nodes on it.
+  function screenLines() {
+    const boxes = [];
+    const range = document.createRange();
+    const walker = document.createTreeWalker(screen, NodeFilter.SHOW_TEXT);
+    for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+      if (!n.data.trim() || n.parentElement.closest('[aria-hidden="true"]')) continue;
+      range.selectNodeContents(n);
+      for (const r of range.getClientRects()) {
+        if (r.width && r.height) boxes.push({ top: r.top + scrollY, bottom: r.bottom + scrollY, node: n });
+      }
+    }
+    boxes.sort((a, b) => a.top - b.top);
+    const lines = [];
+    for (const box of boxes) {
+      const last = lines[lines.length - 1];
+      const mid = (box.top + box.bottom) / 2;
+      if (last && mid > last.top && mid < last.bottom) {
+        last.top = Math.min(last.top, box.top);
+        last.bottom = Math.max(last.bottom, box.bottom);
+        last.nodes.push(box.node);
+      } else {
+        lines.push({ top: box.top, bottom: box.bottom, nodes: [box.node] });
+      }
+    }
+    return lines;
+  }
+
+  function moveMark(down) {
+    const lines = screenLines();
+    if (!lines.length) return;
+    const outline = document.documentElement.classList.contains('sh-outline');
+    const inset = outline ? parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--fx-inset')) || 0 : 0;
+    const viewTop = scrollY + inset + 8;
+    const viewBottom = scrollY + innerHeight - document.getElementById('shortcuts').offsetHeight - inset - 8;
+    let next;
+    if (!marked) {
+      // Starts on the first line on screen going down, the last going up.
+      const seen = lines.filter((l) => l.top >= viewTop && l.bottom <= viewBottom);
+      next = down ? seen[0] ?? lines[0] : seen[seen.length - 1] ?? lines[lines.length - 1];
+    } else {
+      const at = (marked.top + marked.bottom) / 2;
+      next = down ? lines.find((l) => l.top > at) : lines.filter((l) => l.bottom < at).pop();
+      if (!next) return;
+    }
+    marked = next;
+    const box = document.getElementById('console').getBoundingClientRect();
+    const column = screen.getBoundingClientRect();
+    Object.assign(mark.style, {
+      top: `${marked.top - (box.top + scrollY) - 1}px`,
+      height: `${marked.bottom - marked.top + 2}px`,
+      left: `${column.left - box.left - 4}px`,
+      width: `${column.width + 8}px`,
+    });
+    mark.classList.add('is-on');
+    // Keeps it on screen, a whole line at a time.
+    const line = lineHeight();
+    const by = marked.bottom > viewBottom ? Math.ceil((marked.bottom - viewBottom) / line) * line
+      : marked.top < viewTop ? -Math.ceil((viewTop - marked.top) / line) * line : 0;
+    if (by) scrollBy({ top: by, behavior: 'instant' });
+  }
+  function clearMark() {
+    marked = null;
+    mark.classList.remove('is-on');
+  }
+  // Enter: the first command, link or photo on the line.
+  function openMark() {
+    for (const node of marked.nodes) {
+      const target = node.parentElement.closest('a, button, [data-show], [data-lightbox]');
+      if (target) {
+        clearMark();
+        target.click();
+        return;
+      }
+    }
+  }
+
+  addEventListener('keydown', (e) => {
+    if (e.target === input || e.ctrlKey || e.metaKey || e.altKey) return;
+    if (lightbox.classList.contains('is-open') || document.getElementById('gate')?.isConnected) return;
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      moveMark(e.key === 'ArrowDown');
+    } else if (e.key === 'Enter' && marked) {
+      e.preventDefault();
+      openMark();
+    } else if (e.key === 'Escape' && marked) {
+      clearMark();
+      input.focus({ preventScroll: true });
+    } else if (e.key.length === 1 && marked) {
+      clearMark();
+      input.focus({ preventScroll: true });   // the key then types into the prompt
+    }
+  });
+  // Anything else moves the screen on: the highlight goes.
+  input.addEventListener('focus', clearMark);
+  addEventListener('resize', clearMark);
+  addEventListener('pointerdown', clearMark);
+  new MutationObserver(() => { if (marked && !marked.nodes[0].isConnected) clearMark(); }).observe(screen, { childList: true });
 
   document.addEventListener('click', (e) => {
     const shown = e.target.closest('[data-show]');
