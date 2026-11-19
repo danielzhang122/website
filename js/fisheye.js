@@ -8,6 +8,9 @@
   const root = document.documentElement;
   const consoleEl = document.getElementById('console');
   if (!consoleEl || !CSS.supports('filter', 'url(#a)')) return;
+  // Phones get no fisheye at all: css/style.css applies none of it below 641px, and fx-live (the
+  // click and hover redirect) stays off there.
+  const phone = matchMedia('(max-width: 640px)');
 
   // Where the picture at screen point (cx, cy) comes from: x, y run -1..1 across the screen, and the
   // picture comes from p * (1 - K * (1 - r² / 2)) of the way out, r being the distance from the
@@ -133,13 +136,18 @@
   const frame = document.createElementNS(NS, 'svg');
   frame.setAttribute('class', 'crt-frame');
   frame.setAttribute('aria-hidden', 'true');
-  // The labels run along the bent top edge (#crt-top), so they curve with it; a thick black stroke
-  // along the same curve, cut to each label's length, breaks the line behind it.
+  // The labels run along the bent top edge (#crt-top), so they curve with it. A mask cuts the line
+  // and its glow behind each one: a soft-ended stroke along the same curve, cut to the label's
+  // length, so the line fades out around it (a painted black box, or a hard cut through the glow,
+  // shows as a dark rectangle).
   frame.innerHTML =
-    `<defs><path id="crt-top"/></defs>
+    `<defs>
+      <path id="crt-top"/>
+      <filter id="crt-soft"><feGaussianBlur stdDeviation="2.5"/></filter>
+      <mask id="crt-gaps" maskUnits="userSpaceOnUse"><rect class="crt-mask-all"/><path class="crt-gap"/><path class="crt-gap"/></mask>
+    </defs>
     <path class="crt-outside" fill-rule="evenodd"/>
-    <path class="crt-line"/>
-    <path class="crt-gap"/><path class="crt-gap"/>
+    <g mask="url(#crt-gaps)"><path class="crt-line"/></g>
     <text class="crt-label"><textPath href="#crt-top">zhangdz.ca</textPath></text>
     <text class="crt-label" text-anchor="end"><textPath href="#crt-top"></textPath></text>`;
   document.body.appendChild(frame);
@@ -150,11 +158,10 @@
   const [label, clock] = frame.querySelectorAll('textPath');
 
   // The line follows the unbent rectangle INSET px in from the screen's edges, bent like the page.
-  // Phones have no room for it (css/style.css hides it there too), so the page keeps its full width.
-  const phone = matchMedia('(max-width: 640px)');
+  // Phones have none of it (see phone above), so the page keeps its full width there.
   const inset = (w, h) => (phone.matches ? 0 : Math.round(Math.max(14, Math.min(w, h) * 0.06)));
-  const LABEL_IN = 27;   // px from each end of the top edge to its label
-  const GAP = 6;         // px of broken line either side of a label
+  const LABEL_IN = 44;   // px from each end of the top edge to its label
+  const GAP = 3;         // px of broken line either side of a label, plus the soft round ends
   let frameFor = '';
   function drawFrame() {
     const w = innerWidth, h = innerHeight;
@@ -164,6 +171,7 @@
     root.style.setProperty('--fx-inset', `${m}px`);
     if (!m) return;
     frame.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    for (const [k, v] of Object.entries({ x: 0, y: 0, width: w, height: h })) frame.querySelector('.crt-mask-all').setAttribute(k, v);
     const STEPS = 96;   // points per side: enough that the curve reads as smooth
     const corners = [[m, m], [w - m, m], [w - m, h - m], [m, h - m]];
     const pts = [];
@@ -188,7 +196,10 @@
     [[label, LABEL_IN], [clock, total - LABEL_IN - clock.getComputedTextLength()]].forEach(([t, start], i) => {
       const len = t.getComputedTextLength();
       gaps[i].setAttribute('d', top.getAttribute('d'));
-      gaps[i].setAttribute('stroke-dasharray', `0 ${(start - GAP).toFixed(1)} ${(len + 2 * GAP).toFixed(1)} ${total.toFixed(0)}`);
+      // One dash, the label's length, moved along to it (a leading zero-length dash would draw a
+      // round dot, cutting the corner).
+      gaps[i].setAttribute('stroke-dasharray', `${(len + 2 * GAP).toFixed(1)} ${(2 * total).toFixed(0)}`);
+      gaps[i].setAttribute('stroke-dashoffset', (GAP - start).toFixed(1));
     });
   }
   function tick() {
@@ -214,11 +225,12 @@
 
   // On only while the bend shows (retro). Kept in sync with .no-retro, which the retro command flips.
   const sync = () => {
-    const live = !root.classList.contains('no-retro');
+    const live = !root.classList.contains('no-retro') && !phone.matches;
     if (root.classList.contains('fx-live') !== live) root.classList.toggle('fx-live', live);
     if (!live) hover(null);
   };
   new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['class'] });
+  phone.addEventListener('change', sync);
   sync();
 
   // Bent elements whose clicks and hover are redirected. The intro skips on a click anywhere, and

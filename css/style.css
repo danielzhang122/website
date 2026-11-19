@@ -1044,6 +1044,11 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   body::after { display: none !important; }
 }
 
+/* The screen's outline (js/fisheye.js) shows only with the fisheye, on desktop (below). */
+.crt-frame { display: none; }
+
+/* Desktop only: phones get no fisheye at all (js/fisheye.js leaves fx-live off there too). */
+@media (min-width: 641px) {
 /* Fisheye: the console, command bar and intro bulge like an old curved TV tube, in retro only.
    js/fisheye.js builds each one's filter (--fx-filter) and keeps it lined up with the screen. */
 html.fisheye:not(.no-retro) :is(#console, #shortcuts, #gate) { filter: var(--fx-filter); }
@@ -1070,7 +1075,6 @@ html.fx-live :is(#console, #shortcuts) * { cursor: var(--fx-cursor, auto) !impor
    screen's edges and bent with the picture, black outside it, with a label and clock set into its
    top edge (js/fisheye.js draws it). Over everything on screen, the intro and photo viewer too, and
    under the scanlines and static, which sit on the glass. */
-.crt-frame { display: none; }
 html.fisheye:not(.no-retro) .crt-frame {
   display: block;
   position: fixed;
@@ -1088,10 +1092,13 @@ html.fisheye:not(.no-retro) .crt-frame {
   stroke-width: 1.5px;
   filter: drop-shadow(0 0 2px var(--ink)) drop-shadow(0 0 6px color-mix(in srgb, var(--ink) 45%, transparent));
 }
+.crt-mask-all { fill: #fff; }
 .crt-gap {
   fill: none;
   stroke: #000;
-  stroke-width: calc(1.4 * var(--fs));
+  stroke-width: 18px;
+  stroke-linecap: round;
+  filter: url(#crt-soft);
 }
 .crt-label {
   fill: var(--bright);
@@ -1099,7 +1106,5 @@ html.fisheye:not(.no-retro) .crt-frame {
   dominant-baseline: central;
   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--bright) 60%, transparent));
 }
-/* Phones have no room for the outline: js/fisheye.js leaves --fx-inset at 0 there too. */
-@media (max-width: 640px) {
-  html.fisheye:not(.no-retro) .crt-frame { display: none; }
+
 }
