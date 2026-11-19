@@ -1078,13 +1078,19 @@ html.fx-live :is(#console, #shortcuts) * { cursor: var(--fx-cursor, auto) !impor
 html.fisheye:not(.no-retro) .crt-frame {
   display: block;
   position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  top: 0;
+  left: 0;
+  width: 100vw;    /* the window, scrollbar included: js/fisheye.js draws it in those pixels */
+  height: 100vh;
   z-index: 199;
   pointer-events: none;
   overflow: visible;
 }
+/* Off through the intro, then switching on (see powerOn in js/fisheye.js): the labels wait until
+   the screen is open. */
+html.fisheye:not(.no-retro) .crt-frame.is-off { display: none; }
+.crt-frame .crt-label { transition: opacity .3s; }
+.crt-frame.is-opening .crt-label { opacity: 0; transition: none; }
 .crt-outside { fill: #000; }
 .crt-line {
   fill: none;

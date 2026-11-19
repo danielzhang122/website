@@ -136,6 +136,9 @@
   const frame = document.createElementNS(NS, 'svg');
   frame.setAttribute('class', 'crt-frame');
   frame.setAttribute('aria-hidden', 'true');
+  // Drawn in window pixels (innerWidth x innerHeight, scrollbar included) and sized 100vw x 100vh to
+  // match; preserveAspectRatio="none" so it never letterboxes and leaves an edge uncovered.
+  frame.setAttribute('preserveAspectRatio', 'none');
   // The labels run along the bent top edge (#crt-top), so they curve with it. A mask cuts the line
   // and its glow behind each one: a soft-ended stroke along the same curve, cut to the label's
   // length, so the line fades out around it (a painted black box, or a hard cut through the glow,
@@ -163,17 +166,20 @@
   const LABEL_IN = 44;   // px from each end of the top edge to its label
   const GAP = 3;         // px of broken line either side of a label, plus the soft round ends
   let frameFor = '';
+  let open = 1;   // how far the screen is open, 0..1 (see powerOn)
   function drawFrame() {
     const w = innerWidth, h = innerHeight;
-    if (frameFor === `${w}x${h}`) return;
-    frameFor = `${w}x${h}`;
+    if (frameFor === `${w}x${h}x${open}`) return;
+    frameFor = `${w}x${h}x${open}`;
     const m = inset(w, h);
     root.style.setProperty('--fx-inset', `${m}px`);
     if (!m) return;
     frame.setAttribute('viewBox', `0 0 ${w} ${h}`);
     for (const [k, v] of Object.entries({ x: 0, y: 0, width: w, height: h })) frame.querySelector('.crt-mask-all').setAttribute(k, v);
     const STEPS = 96;   // points per side: enough that the curve reads as smooth
-    const corners = [[m, m], [w - m, m], [w - m, h - m], [m, h - m]];
+    // Opening, the rectangle grows out from a line across the middle.
+    const half = Math.max(0.5, open * (h / 2 - m));
+    const corners = [[m, h / 2 - half], [w - m, h / 2 - half], [w - m, h / 2 + half], [m, h / 2 + half]];
     const pts = [];
     corners.forEach(([ax, ay], i) => {
       const [bx, by] = corners[(i + 1) % 4];
@@ -209,6 +215,46 @@
     setTimeout(tick, (60 - now.getSeconds()) * 1000 + 50);
   }
   addEventListener('resize', drawFrame);
+
+  /* An old TV switching on: the screen opens from a bright line across the middle, out to the
+     outline. It stays off through the intro (the intro is its own screen) and plays as the intro
+     goes, or on load when there's no intro. */
+  function powerOn() {
+    if (!frame.classList.contains('is-off')) return;
+    frame.classList.remove('is-off');
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      open = 1;
+      drawFrame();
+      return;
+    }
+    frame.classList.add('is-opening');
+    const LINE = 90, GROW = 420;   // ms as a line, then ms opening
+    const start = performance.now();
+    const step = (now) => {
+      const t = Math.max(0, now - start - LINE) / GROW;
+      open = t >= 1 ? 1 : 0.004 + 0.996 * (1 - (1 - t) ** 3);   // ease out
+      drawFrame();
+      if (t < 1) requestAnimationFrame(step);
+      else frame.classList.remove('is-opening');
+    };
+    open = 0.004;
+    drawFrame();
+    requestAnimationFrame(step);
+  }
+  frame.classList.add('is-off');
+  const gate = document.getElementById('gate');
+  if (gate?.isConnected && !gate.classList.contains('is-leaving')) {
+    const watch = new MutationObserver(() => {
+      if (!gate.isConnected || gate.classList.contains('is-leaving')) {
+        watch.disconnect();
+        powerOn();
+      }
+    });
+    watch.observe(gate, { attributes: true, attributeFilter: ['class'] });
+    watch.observe(document.body, { childList: true });
+  } else {
+    powerOn();
+  }
   drawFrame();
   tick();
   // The labels take the page font, which may still be loading or change with the font commands.
