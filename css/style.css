@@ -712,12 +712,11 @@ article > * + * { margin-top: var(--gap-s); }
 /* help's command list reads like ls: one line each. */
 .output.list > .row + .row { margin-top: 0; }
 
-/* Every project thumbnail is about the same height, whatever its shape or how many share
-   its project: about 210px on a computer, 135px on a phone. Each figure's --ar (width /
-   height) sets its width, so media keeps its own shape, uncropped, and never runs wider
-   than the column. */
+/* A project's photos and videos: a compact strip, like a contact sheet, every piece the same small
+   height at its own proportions, wrapping only when the column runs out. A click opens one full size
+   (js/lightbox.js). A lone piece (.thumb outside a row) is the same size. */
 .thumb {
-  --thumb-h: calc(210px * var(--scale));
+  --thumb-h: calc(100px * var(--scale));
   width: min(100%, calc(var(--ar) * var(--thumb-h)));
   margin-top: var(--gap) !important;
   cursor: zoom-in;
@@ -732,10 +731,6 @@ article > * + * { margin-top: var(--gap-s); }
   height: auto;
 }
 
-/* A project with several pieces of media shows them side by side. Each figure grows by its
-   --ar, so a line ends up one height and fills the column, but only within a narrow band
-   (180 to 230px; 120 to 150px on a phone): a project with four images doesn't shrink them
-   to fit one line, it wraps instead. */
 .thumb-row {
   display: flex;
   flex-wrap: wrap;
@@ -744,18 +739,12 @@ article > * + * { margin-top: var(--gap-s); }
 }
 
 .thumb-row > .thumb {
-  flex: var(--ar) 1 calc(var(--ar) * 180px);
-  width: auto;
-  max-width: min(100%, calc(var(--ar) * 230px));
+  flex: none;
   margin-top: 0 !important;
 }
 
 @media (max-width: 640px) {
-  .thumb { --thumb-h: calc(135px * var(--scale)); }
-  .thumb-row > .thumb {
-    flex-basis: calc(var(--ar) * 120px * var(--scale));
-    max-width: min(100%, calc(var(--ar) * 150px * var(--scale)));
-  }
+  .thumb { --thumb-h: calc(84px * var(--scale)); }
 }
 
 .thumbs {
