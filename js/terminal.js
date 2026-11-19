@@ -594,10 +594,15 @@
       save('retro', 'on');
       await applyLook(true, fontFor(true));
     }
-    for (const name of names) {
-      save(name, on ? 'on' : null);
-      document.documentElement.classList.toggle(`sh-${name}`, on);
-    }
+    const apply = () => {
+      for (const name of names) {
+        save(name, on ? 'on' : null);
+        document.documentElement.classList.toggle(`sh-${name}`, on);
+      }
+    };
+    // Switching the outline off switches the TV off and back on onto the page without it.
+    if (!on && names.includes('outline') && window.Fisheye?.outlineShown()) await window.Fisheye.powerCycle(apply);
+    else apply();
   }
   async function toggleFeature(name) {
     const on = !featureOn(name);

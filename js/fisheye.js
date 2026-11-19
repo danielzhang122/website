@@ -253,27 +253,52 @@
   /* Switching off, for exit (js/terminal.js) while the outline shows: the reverse, closing to a
      bright line across the middle, which then fades. Resolves once the screen is dark. (It can
      close the whole screen without the outline too, via .is-closing in css/style.css.) */
-  function powerOff() {
-    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve();
-    closing = true;
-    frame.classList.remove('is-off', 'is-opening');
-    frame.classList.add('is-closing');
-    const SHUT = 300, LINE = 140;   // ms closing, then ms the line fades
+  const SHUT = 300, OPEN = 420, LINE = 140;   // ms closing, ms opening, ms the line shows alone
+  // Animates `open` from one value to another over ms, easing toward the end or the start.
+  function animate(from, to, ms, ease) {
     const start = performance.now();
     return new Promise((resolve) => {
       const step = (now) => {
-        const t = Math.min(1, (now - start) / SHUT);
-        open = 0.004 + 0.996 * (1 - t) ** 3;   // ease in, the reverse of opening
+        const t = Math.min(1, (now - start) / ms);
+        open = from + (to - from) * ease(t);
         drawFrame();
-        if (t < 1) return requestAnimationFrame(step);
-        line.style.transition = `opacity ${LINE}ms`;
-        line.style.opacity = '0';
-        setTimeout(resolve, LINE);
+        if (t < 1) requestAnimationFrame(step);
+        else resolve();
       };
       requestAnimationFrame(step);
     });
   }
-  window.Fisheye = { powerOff, outlineShown: () => shows('outline') };
+  const easeIn = (t) => t ** 3, easeOut = (t) => 1 - (1 - t) ** 3;
+  const LINE_OPEN = 0.004;   // open, as a line across the middle
+  async function powerOff() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    closing = true;
+    frame.classList.remove('is-off', 'is-opening');
+    frame.classList.add('is-closing');
+    await animate(1, LINE_OPEN, SHUT, easeIn);
+    line.style.transition = `opacity ${LINE}ms`;
+    line.style.opacity = '0';
+    await new Promise((resolve) => setTimeout(resolve, LINE));
+  }
+  /* Switching superhot's outline off (js/terminal.js): the TV switches off to a line, apply() turns
+     the features off behind it, and it switches back on, the whole screen, onto the plain page. */
+  async function powerCycle(apply) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      apply();
+      return;
+    }
+    closing = true;
+    frame.classList.remove('is-off', 'is-opening');
+    frame.classList.add('is-closing');
+    await animate(1, LINE_OPEN, SHUT, easeIn);
+    apply();
+    await new Promise((resolve) => setTimeout(resolve, LINE));
+    await animate(LINE_OPEN, 1, OPEN, easeOut);
+    closing = false;
+    frame.classList.remove('is-closing');
+    drawFrame();
+  }
+  window.Fisheye = { powerOff, powerCycle, outlineShown: () => shows('outline') };
 
   frame.classList.add('is-off');
   const gate = document.getElementById('gate');
