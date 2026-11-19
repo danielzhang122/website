@@ -34,7 +34,8 @@
       <feFlood flood-color="rgb(128,128,128)" result="flat"/>
       <feImage href="${c.toDataURL()}" preserveAspectRatio="none" result="lens"/>
       <feMerge result="map"><feMergeNode in="flat"/><feMergeNode in="lens"/></feMerge>
-      <feDisplacementMap in="SourceGraphic" in2="map" xChannelSelector="R" yChannelSelector="G"/>
+      <feDisplacementMap in="SourceGraphic" in2="map" xChannelSelector="R" yChannelSelector="G" result="bent"/>
+      <feGaussianBlur in="bent"/>
     </filter>`;
   document.body.appendChild(svg);
   const filter = svg.querySelector('filter');
@@ -48,6 +49,9 @@
     const r = consoleEl.getBoundingClientRect();
     const w = innerWidth, h = innerHeight;
     // feDisplacementMap's scale is the full range of shift: twice the largest shift, in pixels.
+    // feDisplacementMap moves whole device pixels, so bent lines step; a one-device-pixel blur
+    // smooths the steps out (like a CRT's soft phosphor) without visibly blurring the text.
+    svg.querySelector('feGaussianBlur').setAttribute('stdDeviation', (0.9 / devicePixelRatio).toFixed(2));
     svg.querySelector('feDisplacementMap').setAttribute('scale', (K * Math.max(w, h) / 2).toFixed(1));
     for (const [k, v] of Object.entries({ x: -r.left, y: -r.top, width: w, height: h })) lens.setAttribute(k, v);
     for (const [k, v] of Object.entries({ x: -r.left, y: -r.top - h, width: w, height: 3 * h })) filter.setAttribute(k, v);
