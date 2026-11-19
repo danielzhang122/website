@@ -24,15 +24,6 @@
   src: url(../fonts/px437-ibm-vga-8x16.woff) format('woff');
 }
 
-/* SUPERHOT text: Perfect DOS VGA 437 by Zeh Fernando (see fonts/perfect-dos-vga-437-LICENSE.txt), the "Win"
-   variant, whose accents map correctly. Also 9x16, so it shares the vga pixel handling (see html.superhot). */
-@font-face {
-  font-family: 'Perfect DOS VGA 437';
-  font-weight: 400;
-  font-display: swap;
-  src: url(../fonts/perfect-dos-vga-437.woff2) format('woff2');
-}
-
 @font-face {
   font-family: 'Cascadia Mono';
   font-weight: 400;
@@ -132,8 +123,11 @@
   --gutter: 1.5rem;
 }
 
-/* Retro (vintage) mode: SUPERHOT's light blue text, with blue-grey dim text. Modern stays grey. */
-html:not(.no-retro) {
+/* SUPERHOT's look, in retro only: four hidden commands, each one class on <html> (js/terminal.js),
+   and `superhot` switches all four. blue (.sh-blue): light blue text, with blue-grey dim text.
+   glow (.sh-glow): a strong glow (below). fisheye (.sh-fisheye) and outline (.sh-outline): the
+   bend and the screen outline (end of this file). */
+html.sh-blue:not(.no-retro) {
   --ink: #cfe8ff;
   --bright: #cfe8ff;
   --dim: #747d88;
@@ -244,39 +238,7 @@ html.plex {
   --lh: calc(19 / 15);
 }
 
-/* SUPERHOT, the hidden `superhot` command: always set together with .vga, which supplies the pixel
-   grid, and SUPERHOT's font in capitals. Its colours and strong glow are every retro font's now
-   (see :root and "The effect's strength"). */
-html.superhot {
-  --text: 'Perfect DOS VGA 437', var(--px-text);
-  --art: 'Perfect DOS VGA 437', var(--px);
-  --ink: #cfe8ff;
-  --bright: #cfe8ff;
-  --dim: #747d88;
-}
-
-/* The light blue and red text in capitals, as in SUPERHOT. The blue-grey dim text keeps its case, and so
-   does the ASCII art, as capitals would change its shapes. Form controls don't inherit text-transform,
-   so the buttons and the command input opt in themselves. */
-html.superhot body,
-html.superhot :is(input, button) { text-transform: uppercase; }
-html.superhot .dim,
-html.superhot .tags,
-html.superhot .row .key,
-html.superhot #shortcuts button,
-html.superhot .thumbs figcaption,
-html.superhot .gate-hint,
-html.superhot .lightbox-caption,
-html.superhot .lightbox-count,
-html.superhot .chrome-art,
-html.superhot .name-art,
-html.superhot .gate-art { text-transform: none; }
-/* Light text inside the dim blocks. */
-html.superhot .row button.key,
-html.superhot :is(.dim, .tags, .lightbox-caption) :is(a, b, strong) { text-transform: uppercase; }
-
-/* VGA: commands in the dim lines (More: under whoami, the prompt's Lost? hint) in capitals, as in
-   SUPERHOT (which already capitalises every button). */
+/* VGA: commands in the dim lines (More: under whoami, the prompt's Lost? hint) in capitals. */
 html.vga .dim button.cmd { text-transform: uppercase; }
 
 /* The prompt's sliver of space after > would put the command between pixels. */
@@ -293,7 +255,7 @@ html {
   --streak: .03;     /* rolling streak brightness */
   --streak-trail: .015; /* the fainter streak trailing it */
   --fringe: .2;      /* RGB fringe opacity */
-  --glare: .16;      /* horizontal glare strength, near the text (modern's default; retro uses the glow below) */
+  --glare: .16;      /* horizontal glare strength, near the text; the glow command has its own */
   /* In each text's own colour, stronger the redder it is, as red is darker and would barely show. */
   --glare-colour: rgb(from currentColor r g b / calc(var(--glare) + max(0, r - b) / 760));
   --glare-near:
@@ -306,12 +268,12 @@ html {
 }
 html.vga { --glare: .11; }
 
-/* Retro's glow, SUPERHOT's strength in every font: a halo and a horizontal glare in each text's own
-   colour. --glow-colour sets the strength from that colour: brightness, plus how much redder than blue
+/* The glow command's glow (.sh-glow), the site's strongest: a halo and a horizontal glare in each
+   text's own colour. --glow-colour sets the strength from that colour: brightness, plus how much redder than blue
    it is, gives about .38 on light blue, .05 on blue-grey and .5 on red (saturation can't tell them
    apart, as light blue is saturated too). currentColor stays unresolved in a custom property, so each
    text gets its own. CSS can't blur sideways only, so the glare is blurred copies of the text to each side. */
-html:not(.no-retro) {
+html.sh-glow:not(.no-retro) {
   --glow-colour: rgb(from currentColor r g b / calc((2 * max(r, g, b) + max(0, r - b) - 181) / 867));
   --glow-shadow:
     0 0 6px var(--glow-colour),
@@ -666,11 +628,14 @@ button.cmd.fx-hover { color: var(--accent); }
    so 16px (the font's native size, so it stays sharp) on a 13px line gives an 8x13 cell:
    the usual 7.8x13 within 3%, so the art keeps its shape. */
 html.vga .chrome-art { font: 400 calc(16 * var(--pxu))/calc(13 * var(--pxu)) var(--art); }
-/* Superhot's font is 9px wide (0.5625em): a 9x15 cell keeps the art's 0.6:1. */
-html.superhot .chrome-art { line-height: calc(15 * var(--pxu)); }
-
 /* The art repaints every frame, so it skips the far glare; it keeps the RGB fringe like all other text. */
 html:not(.no-retro) .chrome-art {
+  text-shadow:
+    calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
+    var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
+    var(--glare-near);
+}
+html.sh-glow:not(.no-retro) .chrome-art {
   text-shadow:
     calc(-1 * var(--dpx)) 0 rgba(255, 40, 80, var(--fringe)),
     var(--dpx) 0 rgba(40, 200, 255, var(--fringe)),
@@ -1044,26 +1009,29 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
   body::after { display: none !important; }
 }
 
-/* The screen's outline (js/fisheye.js) shows only with the fisheye, on desktop (below). */
-.crt-frame { display: none; }
-
-/* Desktop only: phones get no fisheye at all (js/fisheye.js leaves fx-live off there too). */
+/* Desktop only: phones get no fisheye or outline (js/fisheye.js leaves fx-live off there too). */
 @media (min-width: 641px) {
-/* Fisheye: the console, command bar and intro bulge like an old curved TV tube, in retro only.
-   js/fisheye.js builds each one's filter (--fx-filter) and keeps it lined up with the screen. */
-html.fisheye:not(.no-retro) :is(#console, #shortcuts, #gate) { filter: var(--fx-filter); }
-/* The command bar sits inside the screen's outline (see .crt-frame below), like the prompt line in
-   SUPERHOT's terminals; js/fisheye.js sets --fx-inset, the outline's distance from the edges. */
-html.fisheye:not(.no-retro) #shortcuts {
-  right: var(--fx-inset, 0px);
-  bottom: var(--fx-inset, 0px);
-  left: var(--fx-inset, 0px);
+  /* The fisheye command: the console, command bar and intro bulge like an old curved TV tube, in
+     retro only. js/fisheye.js builds each one's filter (--fx-filter) and keeps it lined up with
+     the screen. */
+  html.fisheye.sh-fisheye:not(.no-retro) :is(#console, #shortcuts, #gate) { filter: var(--fx-filter); }
+  /* The outline command: the command bar sits inside the screen's outline (.crt-frame below), like
+     the prompt line in SUPERHOT's terminals; js/fisheye.js sets --fx-inset, the outline's distance
+     from the edges. The console keeps its column, padded clear of it. */
+  html.fisheye.sh-outline:not(.no-retro) #shortcuts {
+    right: var(--fx-inset, 0px);
+    bottom: var(--fx-inset, 0px);
+    left: var(--fx-inset, 0px);
+  }
+  html.fisheye.sh-outline:not(.no-retro) #console {
+    max-width: calc(var(--column) + 2 * var(--gutter) + 2 * var(--fx-inset, 0px));
+    padding: calc(var(--gap-2) + var(--fx-inset, 0px)) calc(var(--gutter) + var(--fx-inset, 0px)) calc(6rem + var(--fx-inset, 0px));
+  }
+  html.fisheye.sh-outline:not(.no-retro) .crt-frame { display: block; }
+  /* Off through the intro, then switching on (see powerOn in js/fisheye.js). */
+  html.fisheye.sh-outline:not(.no-retro) .crt-frame.is-off { display: none; }
 }
-/* The console keeps its column, padded clear of the outline. */
-html.fisheye:not(.no-retro) #console {
-  max-width: calc(var(--column) + 2 * var(--gutter) + 2 * var(--fx-inset, 0px));
-  padding: calc(var(--gap-2) + var(--fx-inset, 0px)) calc(var(--gutter) + var(--fx-inset, 0px)) calc(6rem + var(--fx-inset, 0px));
-}
+
 /* The browser hit-tests the unbent layout, so while the bend shows, js/fisheye.js sends clicks on to
    what's drawn under the pointer and marks it .fx-hover in place of :hover (each :hover rule above
    skips the bent console and bar: :not(html.fx-live :is(#console, #shortcuts) *)). The cursor
@@ -1071,12 +1039,13 @@ html.fisheye:not(.no-retro) #console {
 html.fx-live :is(#console, #shortcuts),
 html.fx-live :is(#console, #shortcuts) * { cursor: var(--fx-cursor, auto) !important; }
 
-/* The screen's outline, in retro, as in SUPERHOT's terminals: a thin glowing line set in from the
-   screen's edges and bent with the picture, black outside it, with a label and clock set into its
-   top edge (js/fisheye.js draws it). Over everything on screen, the intro and photo viewer too, and
-   under the scanlines and static, which sit on the glass. */
-html.fisheye:not(.no-retro) .crt-frame {
-  display: block;
+/* The screen's outline, as in SUPERHOT's terminals: a thin glowing line set in from the screen's
+   edges and bent with the picture, black outside it, with a label and clock set into its top edge
+   (js/fisheye.js draws it). Over everything on screen, the intro and photo viewer too, and under the
+   scanlines and static, which sit on the glass. Shown by the outline command (above), and by exit
+   on any screen, which switches the TV off with it (.is-closing, see powerOff in js/fisheye.js). */
+.crt-frame {
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -1086,11 +1055,10 @@ html.fisheye:not(.no-retro) .crt-frame {
   pointer-events: none;
   overflow: visible;
 }
-/* Off through the intro, then switching on (see powerOn in js/fisheye.js): the labels wait until
-   the screen is open. */
-html.fisheye:not(.no-retro) .crt-frame.is-off { display: none; }
+.crt-frame.is-closing { display: block !important; }
+/* The labels wait until the screen is open, and go first when it closes. */
 .crt-frame .crt-label { transition: opacity .3s; }
-.crt-frame.is-opening .crt-label { opacity: 0; transition: none; }
+.crt-frame:is(.is-opening, .is-closing) .crt-label { opacity: 0; transition: none; }
 .crt-outside { fill: #000; }
 .crt-line {
   fill: none;
@@ -1111,6 +1079,4 @@ html.fisheye:not(.no-retro) .crt-frame.is-off { display: none; }
   font: 400 var(--fs) var(--text);
   dominant-baseline: central;
   filter: drop-shadow(0 0 3px color-mix(in srgb, var(--bright) 60%, transparent));
-}
-
 }

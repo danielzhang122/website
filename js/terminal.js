@@ -85,12 +85,16 @@
     vga: () => setFont('vga'),
     plex: () => setFont('plex'),
     cascadia: () => setFont('cascadia'),
-    superhot: () => setFont('superhot'),
+    superhot: toggleSuperhot,
+    blue: () => toggleFeature('blue'),
+    glow: () => toggleFeature('glow'),
+    fisheye: () => toggleFeature('fisheye'),
+    outline: () => toggleFeature('outline'),
     default: resetFonts,
   };
   // Not re-run when a refresh restores the session: clear and rm reset it themselves,
   // and the look commands would redo saved settings.
-  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'cascadia', 'superhot', 'default', 'rm', 'sudo'];
+  const UNSAVED = ['clear', 'retro', 'vga', 'plex', 'cascadia', 'superhot', 'blue', 'glow', 'fisheye', 'outline', 'default', 'rm', 'sudo'];
 
   // What Tab suggests on an empty prompt: the fun ones, never rm, sudo, exit, logout or default.
   const TAB_HINTS = ['superhot', 'vga', 'plex', 'mercury', 'klein', 'torus', 'name', 'coffee', 'history'];
@@ -520,10 +524,10 @@
     sweepFrame = requestAnimationFrame(tick);
   }
 
-  // Retro and modern each keep their own page font: vga, plex, superhot or cascadia, set by the hidden
+  // Retro and modern each keep their own page font: vga, plex or cascadia, set by the hidden
   // command of the same name for whichever mode is on, and put back by the hidden default.
   // index.html applies the saved choice before first paint, with the same defaults.
-  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'", superhot: "16px 'Perfect DOS VGA 437'", cascadia: "15px 'Cascadia Mono'" };
+  const FONTS = { vga: "16px 'IBM VGA 9x16'", plex: "15px 'IBM Plex Mono'", cascadia: "15px 'Cascadia Mono'" };
   const DEFAULT_FONT = { retro: 'plex', modern: 'cascadia' };
   const modeName = (retro) => (retro ? 'retro' : 'modern');
 
@@ -546,7 +550,6 @@
   }
   function currentFont() {
     const { classList } = document.documentElement;
-    if (classList.contains('superhot')) return 'superhot';
     return classList.contains('vga') ? 'vga' : classList.contains('plex') ? 'plex' : 'cascadia';
   }
 
@@ -564,9 +567,8 @@
     const root = document.documentElement;
     const apply = () => {
       root.classList.toggle('no-retro', !retro);
-      root.classList.toggle('vga', font === 'vga' || font === 'superhot');
+      root.classList.toggle('vga', font === 'vga');
       root.classList.toggle('plex', font === 'plex');
-      root.classList.toggle('superhot', font === 'superhot');
     };
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) apply();
     else sweep(apply, crtChange, fontChange);
@@ -581,7 +583,35 @@
     return printLine(`retro ${on ? 'on' : 'off'}`, 'dim');
   }
 
-  // Easter eggs: vga, plex, superhot and cascadia set the font for the mode that's on.
+  // Easter eggs: SUPERHOT's look in retro, in any font, one feature per command, each saved and
+  // shown as an sh-<name> class on <html> (css/style.css, js/fisheye.js; index.html applies them
+  // before first paint): blue text, its strong glow, the fisheye bend and the screen outline.
+  // superhot switches all four. Turning one on turns retro on too.
+  const FEATURES = ['blue', 'glow', 'fisheye', 'outline'];
+  const featureOn = (name) => document.documentElement.classList.contains(`sh-${name}`);
+  async function setFeatures(names, on) {
+    if (on && !retroOn()) {
+      save('retro', 'on');
+      await applyLook(true, fontFor(true));
+    }
+    for (const name of names) {
+      save(name, on ? 'on' : null);
+      document.documentElement.classList.toggle(`sh-${name}`, on);
+    }
+  }
+  async function toggleFeature(name) {
+    const on = !featureOn(name);
+    await setFeatures([name], on);
+    return printLine(`${name} ${on ? 'on' : 'off'}`, 'dim');
+  }
+  // All on, or all off if they already are.
+  async function toggleSuperhot() {
+    const on = !FEATURES.every(featureOn);
+    await setFeatures(FEATURES, on);
+    return printLine(`superhot ${on ? 'on' : 'off'}`, 'dim');
+  }
+
+  // Easter eggs: vga, plex and cascadia set the font for the mode that's on.
   async function setFont(font) {
     const retro = retroOn();
     save(`font-${modeName(retro)}`, font);
@@ -589,10 +619,11 @@
     return printLine(`${font} in ${modeName(retro)}`, 'dim');
   }
 
-  // Easter egg: default puts both modes' fonts back.
+  // Easter egg: default puts both modes' fonts back, and turns superhot's features off.
   async function resetFonts() {
     save('font-retro', null);
     save('font-modern', null);
+    await setFeatures(FEATURES, false);
     await applyLook(retroOn(), fontFor(retroOn()));
     return printLine(`default fonts: ${DEFAULT_FONT.retro} in retro, ${DEFAULT_FONT.modern} in modern`, 'dim');
   }
@@ -752,7 +783,7 @@
     await printLine('just kidding.', 'dim');
   }
 
-  // Easter egg: a fresh visit, intro and all, after the screen crumbles away.
+  // Easter egg: a fresh visit, intro and all, after the screen crumbles away (or switches off).
   async function exit() {
     try {
       sessionStorage.removeItem('gate');
@@ -760,7 +791,10 @@
     } catch {
       // storage blocked: the reload starts fresh anyway
     }
-    await crumbleScreen();
+    // With superhot's screen outline up, the screen switches off like an old TV (js/fisheye.js);
+    // otherwise the text crumbles away. Then the page starts over.
+    if (window.Fisheye?.outlineShown()) await window.Fisheye.powerOff();
+    else await crumbleScreen();
     location.reload();
     // Never resolves, so run() can't save the session again before the page goes.
     return new Promise(() => {});

@@ -1,4 +1,5 @@
-// A vintage TV's bulging glass, in retro only: an SVG displacement filter on the console, the command
+// A vintage TV's bulging glass and screen outline, the hidden fisheye and outline commands (part of
+// superhot; in retro, on desktop; see setFeatures in js/terminal.js): an SVG displacement filter on the console, the command
 // bar and the intro (see the end of css/style.css). It magnifies the middle of the screen and bows
 // straight lines outward, leaving the corners put.
 (() => {
@@ -11,6 +12,7 @@
   // Phones get no fisheye at all: css/style.css applies none of it below 641px, and fx-live (the
   // click and hover redirect) stays off there.
   const phone = matchMedia('(max-width: 640px)');
+  const shows = (name) => root.classList.contains(`sh-${name}`) && !root.classList.contains('no-retro') && !phone.matches;
 
   // Where the picture at screen point (cx, cy) comes from: x, y run -1..1 across the screen, and the
   // picture comes from p * (1 - K * (1 - r² / 2)) of the way out, r being the distance from the
@@ -34,6 +36,7 @@
   // Where a point of the unbent page is drawn: the screen point whose picture comes from it,
   // found by stepping back from it by the shift there (it settles within a few steps).
   function drawnAt(lx, ly) {
+    if (!shows('fisheye')) return [lx, ly];   // the outline without the bend is a plain rectangle
     let x = lx, y = ly;
     for (let i = 0; i < 8; i++) [x, y] = ((s) => [lx - s[0], ly - s[1]])(source(x, y).map((v, k) => v - [x, y][k]));
     return [x, y];
@@ -166,14 +169,17 @@
   const LABEL_IN = 44;   // px from each end of the top edge to its label
   const GAP = 3;         // px of broken line either side of a label, plus the soft round ends
   let frameFor = '';
-  let open = 1;   // how far the screen is open, 0..1 (see powerOn)
+  let open = 1;          // how far the screen is open, 0..1 (see powerOn and powerOff)
+  let closing = false;   // exit is switching the TV off (see powerOff)
   function drawFrame() {
     const w = innerWidth, h = innerHeight;
-    if (frameFor === `${w}x${h}x${open}`) return;
-    frameFor = `${w}x${h}x${open}`;
-    const m = inset(w, h);
-    root.style.setProperty('--fx-inset', `${m}px`);
-    if (!m) return;
+    root.style.setProperty('--fx-inset', `${inset(w, h)}px`);
+    // Switching off without the outline, the whole screen closes.
+    const m = closing && !shows('outline') ? 0 : inset(w, h);
+    const key = `${w}x${h}x${open}x${m}x${shows('fisheye')}x${closing}`;
+    if (frameFor === key) return;
+    frameFor = key;
+    if (!m && !closing) return;
     frame.setAttribute('viewBox', `0 0 ${w} ${h}`);
     for (const [k, v] of Object.entries({ x: 0, y: 0, width: w, height: h })) frame.querySelector('.crt-mask-all').setAttribute(k, v);
     const STEPS = 96;   // points per side: enough that the curve reads as smooth
@@ -194,7 +200,7 @@
   }
   // Each label starts LABEL_IN along the top edge (the clock ends LABEL_IN from its far end).
   function fitLabels() {
-    if (!inset(innerWidth, innerHeight)) return;
+    if (!inset(innerWidth, innerHeight) || closing) return;
     let total;
     try { total = top.getTotalLength(); } catch { return; }
     label.setAttribute('startOffset', LABEL_IN);
@@ -241,6 +247,31 @@
     drawFrame();
     requestAnimationFrame(step);
   }
+  /* Switching off, for exit (js/terminal.js) while the outline shows: the reverse, closing to a
+     bright line across the middle, which then fades. Resolves once the screen is dark. (It can
+     close the whole screen without the outline too, via .is-closing in css/style.css.) */
+  function powerOff() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return Promise.resolve();
+    closing = true;
+    frame.classList.remove('is-off', 'is-opening');
+    frame.classList.add('is-closing');
+    const SHUT = 300, LINE = 140;   // ms closing, then ms the line fades
+    const start = performance.now();
+    return new Promise((resolve) => {
+      const step = (now) => {
+        const t = Math.min(1, (now - start) / SHUT);
+        open = 0.004 + 0.996 * (1 - t) ** 3;   // ease in, the reverse of opening
+        drawFrame();
+        if (t < 1) return requestAnimationFrame(step);
+        line.style.transition = `opacity ${LINE}ms`;
+        line.style.opacity = '0';
+        setTimeout(resolve, LINE);
+      };
+      requestAnimationFrame(step);
+    });
+  }
+  window.Fisheye = { powerOff, outlineShown: () => shows('outline') };
+
   frame.classList.add('is-off');
   const gate = document.getElementById('gate');
   if (gate?.isConnected && !gate.classList.contains('is-leaving')) {
@@ -269,11 +300,21 @@
 
   let hovered = [];   // the elements marked .fx-hover (see hover below)
 
-  // On only while the bend shows (retro). Kept in sync with .no-retro, which the retro command flips.
+  // On only while the bend shows. Kept in sync with the fisheye and outline commands and .no-retro,
+  // which the retro command flips.
+  let shown = false;   // the screen outline showing (or due to, after the intro)
   const sync = () => {
-    const live = !root.classList.contains('no-retro') && !phone.matches;
+    const live = shows('fisheye');
     if (root.classList.contains('fx-live') !== live) root.classList.toggle('fx-live', live);
     if (!live) hover(null);
+    drawFrame();   // the outline bends, or not, with the page
+    // Switching the outline (or retro, with it) on switches the TV on again, unless the intro is up.
+    const on = shows('outline');
+    if (on && !shown && !closing && !frame.classList.contains('is-off') && !(gate?.isConnected && !gate.classList.contains('is-leaving'))) {
+      frame.classList.add('is-off');
+      powerOn();
+    }
+    shown = on;
   };
   new MutationObserver(sync).observe(root, { attributes: true, attributeFilter: ['class'] });
   phone.addEventListener('change', sync);

@@ -243,7 +243,6 @@
   // fonts, the line height that keeps the art's cells at their native 16px size.
   function artFont() {
     const c = document.documentElement.classList;
-    if (c.contains('superhot')) return { load: "16px 'Perfect DOS VGA 437'", w: 9 / 16, pixelLine: 17 };
     if (c.contains('vga')) return { load: "16px 'Px437 IBM VGA'", w: 0.5, pixelLine: 15 };
     if (c.contains('plex')) return { load: "14px 'IBM Plex Mono'", w: 0.6 };
     return { load: "14px 'Cascadia Mono'", w: MONO_W };
@@ -267,7 +266,7 @@
     const pxu = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--pxu')) || 1;
     if (f.pixelLine && fit >= 16 * pxu) {
       // A pixel font is only sharp at its own size (--pxu, see index.html): an 8x15 cell in vga,
-      // 9x17 in superhot, both the art's 0.6:1.15 within 2%.
+      // the art's 0.6:1.15 within 2%.
       pre.style.fontSize = `${16 * pxu}px`;
       pre.style.lineHeight = `${f.pixelLine * pxu}px`;
     } else if (f.pixelLine) {

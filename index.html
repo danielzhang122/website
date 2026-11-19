@@ -33,7 +33,7 @@
 
   <!-- Swapped before first paint, so the plain-README fallback never flashes. -->
   <script>document.documentElement.classList.replace('no-js', 'js');</script>
-  <!-- The saved mode (`retro`), its font (`vga`, `plex`, `superhot`, `cascadia`), applied before first paint so they cover the intro too. -->
+  <!-- The saved mode (`retro`), its font (`vga`, `plex`, `cascadia`) and superhot's features (`blue`, `glow`, `fisheye`, `outline`), applied before first paint so they cover the intro too. -->
   <script>
     try {
       const root = document.documentElement;
@@ -41,11 +41,14 @@
       if (!retro) root.classList.add('no-retro');
       // Each mode's font (see setFont in js/terminal.js): plex in retro and cascadia in modern by default.
       const font = localStorage.getItem(retro ? 'font-retro' : 'font-modern') || (retro ? 'plex' : 'cascadia');
+      // A font saved before a command was retired (the old superhot font) falls back to the default.
       if (font === 'vga' || font === 'plex') root.classList.add(font);
-      if (font === 'superhot') root.classList.add('vga', 'superhot');
+      else if (retro && font !== 'cascadia') root.classList.add('plex');
+      // superhot's features (see setFeatures in js/terminal.js).
+      for (const name of ['blue', 'glow', 'fisheye', 'outline']) if (localStorage.getItem(name) === 'on') root.classList.add(`sh-${name}`);
       // Only visitors on a pixel font download them up front.
       if (root.classList.contains('vga')) {
-        for (const file of font === 'superhot' ? ['perfect-dos-vga-437.woff2'] : ['px437-ibm-vga-9x16.woff', 'px437-ibm-vga-8x16.woff']) {
+        for (const file of ['px437-ibm-vga-9x16.woff', 'px437-ibm-vga-8x16.woff']) {
           document.head.append(Object.assign(document.createElement('link'), { rel: 'preload', href: `fonts/${file}`, as: 'font', crossOrigin: '' }));
         }
       }
@@ -84,13 +87,13 @@
   <link rel="preload" href="fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261119-17">
+  <link rel="stylesheet" href="css/style.css?v=20261119-19">
 
   <script src="js/intro-glyphs.js?v=20261031-5" defer></script>
-  <script src="js/intro.js?v=20261107-1" defer></script>
+  <script src="js/intro.js?v=20261119-1" defer></script>
   <script src="js/lightbox.js?v=20261104-1" defer></script>
-  <script src="js/terminal.js?v=20261118-5" defer></script>
-  <script src="js/fisheye.js?v=20261119-22" defer></script>
+  <script src="js/terminal.js?v=20261119-3" defer></script>
+  <script src="js/fisheye.js?v=20261119-25" defer></script>
   <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
   <script type="module" src="js/chrome.js?v=20261116-4"></script>
 </head>
@@ -640,7 +643,11 @@
       <div class="row"><button type="button" class="key cmd" data-run="cascadia">cascadia</button><p><a href="https://github.com/microsoft/cascadia-code" target="_blank" rel="noopener noreferrer">Cascadia Mono</a> by Microsoft. The default in modern.</p></div>
       <div class="row"><button type="button" class="key cmd" data-run="plex">plex</button><p><a href="https://github.com/IBM/plex" target="_blank" rel="noopener noreferrer">IBM Plex Mono</a> by IBM. The default in retro.</p></div>
       <div class="row"><button type="button" class="key cmd" data-run="vga">vga</button><p>IBM VGA 9x16 from VileR's <a href="https://int10h.org/oldschool-pc-fonts/" target="_blank" rel="noopener noreferrer">Ultimate Oldschool PC Font Pack</a>, the IBM PC's text mode.</p></div>
-      <div class="row"><button type="button" class="key cmd" data-run="superhot">superhot</button><p><a href="https://www.dafont.com/perfect-dos-vga-437.font" target="_blank" rel="noopener noreferrer">Perfect DOS VGA 437</a> by Zeh Fernando, in light blue with a strong glow. SUPER. HOT.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="superhot">superhot</button><p>Not a font: all four below at once, in retro. Again to turn them off. SUPER. HOT.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="blue">blue</button><p>Light blue text.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="glow">glow</button><p>A strong glow around the text.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="fisheye">fisheye</button><p>The screen bulges like an old TV's curved glass. Desktop only.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="outline">outline</button><p>A glowing screen outline that switches on like an old TV. Desktop only.</p></div>
       <div class="row"><button type="button" class="key cmd" data-run="default">default</button><p>Back to the defaults.</p></div>
       <p class="dim">Each mode keeps its own font: set one in retro and another in modern.</p>
     </section>
