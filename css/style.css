@@ -1047,9 +1047,18 @@ button.cmd + button.cmd { margin-left: 1.5ch; }
 /* Fisheye: the console, command bar and intro bulge like an old curved TV tube, in retro only.
    js/fisheye.js builds each one's filter (--fx-filter) and keeps it lined up with the screen. */
 html.fisheye:not(.no-retro) :is(#console, #shortcuts, #gate) { filter: var(--fx-filter); }
-/* The bend pushes the middle of the bottom edge a little off screen (js/fisheye.js sets how far as
-   --fx-lift), which would cut the bar's commands in half; lift them by as much. */
-html.fisheye:not(.no-retro) #shortcuts { padding-bottom: calc(.7rem + var(--fx-lift, 0px)); }
+/* The command bar sits inside the screen's outline (see .crt-frame below), like the prompt line in
+   SUPERHOT's terminals; js/fisheye.js sets --fx-inset, the outline's distance from the edges. */
+html.fisheye:not(.no-retro) #shortcuts {
+  right: var(--fx-inset, 0px);
+  bottom: var(--fx-inset, 0px);
+  left: var(--fx-inset, 0px);
+}
+/* The console keeps its column, padded clear of the outline. */
+html.fisheye:not(.no-retro) #console {
+  max-width: calc(var(--column) + 2 * var(--gutter) + 2 * var(--fx-inset, 0px));
+  padding: calc(var(--gap-2) + var(--fx-inset, 0px)) calc(var(--gutter) + var(--fx-inset, 0px)) calc(6rem + var(--fx-inset, 0px));
+}
 /* The browser hit-tests the unbent layout, so while the bend shows, js/fisheye.js sends clicks on to
    what's drawn under the pointer and marks it .fx-hover in place of :hover (each :hover rule above
    skips the bent console and bar: :not(html.fx-live :is(#console, #shortcuts) *)). The cursor
@@ -1057,21 +1066,32 @@ html.fisheye:not(.no-retro) #shortcuts { padding-bottom: calc(.7rem + var(--fx-l
 html.fx-live :is(#console, #shortcuts),
 html.fx-live :is(#console, #shortcuts) * { cursor: var(--fx-cursor, auto) !important; }
 
-/* An old TV's rounded screen, in retro: the picture's corners rounded off into a black bezel, with
-   the glass darkening toward its edge. Over everything on screen (the intro and photo viewer too)
-   and under the scanlines and static, which sit on the glass. */
+/* The screen's outline, in retro, as in SUPERHOT's terminals: a thin glowing line set in from the
+   screen's edges and bent with the picture, black outside it, with a label and clock set into its
+   top edge (js/fisheye.js draws it). Over everything on screen, the intro and photo viewer too, and
+   under the scanlines and static, which sit on the glass. */
 .crt-frame { display: none; }
 html.fisheye:not(.no-retro) .crt-frame {
   display: block;
   position: fixed;
   inset: 0;
+  width: 100%;
+  height: 100%;
   z-index: 199;
   pointer-events: none;
-  border-radius: 7vmin / 8vmin;
-  /* The bezel, a faint rim of light where the glass meets it, then the glass's dark edge. */
-  box-shadow:
-    0 0 0 100vmax #000,
-    inset 0 0 0 1px rgba(207, 232, 255, .07),
-    inset 0 0 2vmin 0.6vmin rgba(0, 0, 0, .85),
-    inset 0 0 9vmin rgba(0, 0, 0, .45);
+  overflow: visible;
+}
+.crt-outside { fill: #000; }
+.crt-line {
+  fill: none;
+  stroke: var(--ink);
+  stroke-width: 1.5px;
+  filter: drop-shadow(0 0 2px var(--ink)) drop-shadow(0 0 6px color-mix(in srgb, var(--ink) 45%, transparent));
+}
+.crt-label rect { fill: #000; }
+.crt-label text {
+  fill: var(--bright);
+  font: 400 var(--fs) var(--text);
+  dominant-baseline: central;
+  filter: drop-shadow(0 0 3px color-mix(in srgb, var(--bright) 60%, transparent));
 }

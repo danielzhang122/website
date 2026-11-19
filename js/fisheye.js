@@ -28,9 +28,13 @@
   // feDisplacementMap shifts by scale * (C / 255 - 0.5), C being the map's channel value. The largest
   // shift is K / 2 of a half-screen (at the middle of an edge), so scale = K * M / 2 fits it exactly.
   const scaleFor = (w, h) => K * Math.max(w, h) / 2;
-  // How far the middle of the bottom edge is pushed off screen: the command bar lifts its commands
-  // by as much (--fx-lift, see the end of css/style.css), or they'd be cut in half.
-  const lift = (w, h) => -shiftAt(0, 1, w, h)[1];
+  // Where a point of the unbent page is drawn: the screen point whose picture comes from it,
+  // found by stepping back from it by the shift there (it settles within a few steps).
+  function drawnAt(lx, ly) {
+    let x = lx, y = ly;
+    for (let i = 0; i < 8; i++) [x, y] = ((s) => [lx - s[0], ly - s[1]])(source(x, y).map((v, k) => v - [x, y][k]));
+    return [x, y];
+  }
   const canvas = document.createElement('canvas');
   canvas.width = canvas.height = N;
   // The map depends on the screen's shape (it's stretched across the screen), so it's redrawn when
@@ -99,7 +103,6 @@
       for (const l of lenses) l.image.setAttribute('href', href);
     }
     const scale = scaleFor(w, h);
-    root.style.setProperty('--fx-lift', `${lift(w, h).toFixed(1)}px`);
     // feDisplacementMap moves whole device pixels, so bent lines step. Two bends, offset by SHIFT
     // device pixels each way, put their steps in different places; averaged, each step becomes two
     // half steps. No blur on top: it softened the text more than it smoothed the steps.
@@ -122,8 +125,73 @@
   place();
   root.classList.add('fisheye');
 
-  // The tube's rounded screen: a frame over everything, styled at the end of css/style.css.
-  document.body.appendChild(Object.assign(document.createElement('div'), { className: 'crt-frame', ariaHidden: 'true' }));
+  /* ---------- the screen's outline ----------
+     As in SUPERHOT's terminals: a thin glowing line around the picture, set in from the screen's
+     edges and bent with it, black outside, a label and a clock set into its top edge. It's drawn
+     as a vector line, so it stays smooth however it bends. The command bar sits inside it (see
+     the end of css/style.css). */
+  const frame = document.createElementNS(NS, 'svg');
+  frame.setAttribute('class', 'crt-frame');
+  frame.setAttribute('aria-hidden', 'true');
+  frame.innerHTML =
+    `<path class="crt-outside" fill-rule="evenodd"/>
+    <path class="crt-line"/>
+    <g class="crt-label"><rect/><text>zhangdz.ca</text></g>
+    <g class="crt-label crt-clock"><rect/><text text-anchor="end"></text></g>`;
+  document.body.appendChild(frame);
+  const [outside, line] = frame.querySelectorAll('path');
+  const [label, clock] = frame.querySelectorAll('.crt-label');
+
+  // The line follows the unbent rectangle INSET px in from the screen's edges, bent like the page.
+  const inset = (w, h) => Math.round(Math.max(14, Math.min(w, h) * 0.06));
+  let frameFor = '';
+  function drawFrame() {
+    const w = innerWidth, h = innerHeight;
+    if (frameFor === `${w}x${h}`) return;
+    frameFor = `${w}x${h}`;
+    const m = inset(w, h);
+    root.style.setProperty('--fx-inset', `${m}px`);
+    frame.setAttribute('viewBox', `0 0 ${w} ${h}`);
+    const STEPS = 96;   // points per side: enough that the curve reads as smooth
+    const corners = [[m, m], [w - m, m], [w - m, h - m], [m, h - m]];
+    const pts = [];
+    corners.forEach(([ax, ay], i) => {
+      const [bx, by] = corners[(i + 1) % 4];
+      for (let k = 0; k < STEPS; k++) pts.push(drawnAt(ax + (bx - ax) * k / STEPS, ay + (by - ay) * k / STEPS));
+    });
+    const d = `M${pts.map(([x, y]) => `${x.toFixed(2)} ${y.toFixed(2)}`).join('L')}Z`;
+    line.setAttribute('d', d);
+    outside.setAttribute('d', `M0 0H${w}V${h}H0Z${d}`);
+    // The labels sit on the top edge, 3 characters in from each end.
+    const ch = 9;
+    placeLabel(label, drawnAt(m + 3 * ch, m));
+    placeLabel(clock, drawnAt(w - m - 3 * ch, m));
+  }
+  function placeLabel(g, [x, y]) {
+    const text = g.querySelector('text');
+    text.setAttribute('x', x.toFixed(1));
+    text.setAttribute('y', y.toFixed(1));
+    fitLabel(g);
+  }
+  // A black box behind each label breaks the line, as in SUPERHOT's title bars.
+  function fitLabel(g) {
+    const text = g.querySelector('text'), rect = g.querySelector('rect');
+    let b;
+    try { b = text.getBBox(); } catch { return; }
+    if (!b.width) return;
+    for (const [k, v] of Object.entries({ x: b.x - 6, y: b.y, width: b.width + 12, height: b.height })) rect.setAttribute(k, v.toFixed(1));
+  }
+  function tick() {
+    const now = new Date();
+    clock.querySelector('text').textContent = `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+    fitLabel(clock);
+    setTimeout(tick, (60 - now.getSeconds()) * 1000 + 50);
+  }
+  addEventListener('resize', drawFrame);
+  drawFrame();
+  tick();
+  // The labels take the page font, which may still be loading.
+  document.fonts?.ready.then(() => { fitLabel(label); fitLabel(clock); });
 
   /* ---------- pointing at the bent picture ----------
      The filter only moves what's drawn: the browser still hit-tests the unbent layout, so a click
