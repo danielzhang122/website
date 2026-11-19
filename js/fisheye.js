@@ -4,7 +4,7 @@
 // straight lines outward, leaving the corners put.
 (() => {
   const K = 0.065;     // bulge strength: the centre is magnified by 1 / (1 - K)
-  const SHIFT = 0.3;   // device px each way for the two averaged bends that halve the steps (see place)
+  const SHIFT = 0.2;   // device px each way for the two averaged bends that soften the steps (see place)
   const N = 512;       // map resolution; the browser smooths it up to screen size
   const root = document.documentElement;
   const consoleEl = document.getElementById('console');
