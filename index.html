@@ -90,7 +90,7 @@
   <link rel="preload" href="fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
   <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
        files for 10 min). Bump it whenever css/ or js/ changes. -->
-  <link rel="stylesheet" href="css/style.css?v=20261119-33">
+  <link rel="stylesheet" href="css/style.css?v=20261122-1">
 
   <script src="js/intro-glyphs.js?v=20261031-5" defer></script>
   <script src="js/intro.js?v=20261119-2" defer></script>
@@ -186,7 +186,7 @@
 
       <article data-id="quadruped">
         <h3>Quadruped Robot &amp; Locomotion Sim</h3>
-        <p class="tldr">12-DOF quadruped · trot gait in MuJoCo · first custom PCB (KiCad)</p>
+        <p class="tldr"><span>12-DOF quadruped ·</span> <span>trot gait in MuJoCo ·</span> <span>first custom PCB (KiCad)</span></p>
         <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place. The hardware mode (servos through a PCA9685 board on a Raspberry Pi) is written and tested against a fake servo board, but waits for the first build. It walks perfectly in simulation, where friction always behaves.</p>
         <p>I also designed my first PCB in KiCad, a carrier board for the Pi: battery protection and monitoring, separate 5 V rails for the servos and the Pi, and an on-board PCA9685 for all 12 servos. It's routed and DRC clean but not ordered yet. Being my first board, it has flaws, like loose placement and overly long traces. The CAD shown is an older revision, so next up is redesigning the electronics holder to fit the board.</p>
         <p class="tags">Python, MuJoCo, Fusion 360, KiCad, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener noreferrer">Repo</a></p>
@@ -221,7 +221,7 @@
 
       <article data-id="pacemaker">
         <h3>Rate-Adaptive Pacemaker Firmware</h3>
-        <p class="tldr">Simulink → C on FRDM-K64F · 4 rate-adaptive pacing modes · accelerometer-driven</p>
+        <p class="tldr"><span>Simulink → C on FRDM-K64F ·</span> <span>4 accelerometer-driven pacing modes</span></p>
         <p>Pacemaker firmware modelled in Simulink and Stateflow for an NXP FRDM-K64F board, with Embedded Coder generating the C that runs on it. The team model paces in AOO, VOO, AAI and VVI modes. My part was the rate-adaptive modes (AOOR, VOOR, AAIR, VVIR): they read the board's FXOS8700 accelerometer and raise the pacing rate with activity, tuned by threshold, reaction and recovery times.</p>
         <p class="tags">Simulink, Stateflow, Embedded Coder, NXP FRDM-K64F <a href="https://github.com/danielzhang122/sfwreng-3k04-pacemaker" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <div class="thumb-row">
@@ -240,7 +240,7 @@
 
       <article data-id="nuclear">
         <h3>Ontario Nuclear Grid Impact Analysis</h3>
-        <p class="tldr">11.8M rows of IESO data · 206 outages found · 74% long vs. short outage prediction</p>
+        <p class="tldr"><span>11.8M rows of IESO data ·</span> <span>206 outages ·</span> <span>74% accurate outage-length model</span></p>
         <p>What happens to Ontario's grid when a reactor goes offline? 11.8 million rows of hourly IESO Data in DuckDB, SQL that finds 206 outages of a day or longer, and an interactive dashboard that shows who picks up the slack. Mostly gas and fewer exports. Outage hours line up with prices about $4/MWh higher and about 145 more tonnes of CO2 an hour. Predicting outages from public data is a coin flip, but one hour in, a model can tell long ones from short ones 74% of the time.</p>
         <p class="tags">SQL (DuckDB), Python, Streamlit, IESO Data <a href="https://nuclear-dashboard.streamlit.app/" target="_blank" rel="noopener noreferrer">Live App</a> <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <div class="thumb-row">
@@ -269,7 +269,7 @@
 
       <article data-id="daniellm">
         <h3>daniellm — Language Model From Scratch</h3>
-        <p class="tldr">98M-parameter GPT from scratch · 4.5B training tokens · cites Wikipedia sources</p>
+        <p class="tldr"><span>98M-parameter GPT ·</span> <span>trained on 4.5B tokens ·</span> <span>cites Wikipedia sources</span></p>
         <p>"Know your enemy and know yourself," said Sun Tzu, so I'm building the enemy myself: a GPT-style language model trained from scratch on my own PC. The first, 34 million parameters, wrote confident nonsense. The second, 98 million, read 4.5 billion tokens of Wikipedia and then educational web pages, and now looks things up before it answers: it searches an offline copy of all 6.5 million Wikipedia articles and cites the passage it used. On my test questions it gets 8 in 13 right, admits it doesn't know on 2, and confidently botches the rest. Next: writing backpropagation by hand.</p>
         <p class="tags">Python, PyTorch, Hugging Face Tokenizers, SQLite, RTX 4070 Ti <a href="https://github.com/danielzhang122/daniel-lm" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <div class="thumb-row">
@@ -298,7 +298,7 @@
 
       <article>
         <h3>Vision-Guided 2-DOF Robotic Arm</h3>
-        <p class="tldr">built in 12 hours · OpenCV hand tracking · ESP32 over UDP</p>
+        <p class="tldr"><span>Built in 12 hours ·</span> <span>OpenCV hand tracking ·</span> <span>ESP32 over UDP</span></p>
         <p>Built in 12 hours, about as long as SolidWorks takes to open. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
         <p class="tags">OpenCV, ESP32, C++, UDP</p>
         <figure class="thumb" style="--ar: 0.56">
@@ -310,7 +310,7 @@
 
       <article>
         <h3>Globe Ghost — iOS GPS Simulator</h3>
-        <p class="tldr">spoofs iPhone GPS · scripted routes · geofence tester</p>
+        <p class="tldr"><span>Simulates iPhone GPS for app testing ·</span> <span>scripted routes ·</span> <span>geofence tester</span></p>
         <p>Simulates an iPhone's reported location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester.</p>
         <p class="tags">Python, pymobiledevice3, OpenStreetMap <a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <figure class="thumb" style="--ar: 1.647">
@@ -322,7 +322,7 @@
 
       <article data-id="resume-sync">
         <h3>Résumé Sync Pipeline</h3>
-        <p class="tldr">weekly automated résumé updates · AI-proposed, human-reviewed · CI checks one-page fit</p>
+        <p class="tldr"><span>Weekly AI-proposed résumé edits ·</span> <span>human-reviewed ·</span> <span>CI enforces one page</span></p>
         <p>Updating my résumé got tedious, so I spent far too long automating it. Every Monday a script checks my repos, an AI agent proposes source-backed edits, and GitHub Actions makes sure it still compiles on one page. I review everything before merging. The repo's public now, so you can watch me reword the same bullet eleven times. It's the most innovative résumé I've built in years.</p>
         <p class="tags">Python, GitHub Actions, LaTeX, Claude Code <a href="https://github.com/danielzhang122/resume-sync" target="_blank" rel="noopener noreferrer">Repo</a></p>
         <figure class="thumb" style="--ar: 2.308">
@@ -334,7 +334,7 @@
 
       <article data-id="wheelsafe">
         <h3>WheelSafe Storage</h3>
-        <p class="tldr">top 3 of 200+ teams · 0.4 kg carbon-fiber build · 3.25:1 load-to-weight</p>
+        <p class="tldr"><span>Top 3 of 200+ teams ·</span> <span>0.4 kg carbon fiber ·</span> <span>3.25:1 load-to-weight</span></p>
         <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the 2024 ENGINEER 1P13 Design Showcase, presented to a panel of P.Eng judges. My contributions focused on concept development and testing, with some prototyping.</p>
         <p class="tags">Concept Development, Testing, Prototyping, Carbon Fiber <a href="https://www.youtube.com/watch?v=3dYv_6PoitU" target="_blank" rel="noopener noreferrer">Demo</a> <a href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:a0181878-fe27-42bb-92b6-26a483603809" target="_blank" rel="noopener noreferrer">Presentation</a></p>
         <figure class="thumb" style="--ar: 0.75">
@@ -346,7 +346,7 @@
 
       <article data-id="suspension">
         <h3>Double Wishbone Suspension (Concept)</h3>
-        <p class="tldr">SolidWorks kinematics · camber vs. wheel travel · Chem-E-Car 2026–27</p>
+        <p class="tldr"><span>SolidWorks kinematics ·</span> <span>camber vs. wheel travel ·</span> <span>Chem-E-Car 2026–27</span></p>
         <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how camber changes as the wheel moves through its travel. Whether any of that keeps a 500 mL payload from sloshing over a 33 m run is a question for the real car.</p>
         <p class="tags">SolidWorks, Kinematics, Vehicle Dynamics</p>
         <figure class="thumb" style="--ar: 1.183">
