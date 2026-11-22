@@ -797,6 +797,10 @@ article > * + * { margin-top: var(--gap-s); }
   color: var(--dim);
 }
 
+/* Certificates show whole, wide enough to read the name, with a short note under each. */
+.thumbs.certs figure { width: calc(240px * var(--scale)); max-width: 100%; }
+.thumbs.certs figure > img { width: 100%; height: auto; object-fit: contain; }
+
 /* Inline command links in a sentence ("More: projects  misc") need a gap. */
 button.cmd + button.cmd { margin-left: 1.5ch; }
 /* The banner's buttons sit inside a sentence; the text between them already spaces them. */
