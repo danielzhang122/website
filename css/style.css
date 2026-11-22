@@ -798,7 +798,7 @@ article > * + * { margin-top: var(--gap-s); }
 }
 
 /* Certificates show whole, wide enough to read the name, with a short note under each. */
-.thumbs.certs figure { width: calc(240px * var(--scale)); max-width: 100%; }
+.thumbs.certs figure { width: calc(320px * var(--scale)); max-width: 100%; }
 .thumbs.certs figure > img { width: 100%; height: auto; object-fit: contain; }
 
 /* Inline command links in a sentence ("More: projects  misc") need a gap. */
