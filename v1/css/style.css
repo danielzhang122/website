@@ -1,0 +1,1127 @@
+/* ==========================================================================
+   Tokens
+   ========================================================================== */
+
+:root {
+  --bg: #08070a;
+  --card: #100d10;
+  --line: #2a1519;
+  --ink: #ece8e8;
+  --mute: #a09aa0;
+  --dim: #6e666c;
+  --red: #e0193f;
+  --hot: #ff3a5c;
+  --blue: #8ad8ff;
+
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --display: 'Chakra Petch', system-ui, sans-serif;
+
+  --content-width: 1080px;
+  --nav-height: 56px;
+  --ease-out: cubic-bezier(.22, .61, .36, 1);
+}
+
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: calc(var(--nav-height) + 16px);
+}
+
+body {
+  position: relative;
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(ellipse 60% 40% at 90% 0, rgba(224, 25, 63, .14), transparent),
+    radial-gradient(ellipse 50% 40% at 0 100%, rgba(120, 10, 40, .2), transparent);
+  color: var(--ink);
+  font: 400 15px/1.7 var(--mono);
+}
+
+a { color: inherit; }
+
+img,
+video {
+  display: block;
+  max-width: 100%;
+}
+
+:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 3px;
+}
+
+::selection {
+  background: var(--blue);
+  color: #000;
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--display);
+  text-transform: uppercase;
+  letter-spacing: .03em;
+  line-height: 1.1;
+}
+
+.wrap {
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+main {
+  position: relative;
+}
+
+@keyframes blink {
+  50% { opacity: .25; }
+}
+
+
+/* ==========================================================================
+   Background layers: scroll bar, particle network, neon sign
+   ========================================================================== */
+
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 60;
+  width: 100%;
+  height: 3px;
+  background: linear-gradient(90deg, var(--red), var(--blue));
+  /* Scaled rather than resized, so scrolling never triggers layout. */
+  transform: scaleX(0);
+  transform-origin: left;
+}
+
+#particles {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* Hanging sign in the left margin. Only shown when there's room for it. */
+#neon-sign {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: none;
+  width: 100%;
+  height: 520px;
+  pointer-events: none;
+}
+
+@media (min-width: 1280px) {
+  #neon-sign { display: block; }
+}
+
+/* Wires are 1px-tall bars that js/neon-sign.js stretches and rotates with
+   transform only, so the swinging never triggers layout. */
+.wire {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 1px;
+  transform-origin: 50% 0;
+}
+
+.wire-glow {
+  width: 7px;
+  margin-left: -3.5px;
+  background: #8ad8ff;
+  opacity: .22;
+}
+
+.wire-core {
+  width: 2px;
+  margin-left: -1px;
+  background: #c6ecff;
+}
+
+.neon-sign-text {
+  position: absolute;
+  top: 230px; /* keep in sync with SIGN_TOP in js/neon-sign.js */
+  padding: .9rem .5rem;
+  border: 2px solid var(--blue);
+  background: rgba(4, 18, 28, .82);
+  box-shadow: 0 0 14px rgba(138, 216, 255, .5), inset 0 0 10px rgba(138, 216, 255, .3);
+  color: #dff4ff;
+  font: 900 1.8rem/1.2 'Noto Sans SC', var(--display);
+  letter-spacing: .22em;
+  text-shadow: 0 0 6px var(--blue), 0 0 16px var(--blue);
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  transform-origin: 50% 0;
+  will-change: transform;
+  animation: flicker 7.5s infinite;
+}
+
+@keyframes flicker {
+  0%, 18%, 22%, 25%, 53%, 57%, 100% { opacity: 1; }
+  20%, 24% { opacity: .2; }
+  55% { opacity: .45; }
+}
+
+
+/* ==========================================================================
+   Navigation
+   ========================================================================== */
+
+nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border-bottom: 1px solid var(--line);
+  /* Near-opaque instead of backdrop-filter: blurring the animated canvas
+     underneath would be recomputed every frame. */
+  background: rgba(8, 7, 10, .95);
+}
+
+nav .wrap {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: var(--nav-height);
+}
+
+.logo {
+  font: 700 1.1rem var(--display);
+  letter-spacing: .08em;
+  text-decoration: none;
+}
+
+.logo b { color: var(--red); }
+
+nav ul {
+  display: flex;
+  gap: 1.4rem;
+  list-style: none;
+}
+
+nav li a {
+  padding: .3rem 0;
+  border-bottom: 1px solid transparent;
+  color: var(--mute);
+  font-size: .74rem;
+  letter-spacing: .08em;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+nav li a:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+
+/* ==========================================================================
+   Buttons, pills, tags
+   ========================================================================== */
+
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7rem;
+}
+
+.btn {
+  padding: .7rem 1.2rem;
+  border: 1px solid var(--line);
+  font: 600 .78rem var(--mono);
+  letter-spacing: .06em;
+  text-decoration: none;
+  text-transform: uppercase;
+  transition: .2s;
+}
+
+.btn:hover {
+  border-color: var(--blue);
+  color: var(--blue);
+}
+
+.btn-primary {
+  border-color: var(--red);
+  background: var(--red);
+  color: #fff;
+}
+
+.btn-primary:hover {
+  background: var(--hot);
+  color: #fff;
+}
+
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .7rem;
+  margin-bottom: 1.5rem;
+}
+
+.pill {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  width: fit-content;
+  padding: .35rem .9rem;
+  border: 1px solid rgba(224, 25, 63, .35);
+  border-radius: 999px;
+  background: rgba(224, 25, 63, .1);
+  color: var(--hot);
+  font-size: .7rem;
+  letter-spacing: .1em;
+  text-decoration: none;
+}
+
+.pill-blue {
+  border-color: rgba(138, 216, 255, .35);
+  background: rgba(138, 216, 255, .08);
+  color: var(--blue);
+}
+
+a.pill-blue:hover { background: rgba(138, 216, 255, .16); }
+
+.tags span,
+.skill-face span {
+  display: inline-block;
+  margin: 0 .3rem .35rem 0;
+  padding: .15rem .5rem;
+  border: 1px solid var(--line);
+  color: var(--mute);
+  font-size: .74rem;
+}
+
+.tags span:hover,
+.skill-face span:hover {
+  border-color: var(--blue);
+  color: #fff;
+}
+
+.tags a {
+  float: right;
+  color: var(--blue);
+  font-size: .72rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+
+/* ==========================================================================
+   Hero
+   ========================================================================== */
+
+.hero {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 3.5rem;
+  align-items: center;
+  padding: 5rem 0 4rem;
+}
+
+.hero h1 {
+  margin-bottom: 1.3rem;
+  background: linear-gradient(#fff, #9a9298);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  font-size: clamp(2.8rem, 8vw, 5.2rem);
+}
+
+.hero h1 span { color: var(--red); }
+
+.lead {
+  max-width: 520px;
+  margin-bottom: 2rem;
+  color: var(--mute);
+}
+
+/* Staggered fade-up, triggered once the intro finishes (body.is-ready). */
+.hero-intro > * { opacity: 0; }
+
+.is-ready .hero-intro > * { animation: fade-up .8s ease-in-out forwards; }
+.is-ready .hero-intro > :nth-child(1) { animation-delay: .5s; }
+.is-ready .hero-intro > :nth-child(2) { animation-delay: .7s; }
+.is-ready .hero-intro > :nth-child(3) { animation-delay: .9s; }
+.is-ready .hero-intro > :nth-child(4) { animation-delay: 1.1s; }
+
+@keyframes fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.terminal {
+  position: relative;
+  z-index: 10;
+  border: 1px solid var(--line);
+  background: rgba(5, 5, 7, .92);
+  box-shadow: 0 0 35px rgba(224, 25, 63, .25);
+  font-size: .8rem;
+  transition: translate .35s var(--ease-out), box-shadow .2s;
+}
+
+/* Dragged via the title bar (js/terminal.js). */
+.terminal.is-dragging {
+  box-shadow: 0 0 50px rgba(224, 25, 63, .45), 0 18px 40px rgba(0, 0, 0, .6);
+  transition: box-shadow .2s;
+}
+
+.terminal header {
+  display: flex;
+  justify-content: space-between;
+  padding: .5rem .8rem;
+  border-bottom: 1px solid var(--line);
+  color: var(--dim);
+  font-size: .7rem;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.terminal.is-dragging header { cursor: grabbing; }
+
+.terminal-hint {
+  opacity: .6;
+  transition: opacity .2s, color .2s;
+}
+
+.terminal header:hover .terminal-hint {
+  color: var(--blue);
+  opacity: 1;
+}
+
+.terminal-body {
+  min-height: 210px;
+  padding: 1rem;
+}
+
+.terminal em {
+  color: var(--hot);
+  font-style: normal;
+}
+
+.terminal b {
+  color: var(--blue);
+  font-weight: 600;
+}
+
+.terminal .cursor {
+  color: var(--hot);
+  animation: blink 1s steps(2) infinite;
+}
+
+
+/* ==========================================================================
+   Sections
+   ========================================================================== */
+
+section {
+  padding: 4.5rem 0 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.section-head { margin-bottom: 2.2rem; }
+
+.section-head small {
+  display: block;
+  margin-bottom: .5rem;
+  color: var(--red);
+  font-size: .72rem;
+  letter-spacing: .14em;
+}
+
+.section-head h2 {
+  margin-bottom: .4rem;
+  font-size: 1.9rem;
+}
+
+.section-head p {
+  color: var(--dim);
+  font-size: .86rem;
+}
+
+/* Fade-in as elements scroll into view (see js/scroll.js). */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity .6s, transform .6s;
+}
+
+.reveal.is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+
+/* ==========================================================================
+   Skills carousel
+   ========================================================================== */
+
+.carousel {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  overflow: hidden;
+  perspective: 1100px;
+  cursor: grab;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.carousel:active { cursor: grabbing; }
+
+.carousel-ring {
+  position: relative;
+  width: 260px;
+  height: 270px;
+  transform-style: preserve-3d;
+}
+
+.skill-face {
+  position: absolute;
+  inset: 0;
+  padding: 1.2rem;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--line);
+  background: var(--card);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .7);
+  transform: rotateY(calc(var(--i) * 90deg)) translateZ(240px);
+  backface-visibility: hidden;
+  transition: border-color .2s, box-shadow .2s;
+}
+
+.skill-face:hover {
+  border-left-color: var(--red);
+  box-shadow: 0 0 22px rgba(224, 25, 63, .35);
+}
+
+.skill-face h3 {
+  margin-bottom: .8rem;
+  color: var(--red);
+  font-size: .85rem;
+}
+
+.skill-face a { color: var(--blue); }
+
+.carousel-hint {
+  color: var(--dim);
+  font-size: .7rem;
+  text-align: center;
+}
+
+.pause-btn {
+  margin-left: .8rem;
+  padding: .2rem .6rem;
+  border: 1px solid var(--line);
+  background: none;
+  color: var(--blue);
+  font: 600 .68rem var(--mono);
+  letter-spacing: .08em;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.pause-btn:hover { border-color: var(--blue); }
+
+
+/* ==========================================================================
+   Project cards
+   ========================================================================== */
+
+.projects {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.card {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  border: 1px solid var(--line);
+  background: var(--card);
+  transition: border-color .2s;
+}
+
+.card:hover { border-color: var(--red); }
+
+.card:nth-child(even) figure { order: 2; }
+
+.card figure {
+  position: relative;
+  height: 320px;
+  overflow: hidden;
+  background: #050405;
+  cursor: zoom-in;
+}
+
+.card figure > :is(img, video) {
+  width: 100%;
+  height: 100%;
+  padding: .5rem;
+  object-fit: contain;
+}
+
+.card figcaption {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  padding: .15rem .5rem;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--blue);
+  font-size: .64rem;
+  font-weight: 800;
+}
+
+.card-body {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 1.2rem;
+  padding: 1.6rem;
+}
+
+.card h3 {
+  margin-bottom: .6rem;
+  font-size: 1.2rem;
+}
+
+.card p {
+  color: var(--mute);
+  font-size: .84rem;
+}
+
+
+/* ==========================================================================
+   Hardware grid and art masonry
+   ========================================================================== */
+
+.bench-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(230px, 1fr));
+  gap: 1rem;
+}
+
+.bench-item {
+  position: relative;
+  overflow: hidden;
+  cursor: zoom-in;
+}
+
+.bench-item > :is(img, video),
+.art-grid > :is(img, video) {
+  width: 100%;
+  border: 1px solid var(--line);
+  cursor: zoom-in;
+}
+
+.bench-item > :is(img, video) {
+  height: 220px;
+  object-fit: cover;
+}
+
+/* Wide shots that must not lose their edges: letterbox in the image's own flat background colour. */
+.bench-item > img.fit-whole {
+  object-fit: contain;
+  background: #2e3440;
+}
+
+.bench-item:hover > :is(img, video),
+.art-grid > :is(img, video):hover {
+  border-color: var(--red);
+}
+
+/* Caption slides up from the bottom on hover/focus. */
+.bench-item figcaption {
+  position: absolute;
+  inset: auto 0 0;
+  padding: .45rem .75rem;
+  border-top: 1px solid var(--line);
+  background: rgba(8, 7, 10, .93);
+  color: var(--mute);
+  font-size: .72rem;
+  pointer-events: none;
+  transform: translateY(100%);
+  transition: transform .2s;
+}
+
+.bench-item:hover figcaption,
+.bench-item:focus-visible figcaption {
+  transform: none;
+}
+
+.art-grid {
+  columns: 3 220px;
+  column-gap: 1rem;
+}
+
+.art-grid > :is(img, video) {
+  position: relative;
+  margin-bottom: 1rem;
+  break-inside: avoid;
+}
+
+
+/* ==========================================================================
+   Experience timeline
+   ========================================================================== */
+
+.timeline {
+  display: grid;
+  gap: 2.2rem;
+  margin-left: .4rem;
+  padding-left: 1.8rem;
+  border-left: 1px solid var(--line);
+}
+
+.timeline article { position: relative; }
+
+.timeline article::before {
+  content: "";
+  position: absolute;
+  top: .5rem;
+  left: calc(-1.8rem - 4px);
+  width: 7px;
+  height: 7px;
+  background: var(--red);
+}
+
+.timeline article:first-child::before {
+  background: var(--blue);
+  box-shadow: 0 0 8px var(--blue);
+}
+
+.timeline time {
+  color: var(--red);
+  font-size: .72rem;
+  font-weight: 600;
+}
+
+.timeline h3 { font-size: 1.1rem; }
+
+.timeline .org {
+  color: var(--mute);
+  font-size: .8rem;
+  text-transform: uppercase;
+}
+
+.timeline p {
+  max-width: 760px;
+  color: var(--dim);
+  font-size: .85rem;
+}
+
+.timeline p a {
+  color: var(--blue);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+
+/* ==========================================================================
+   Certification and resume panels
+   ========================================================================== */
+
+.panel {
+  display: grid;
+  grid-template-columns: 150px 1fr 260px;
+  gap: 1.8rem;
+  align-items: center;
+  margin-bottom: 1.2rem;
+  padding: 1.6rem;
+  border: 1px solid var(--line);
+  background: var(--card);
+}
+
+.panel-resume { grid-template-columns: 1fr 240px; }
+
+.panel > img {
+  width: 100%;
+  border: 1px solid var(--line);
+  cursor: zoom-in;
+}
+
+.panel .meta {
+  margin: .4rem 0 .8rem;
+  color: var(--red);
+  font-size: .72rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.panel p {
+  margin-bottom: 1rem;
+  color: var(--mute);
+  font-size: .85rem;
+}
+
+.panel .btns { margin-top: 1.2rem; }
+
+.badge-link img { border: 0; }
+
+
+/* ==========================================================================
+   Footer
+   ========================================================================== */
+
+footer {
+  position: relative;
+  z-index: 1;
+  margin-top: 5rem;
+  padding: 2.5rem 0;
+  border-top: 1px solid var(--line);
+  color: var(--dim);
+  font-size: .76rem;
+  text-align: center;
+}
+
+footer a {
+  color: var(--hot);
+  font-size: 1rem;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+footer p { margin-top: .8rem; }
+
+
+/* ==========================================================================
+   Lightbox
+   ========================================================================== */
+
+#lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: rgba(5, 4, 6, .96);
+  cursor: zoom-out;
+}
+
+#lightbox.is-open { display: flex; }
+
+#lightbox :is(img, video) {
+  max-width: 92vw;
+  max-height: 80vh;
+  border: 1px solid var(--red);
+}
+
+#lightbox [hidden] { display: none; }
+
+.lightbox-caption {
+  max-width: 800px;
+  color: var(--mute);
+  font-size: .85rem;
+  text-align: center;
+}
+
+.lightbox-caption strong {
+  color: var(--hot);
+  text-transform: uppercase;
+}
+
+.lightbox-count {
+  color: var(--dim);
+  font-size: .7rem;
+  letter-spacing: .1em;
+}
+
+.lightbox-nav {
+  position: absolute;
+  top: 50%;
+  z-index: 1;
+  padding: .4rem 1rem;
+  border: 1px solid var(--line);
+  background: rgba(16, 13, 16, .85);
+  color: var(--ink);
+  font: 2rem/1 var(--mono);
+  cursor: pointer;
+  transform: translateY(-50%);
+  transition: .2s;
+}
+
+.lightbox-nav:hover {
+  border-color: var(--red);
+  color: var(--hot);
+}
+
+.lightbox-prev { left: 1rem; }
+.lightbox-next { right: 1rem; }
+
+
+/* ==========================================================================
+   Hover zoom on images and videos
+   ========================================================================== */
+
+.card figure > :is(img, video),
+.bench-item > :is(img, video),
+.art-grid > :is(img, video),
+.panel > img,
+.badge-link img,
+#lightbox :is(img, video) {
+  /* No will-change here: it would keep ~30 images on their own GPU layers
+     permanently. Browsers promote them on their own while they animate. */
+  transition: transform .5s var(--ease-out), border-color .2s, box-shadow .5s;
+}
+
+@media (hover: hover) {
+  .card figure:hover > :is(img, video),
+  .bench-item:hover > :is(img, video),
+  .bench-item:focus-visible > :is(img, video) {
+    transform: scale(1.07);
+  }
+
+  .art-grid > :is(img, video):hover {
+    z-index: 5;
+    box-shadow: 0 8px 28px rgba(0, 0, 0, .7);
+    transform: scale(1.05);
+  }
+
+  .panel > img:hover { transform: scale(1.06); }
+  .badge-link:hover img,
+  .badge-link:focus-visible img { transform: scale(1.08); }
+  #lightbox :is(img, video):hover { transform: scale(1.02); }
+}
+
+
+/* ==========================================================================
+   Intro gate (js/intro.js)
+   ========================================================================== */
+
+#gate {
+  /* Set from JS to the word's bounding box, so the halo and labels hug it. */
+  --word-top: 40%;
+  --word-height: 0px;
+
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  color: var(--red);
+  cursor: pointer;
+  /* Its size comes from the viewport, so text changes inside never need to
+     re-lay-out the page underneath. */
+  contain: strict;
+}
+
+/* The backdrop and the vignette/scanlines live on pseudo-elements so they can
+   fade out on their own while the canvas keeps animating the exit. */
+#gate::before,
+#gate::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: opacity .55s ease-out;
+  /* On their own layers from the start, so the exit fade doesn't re-raster them. */
+  will-change: opacity;
+}
+
+#gate::before {
+  background-color: #050204;
+  background-image:
+    radial-gradient(ellipse 110% 60% at 50% 115%, #5c0820, transparent 72%),
+    radial-gradient(ellipse 40% 50% at 0 100%, #3a0614, transparent 70%),
+    radial-gradient(ellipse 40% 50% at 100% 100%, #3a0614, transparent 70%);
+  /* Not quite opaque (invisibly so): a fully opaque backdrop lets the browser skip
+     drawing the page underneath, which then all gets drawn on the first frames of
+     the exit and stalls the burst. This way it's drawn while the intro plays. */
+  opacity: .995;
+}
+
+#gate::after {
+  background:
+    radial-gradient(ellipse at 50% 46%, transparent 42%, rgba(0, 0, 0, .8)),
+    repeating-linear-gradient(to bottom, rgba(255, 255, 255, .035) 0 1px, transparent 1px 3px);
+}
+
+#gate canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.gate-halo {
+  position: absolute;
+  top: calc(var(--word-top) - 12vmin);
+  right: 8%;
+  left: 8%;
+  height: calc(var(--word-height) + 24vmin);
+  background: radial-gradient(closest-side, rgba(224, 25, 63, .34), transparent);
+  pointer-events: none;
+  will-change: opacity;
+}
+
+.gate-label {
+  position: absolute;
+  right: 0;
+  left: 0;
+  z-index: 1;
+  font: 800 clamp(12px, 2.2vmin, 22px)/1 var(--mono);
+  letter-spacing: .6em;
+  text-align: center;
+  text-indent: .6em; /* balances the trailing letter-spacing */
+  text-shadow: 0 0 8px var(--red);
+  white-space: pre;
+}
+
+.gate-name {
+  top: calc(var(--word-top) - 4vmin);
+  color: #c6ecff;
+  text-shadow: 0 0 8px var(--blue);
+  transform: translateY(-100%);
+}
+
+/* Live G-code feed under the word, written by js/intro.js as the name is plotted. */
+.gate-log {
+  position: absolute;
+  top: calc(var(--word-top) + var(--word-height) + 3vmin);
+  left: 50%;
+  z-index: 1;
+  width: 38ch;
+  color: var(--dim);
+  font: 600 clamp(10px, 1.45vmin, 14px)/1.7 var(--mono);
+  white-space: pre;
+  transform: translateX(-50%);
+}
+
+.gate-log .status { color: var(--mute); }
+.gate-log .status b { color: var(--hot); font-weight: 800; }
+.gate-log .now { color: var(--blue); }
+
+.gate-log .final {
+  color: var(--hot);
+  text-shadow: 0 0 8px var(--red);
+}
+
+.gate-hint {
+  position: absolute;
+  right: 20px;
+  bottom: 18px;
+  z-index: 1;
+  color: var(--dim);
+  font-size: .65rem;
+  letter-spacing: .24em;
+  text-transform: uppercase;
+  animation: blink 1.4s steps(2) infinite;
+}
+
+/* Exit: everything but the canvas fades; the grains scatter into the
+   background particle network (see release() in js/intro.js). */
+#gate.is-releasing { pointer-events: none; }
+#gate.is-releasing .gate-hint { animation: none; }
+
+#gate.is-releasing::before,
+#gate.is-releasing::after,
+#gate.is-releasing .gate-halo,
+#gate.is-releasing .gate-label,
+#gate.is-releasing .gate-log,
+#gate.is-releasing .gate-hint {
+  opacity: 0;
+}
+
+.gate-halo,
+.gate-label,
+.gate-log,
+.gate-hint {
+  transition: opacity .35s ease-out;
+}
+
+
+/* ==========================================================================
+   Responsive
+   ========================================================================== */
+
+/* Keep in sync with MOBILE_MAX_WIDTH in js/skills-carousel.js */
+@media (max-width: 650px) {
+  .carousel {
+    height: auto;
+    overflow: visible;
+    perspective: none;
+  }
+
+  .carousel-ring {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+    height: auto;
+    transform: none !important;
+  }
+
+  .skill-face {
+    position: static;
+    transform: none;
+  }
+
+  .carousel-hint { display: none; }
+}
+
+@media (max-width: 860px) {
+  nav ul { display: none; }
+
+  .hero,
+  .card,
+  .panel,
+  .panel-resume {
+    grid-template-columns: 1fr;
+  }
+
+  .card:nth-child(even) figure { order: 0; }
+  .card figure { height: 260px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+
+  .hero-intro > * {
+    opacity: 1;
+    animation: none !important;
+  }
+
+  .neon-sign-text { animation: none; }
+
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .card figure > :is(img, video),
+  .bench-item > :is(img, video),
+  .art-grid > :is(img, video),
+  .panel > img,
+  .badge-link img,
+  #lightbox :is(img, video) {
+    transform: none !important;
+    transition: none;
+  }
+}

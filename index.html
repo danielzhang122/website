@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en" class="no-js">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Daniel Zhang</title>
+  <meta name="description" content="Daniel Zhang — Mechatronics Engineering co-op at McMaster. Robotics, CAD, nuclear tooling.">
+  <meta name="theme-color" content="#0b0b0b">
+  <link rel="canonical" href="https://zhangdz.ca/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Daniel Zhang">
+  <meta property="og:description" content="Daniel Zhang — Mechatronics Engineering co-op at McMaster. Robotics, CAD, nuclear tooling.">
+  <meta property="og:url" content="https://zhangdz.ca/">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"Person","name":"Daniel Zhang","url":"https://zhangdz.ca/","sameAs":["https://github.com/danielzhang122","https://www.linkedin.com/in/zhangdz/"]}
+  </script>
+  <link rel="icon" type="image/svg+xml" href="images/favicon.svg">
+  <link rel="icon" type="image/png" sizes="32x32" href="images/favicon-32.png">
+  <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
+
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "name": "Daniel Zhang",
+    "url": "https://zhangdz.ca",
+    "sameAs": [
+      "https://github.com/danielzhang122",
+      "https://www.linkedin.com/in/zhangdz/"
+    ]
+  }
+  </script>
+
+  <!-- Swapped before first paint, so the plain-README fallback never flashes. -->
+  <script>document.documentElement.classList.replace('no-js', 'js');</script>
+  <!-- The saved mode (`retro`), its font (`vga`, `plex`, `cascadia`) and superhot's features (`blue`, `glow`, `fisheye`, `outline`), applied before first paint so they cover the intro too. -->
+  <script>
+    try {
+      const root = document.documentElement;
+      const retro = localStorage.getItem('retro') !== 'off';
+      if (!retro) root.classList.add('no-retro');
+      // Each mode's font (see setFont in js/terminal.js): plex in retro and cascadia in modern by default.
+      const font = localStorage.getItem(retro ? 'font-retro' : 'font-modern') || (retro ? 'plex' : 'cascadia');
+      // A font saved before a command was retired (the old superhot font) falls back to the default.
+      if (font === 'vga' || font === 'plex') root.classList.add(font);
+      else if (retro && font !== 'cascadia') root.classList.add('plex');
+      // superhot's features (see setFeatures in js/terminal.js): blue on unless turned off.
+      for (const name of ['blue', 'glow', 'fisheye', 'outline']) {
+        const value = localStorage.getItem(name);
+        if (value === 'on' || (value === null && name === 'blue')) root.classList.add(`sh-${name}`);
+      }
+      // Only visitors on a pixel font download them up front.
+      if (root.classList.contains('vga')) {
+        for (const file of ['px437-ibm-vga-9x16.woff', 'px437-ibm-vga-8x16.woff']) {
+          document.head.append(Object.assign(document.createElement('link'), { rel: 'preload', href: `fonts/${file}`, as: 'font', crossOrigin: '' }));
+        }
+      }
+    } catch {
+      document.documentElement.classList.add('plex');
+    }
+  </script>
+  <!-- Keeps the retro pixel font on whole screen pixels (see the CRT section of css/style.css):
+       --pxu is one font pixel, a whole number of screen pixels; snapping nudges centred
+       blocks that would otherwise start between two screen pixels. -->
+  <script>
+    (() => {
+      const root = document.documentElement;
+      const SNAP = '#console, #shortcuts button, .gate-art';
+      function snap() {
+        const dpr = devicePixelRatio || 1;
+        root.style.setProperty('--pxu', `${Math.max(1, Math.round(dpr)) / dpr}px`);
+        root.style.setProperty('--dpx', `${1 / dpr}px`);
+        const els = [...document.querySelectorAll(SNAP)];
+        els.forEach((el) => { el.style.translate = ''; });
+        if (!root.classList.contains('vga')) return;
+        for (const el of els) {
+          const off = (el.getBoundingClientRect().left * dpr) % 1;
+          if (off > 0.01 && off < 0.99) el.style.translate = `${-off / dpr}px 0`;
+        }
+      }
+      window.snapPixels = snap;
+      snap();
+      addEventListener('DOMContentLoaded', snap);
+      addEventListener('resize', snap);
+    })();
+  </script>
+
+  <!-- Self-hosted (see @font-face in css/style.css) so no third-party server can block or break the first paint. -->
+  <link rel="preload" href="fonts/cascadia-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="fonts/ibm-plex-mono-400-latin.woff2" as="font" type="font/woff2" crossorigin>
+  <!-- ?v= forces browsers to refetch after an update (GitHub Pages lets them cache
+       files for 10 min). Bump it whenever css/ or js/ changes. -->
+  <link rel="stylesheet" href="css/style.css?v=20261119-33">
+
+  <script src="js/intro-glyphs.js?v=20261031-5" defer></script>
+  <script src="js/intro.js?v=20261119-2" defer></script>
+  <script src="js/lightbox.js?v=20261104-1" defer></script>
+  <script src="js/terminal.js?v=20261119-14" defer></script>
+  <script src="js/fisheye.js?v=20261119-30" defer></script>
+  <!-- Plays a randomly picked ASCII Magic piece (MIT) as page text at the top of the console. -->
+  <script type="module" src="js/chrome.js?v=20261116-4"></script>
+</head>
+<body>
+
+  <!-- Intro screen. js/intro.js animates it and removes it when done. -->
+  <div id="gate" aria-hidden="true">
+    <pre class="gate-art"></pre>
+    <div class="gate-hint"><span class="hint-keys">esc to skip</span><span class="hint-touch">press here to skip</span></div>
+  </div>
+
+  <!-- The console. js/terminal.js prints sections from #content into #screen. -->
+  <main id="console" class="is-booting">
+    <!-- Permanent: stays put through whoami and clear (js/chrome.js plays it). -->
+    <div class="chrome-art" aria-hidden="true"><pre></pre><pre class="chrome-mid"></pre><pre class="chrome-red"></pre></div>
+    <div id="screen" aria-live="polite"></div>
+    <form id="prompt" autocomplete="off">
+      <label for="cmd" class="ps">&gt;</label>
+      <span class="input-wrap">
+        <input id="cmd" type="text" spellcheck="false" autocapitalize="off" autocorrect="off" aria-label="Command" placeholder=" ">
+        <span class="cursor" aria-hidden="true"></span>
+        <!-- Ghost hint: shows while the prompt is empty; its commands still run when clicked. -->
+        <span class="ghost dim">Lost? Try <span class="nowrap"><button type="button" class="cmd" data-run="help">help</button>.</span> <span data-retro-label="on">Hard on the eyes?</span><span data-retro-label="off">Miss the glow?</span> <span class="nowrap"><button type="button" class="cmd" data-run="retro">retro</button>.</span> Too much clutter? <span class="nowrap"><button type="button" class="cmd" data-run="clear">clear</button>.</span></span>
+      </span>
+    </form>
+  </main>
+
+  <nav id="shortcuts" aria-label="Commands">
+    <button type="button" data-run="whoami">whoami</button>
+    <button type="button" data-run="projects">projects</button>
+    <button type="button" data-run="experience">experience</button>
+    <button type="button" data-run="resume">resume</button>
+    <button type="button" data-run="contact">contact</button>
+    <button type="button" data-run="art">art</button>
+    <button type="button" data-run="misc">misc</button>
+    <button type="button" class="util" data-run="help">help</button>
+    <button type="button" class="util" data-run="clear">clear</button>
+  </nav>
+
+  <!--
+    Everything the terminal can print. Each [data-cmd] section is the output of
+    that command. Without JavaScript this whole block shows as a plain README.
+
+    Lightbox convention: any <img>/<video> with data-lightbox opens in the viewer.
+    Its data-title (else alt / aria-label) is the title, data-caption the description,
+    data-repo adds a Repo link after the description, alt the full description for screen readers, and the
+    arrows cycle through the other media inside the same [data-gallery].
+  -->
+  <div id="content">
+
+    <header data-cmd="banner" class="banner">
+      <div>
+        <h1>Daniel Zhang</h1>
+        <p class="dim">Mechatronics Engineering III, McMaster University</p>
+        <p>I build robots, design mechanical parts, and work on nuclear tooling, ranked in ascending order of paperwork.</p>
+      </div>
+    </header>
+
+    <section data-cmd="whoami">
+      <p>Available for a Spring 2027 co-op.</p>
+
+      <p class="dim">Featured:</p>
+      <!-- Each opens `projects` and jumps to that project (js/terminal.js, data-show). -->
+      <div class="thumbs featured">
+        <figure data-show="projects:quadruped" role="link" tabindex="0" aria-label="Quadruped robot: show in projects">
+          <video disablepictureinpicture src="images/quadruped-thumb.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+          <figcaption>Quadruped robot</figcaption>
+        </figure>
+        <figure data-show="projects:pacemaker" role="link" tabindex="0" aria-label="Pacemaker firmware: show in projects">
+          <img src="images/pacemaker-thumb-accel.webp" loading="lazy" alt="">
+          <figcaption>Rate-adaptive pacemaker firmware</figcaption>
+        </figure>
+        <figure data-show="projects:nuclear" role="link" tabindex="0" aria-label="Ontario nuclear grid analysis: show in projects">
+          <img src="images/nuclear-thumb-full.webp" loading="lazy" alt="">
+          <figcaption>Ontario nuclear grid analysis</figcaption>
+        </figure>
+        <figure data-show="projects:wheelsafe" role="link" tabindex="0" aria-label="WheelSafe: show in projects">
+          <img src="images/wheelsafe.webp" loading="lazy" alt="">
+          <figcaption>WheelSafe, top 3 of 200+</figcaption>
+        </figure>
+      </div>
+      <p class="dim">More: <button type="button" class="cmd" data-run="projects">projects</button> <button type="button" class="cmd" data-run="experience">experience</button> <button type="button" class="cmd" data-run="resume">resume</button> <button type="button" class="cmd" data-run="contact">contact</button></p>
+    </section>
+
+    <section data-cmd="projects" data-gallery>
+      <h2>Projects</h2>
+
+      <article data-id="quadruped">
+        <h3>Quadruped Robot &amp; Locomotion Sim</h3>
+        <p class="tldr">12-DOF quadruped · trot gait in MuJoCo · first custom PCB (KiCad)</p>
+        <p>A 12-servo, 3D-printable quadruped designed in Fusion 360, exported to URDF and simulated in MuJoCo. A trot gait controller makes it stand, walk and turn in place. The hardware mode (servos through a PCA9685 board on a Raspberry Pi) is written and tested against a fake servo board, but waits for the first build. It walks perfectly in simulation, where friction always behaves.</p>
+        <p>I also designed my first PCB in KiCad, a carrier board for the Pi: battery protection and monitoring, separate 5 V rails for the servos and the Pi, and an on-board PCA9685 for all 12 servos. It's routed and DRC clean but not ordered yet. Being my first board, it has flaws, like loose placement and overly long traces. The CAD shown is an older revision, so next up is redesigning the electronics holder to fit the board.</p>
+        <p class="tags">Python, MuJoCo, Fusion 360, KiCad, Raspberry Pi <a href="https://github.com/danielzhang122/quadruped-robot" target="_blank" rel="noopener noreferrer">Repo</a></p>
+        <div class="thumb-row">
+          <figure class="thumb" style="--ar: 1.41">
+            <video disablepictureinpicture src="images/quadruped-sim.mp4" width="1066" height="756" muted loop playsinline preload="none" data-lightbox
+                   aria-label="Quadruped Robot &amp; Locomotion Sim"
+                   data-caption="Trot gait running in MuJoCo"></video>
+          </figure>
+          <figure class="thumb" style="--ar: 1.563">
+            <img src="images/quadruped-cad-v2.webp" width="994" height="636" loading="lazy" data-lightbox
+                 alt="Fusion 360 render of the 12-servo quadruped: four three-joint legs around a central body plate carrying a Raspberry Pi and a PCA9685 servo driver board" data-title="Quadruped CAD Assembly"
+                 data-caption="Full 12-DOF quadruped assembly (older revision, before the custom PCB) with the Raspberry Pi and PCA9685 servo driver mounted. Twelve servos, twelve chances for a mate error.">
+          </figure>
+          <figure class="thumb" style="--ar: 1.38">
+            <img src="images/quadruped-leg.webp" width="1045" height="757" loading="lazy" data-lightbox
+                 alt="Fusion 360 render of one quadruped leg: a Tower Pro micro servo in the hip bracket, a two-link linkage and a rounded foot" data-title="Leg Linkage"
+                 data-caption="Kinematic linkage for one leg. There are four, so every problem comes in fours.">
+          </figure>
+          <figure class="thumb" style="--ar: 1.745">
+            <img src="images/quadruped-pcb-schematic.webp" width="2000" height="1146" loading="lazy" data-lightbox
+                 alt="KiCad schematic of the quadruped carrier board in blocks: battery input, battery monitor, power rails, Pi connections, PCA9685 servo driver, servo connectors and a spare I2C port with test points" data-title="Carrier PCB Schematic"
+                 data-caption="Full schematic: battery in, two 5 V rails, the Pi header and the PCA9685 fanning out to twelve servo plugs.">
+          </figure>
+          <figure class="thumb" style="--ar: 1.11">
+            <img src="images/quadruped-pcb-3d.webp" width="1400" height="1261" loading="lazy" data-lightbox
+                 alt="KiCad 3D render of the quadruped carrier PCB: a Pi header down the middle, a PCA9685 servo driver, two bulk capacitors, a blade fuse and four groups of servo headers at the corners" data-title="Carrier PCB (3D)"
+                 data-caption="KiCad 3D render of the carrier board. Battery in at the bottom, Pi on the long header, three servos per corner.">
+          </figure>
+        </div>
+      </article>
+
+      <article data-id="pacemaker">
+        <h3>Rate-Adaptive Pacemaker Firmware</h3>
+        <p class="tldr">Simulink → C on FRDM-K64F · 4 rate-adaptive pacing modes · accelerometer-driven</p>
+        <p>Pacemaker firmware modelled in Simulink and Stateflow for an NXP FRDM-K64F board, with Embedded Coder generating the C that runs on it. The team model paces in AOO, VOO, AAI and VVI modes. My part was the rate-adaptive modes (AOOR, VOOR, AAIR, VVIR): they read the board's FXOS8700 accelerometer and raise the pacing rate with activity, tuned by threshold, reaction and recovery times.</p>
+        <p class="tags">Simulink, Stateflow, Embedded Coder, NXP FRDM-K64F <a href="https://github.com/danielzhang122/sfwreng-3k04-pacemaker" target="_blank" rel="noopener noreferrer">Repo</a></p>
+        <div class="thumb-row">
+          <figure class="thumb" style="--ar: 2.395">
+            <img src="images/pacemaker-rate-adaptive.webp" width="2400" height="1002" loading="lazy" data-lightbox
+                 alt="Simulink diagram of the rate-adaptive pacing subsystem: the FRDM-K64F accelerometer's three axes are squared, summed and square-rooted, a moving standard deviation turns that into an activity level, and two Stateflow charts set and ramp the pacing rate between the lower and upper rate limits" data-title="Rate-adaptive pacing subsystem"
+                 data-caption="My part: accelerometer magnitude, moving standard deviation as the activity level, then a Stateflow chart that sets and ramps the pacing rate">
+          </figure>
+          <figure class="thumb" style="--ar: 1.264">
+            <img src="images/pacemaker-modes.webp" width="1800" height="1424" loading="lazy" data-lightbox
+                 alt="Top-level Stateflow chart: a Start state switches by mode number to eight pacing-mode states, AOO, VOO, AAI, VVI, AOOR, VOOR, AAIR and VVIR" data-title="Pacemaker mode chart"
+                 data-caption="Top-level Stateflow chart switching between the eight pacing modes">
+          </figure>
+        </div>
+      </article>
+
+      <article data-id="nuclear">
+        <h3>Ontario Nuclear Grid Impact Analysis</h3>
+        <p class="tldr">11.8M rows of IESO data · 206 outages found · 74% long vs. short outage prediction</p>
+        <p>What happens to Ontario's grid when a reactor goes offline? 11.8 million rows of hourly IESO Data in DuckDB, SQL that finds 206 outages of a day or longer, and an interactive dashboard that shows who picks up the slack. Mostly gas and fewer exports. Outage hours line up with prices about $4/MWh higher and about 145 more tonnes of CO2 an hour. Predicting outages from public data is a coin flip, but one hour in, a model can tell long ones from short ones 74% of the time.</p>
+        <p class="tags">SQL (DuckDB), Python, Streamlit, IESO Data <a href="https://nuclear-dashboard.streamlit.app/" target="_blank" rel="noopener noreferrer">Live App</a> <a href="https://github.com/danielzhang122/ontario-nuclear-dashboard" target="_blank" rel="noopener noreferrer">Repo</a></p>
+        <div class="thumb-row">
+          <figure class="thumb" style="--ar: 2.225">
+            <img src="images/nuclear-gap.webp" width="1624" height="730" loading="lazy" data-lightbox
+                 alt="Dashboard bar chart: when nuclear runs about 840 MW below its monthly average, natural gas and net imports cover most of it, with hydro, wind and solar, and lower demand making up the rest; added up, they match the missing power" data-title="What replaces the missing nuclear power"
+                 data-caption="When ~840 MW of nuclear goes missing, gas, imports and lower demand fill the gap, and they add up to it">
+          </figure>
+          <figure class="thumb" style="--ar: 1.838">
+            <img src="images/nuclear-seasons.webp" width="1360" height="740" loading="lazy" data-lightbox
+                 alt="Dashboard line chart by month, averaged over 2020 to 2024: nuclear available and Ontario demand, each compared with that year's average, both dip in spring and autumn and peak in winter and summer" data-title="Nuclear is away when Ontario needs it least"
+                 data-caption="Planned outages land in spring and autumn, the same months demand is lowest, which is why prices barely move">
+          </figure>
+          <figure class="thumb" style="--ar: 1.574">
+            <img src="images/nuclear-restart-time.webp" width="1316" height="836" loading="lazy" data-lightbox
+                 alt="Dashboard step chart: share of restarts not yet at steady full power against hours since the reactor came back, for Bruce, Darlington and Pickering, falling from 100% to near zero within about ten days" data-title="How long a restart takes"
+                 data-caption="Half of all restarts reach steady full power within about 33 hours; one in ten takes over 5 days">
+          </figure>
+          <figure class="thumb" style="--ar: 1.778">
+            <img src="images/nuclear-restart.webp" width="1316" height="740" loading="lazy" data-lightbox
+                 alt="Dashboard chart of the typical climb back to full power over the first 72 hours after a restart, with shaded middle-half bands: Bruce and Darlington start near a quarter of full power, Pickering starts near zero" data-title="The climb back to full power"
+                 data-caption="Bruce and Darlington come back at about a quarter of full power; Pickering starts near zero and climbs slower">
+          </figure>
+        </div>
+      </article>
+
+      <article data-id="daniellm">
+        <h3>daniellm — Language Model From Scratch</h3>
+        <p class="tldr">98M-parameter GPT from scratch · 4.5B training tokens · cites Wikipedia sources</p>
+        <p>"Know your enemy and know yourself," said Sun Tzu, so I'm building the enemy myself: a GPT-style language model trained from scratch on my own PC. The first, 34 million parameters, wrote confident nonsense. The second, 98 million, read 4.5 billion tokens of Wikipedia and then educational web pages, and now looks things up before it answers: it searches an offline copy of all 6.5 million Wikipedia articles and cites the passage it used. On my test questions it gets 8 in 13 right, admits it doesn't know on 2, and confidently botches the rest. Next: writing backpropagation by hand.</p>
+        <p class="tags">Python, PyTorch, Hugging Face Tokenizers, SQLite, RTX 4070 Ti <a href="https://github.com/danielzhang122/daniel-lm" target="_blank" rel="noopener noreferrer">Repo</a></p>
+        <div class="thumb-row">
+          <figure class="thumb" style="--ar: 1.242">
+            <img src="images/daniellm-chat.webp" width="1600" height="1288" loading="lazy" data-lightbox
+                 alt="daniellm chat page with the library lookup on: asked 'How tall is Mount Everest?', the 98-million-parameter model answers '8,848.86 m [1]', and the expanded source shows the Mount Everest passage it came from; asked 'Who discovered penicillin?', it answers 'Alexander Fleming [2]'" data-title="Asking it questions"
+                 data-caption="It searches the offline Wikipedia library first, then answers from the passage and cites it">
+          </figure>
+          <figure class="thumb" style="--ar: 1.509">
+            <img src="images/daniellm-training-98m.webp" width="1600" height="1060" loading="lazy" data-lightbox
+                 alt="daniellm training dashboard for the 98-million-parameter run: step 275,000 of 275,000, validation loss 2.486, 68,318 tokens per second, 5,618,708 articles and 4.5 billion training tokens, above a loss chart falling from about 10 to 2.5" data-title="Training dashboard"
+                 data-caption="The 98M run: 275,000 steps over 4.5 billion tokens of Wikipedia, validation loss down to 2.49 (the 34M model stopped at 2.93)">
+          </figure>
+          <figure class="thumb" style="--ar: 1.57">
+            <img src="images/daniellm-generate.webp" width="1600" height="1019" loading="lazy" data-lightbox
+                 alt="daniellm text playground: prompted with 'The Solar System consists of', the 34-million-parameter model continues 'two solar cells, each with a pair of gigantic orbital cells in the outer layer, and a central cell. The central cells are made of silicone'" data-title="The first model"
+                 data-caption="The 34M model on its own: fluent, confident, wrong. The Solar System is apparently made of silicone">
+          </figure>
+          <figure class="thumb" style="--ar: 1.185">
+            <img src="images/daniellm-network.webp" width="1600" height="1350" loading="lazy" data-lightbox
+                 alt="daniellm model explorer: a sample of real learned weights from transformer block 1, drawn as lines from 32 input features to 48 hidden neurons to 32 output features, red for positive and blue for negative" data-title="Inside the network"
+                 data-caption="Real learned weights from one transformer block, sampled: red is positive, blue is negative">
+          </figure>
+        </div>
+      </article>
+
+      <article>
+        <h3>Vision-Guided 2-DOF Robotic Arm</h3>
+        <p class="tldr">built in 12 hours · OpenCV hand tracking · ESP32 over UDP</p>
+        <p>Built in 12 hours, about as long as SolidWorks takes to open. A real-time OpenCV hand-tracking pipeline streams coordinate deltas over UDP to an ESP32, which turns them into smooth stepper motor pulses.</p>
+        <p class="tags">OpenCV, ESP32, C++, UDP</p>
+        <figure class="thumb" style="--ar: 0.56">
+          <video disablepictureinpicture src="images/robotic-arm.mp4" width="400" height="714" muted loop playsinline preload="none" data-lightbox
+                 aria-label="Vision-Guided 2-DOF Robotic Arm"
+                 data-caption="Real-time OpenCV hand tracking over UDP to an ESP32"></video>
+        </figure>
+      </article>
+
+      <article>
+        <h3>Globe Ghost — iOS GPS Simulator</h3>
+        <p class="tldr">spoofs iPhone GPS · scripted routes · geofence tester</p>
+        <p>Simulates an iPhone's reported location, not just its IP address like a VPN does, for testing location-aware apps. Includes a live map, scripted routes and a geofence tester.</p>
+        <p class="tags">Python, pymobiledevice3, OpenStreetMap <a href="https://github.com/danielzhang122/globe-ghost" target="_blank" rel="noopener noreferrer">Repo</a></p>
+        <figure class="thumb" style="--ar: 1.647">
+          <img src="images/spoofer.webp" width="1502" height="912" loading="lazy" data-lightbox
+               alt="Globe Ghost desktop app: connection and location controls, a scenario script walking from Times Square to Central Park, a run log, and an OpenStreetMap view of Manhattan with the simulated iPhone position" data-title="Globe Ghost — iOS GPS Simulator"
+               data-caption="A scripted walk through Manhattan on the live map, logged step by step">
+        </figure>
+      </article>
+
+      <article data-id="resume-sync">
+        <h3>Résumé Sync Pipeline</h3>
+        <p class="tldr">weekly automated résumé updates · AI-proposed, human-reviewed · CI checks one-page fit</p>
+        <p>Updating my résumé got tedious, so I spent far too long automating it. Every Monday a script checks my repos, an AI agent proposes source-backed edits, and GitHub Actions makes sure it still compiles on one page. I review everything before merging. The repo's public now, so you can watch me reword the same bullet eleven times. It's the most innovative résumé I've built in years.</p>
+        <p class="tags">Python, GitHub Actions, LaTeX, Claude Code <a href="https://github.com/danielzhang122/resume-sync" target="_blank" rel="noopener noreferrer">Repo</a></p>
+        <figure class="thumb" style="--ar: 2.308">
+          <img src="images/resume-sync-diagram.svg" width="1200" height="520" class="fit-whole" loading="lazy" data-lightbox
+               alt="Pipeline diagram: a weekly schedule runs check.py, which stops if nothing changed; otherwise an agent reviews the diffs, edits resume.tex on a new branch, a GitHub Action builds the PDF and, if it runs over one page, sends it back to the agent to rewrite and retry; once it passes, a pull request shows each edit with its source commit, I review and merge, and the next run opens a website PR with the new PDF, which I merge. My project work during the week becomes the next Monday's input" data-title="Résumé Sync Pipeline" data-repo="https://github.com/danielzhang122/resume-sync"
+               data-caption="Grey steps run on their own. Red ones are me: nothing reaches the résumé or this site until I merge.">
+        </figure>
+      </article>
+
+      <article data-id="wheelsafe">
+        <h3>WheelSafe Storage</h3>
+        <p class="tldr">top 3 of 200+ teams · 0.4 kg carbon-fiber build · 3.25:1 load-to-weight</p>
+        <p>An ergonomic, weatherproof wheelchair storage module designed for a client with spina bifida. The 0.4 kg carbon-fiber-reinforced structure reached a 3.25:1 load-to-weight ratio. Placed top 3 of 200+ teams at the 2024 ENGINEER 1P13 Design Showcase, presented to a panel of P.Eng judges. My contributions focused on concept development and testing, with some prototyping.</p>
+        <p class="tags">Concept Development, Testing, Prototyping, Carbon Fiber <a href="https://www.youtube.com/watch?v=3dYv_6PoitU" target="_blank" rel="noopener noreferrer">Demo</a> <a href="https://acrobat.adobe.com/id/urn:aaid:sc:VA6C2:a0181878-fe27-42bb-92b6-26a483603809" target="_blank" rel="noopener noreferrer">Presentation</a></p>
+        <figure class="thumb" style="--ar: 0.75">
+          <img src="images/wheelsafe.webp" width="1280" height="1706" loading="lazy" data-lightbox
+               alt="WheelSafe storage module, a black weatherproof fabric bag, next to two McMaster Engineering 3rd-place certificates of achievement" data-title="WheelSafe Storage"
+               data-caption="Carbon-fiber wheelchair storage module, Top 3 at the McMaster Design Showcase">
+        </figure>
+      </article>
+
+      <article data-id="suspension">
+        <h3>Double Wishbone Suspension (Concept)</h3>
+        <p class="tldr">SolidWorks kinematics · camber vs. wheel travel · Chem-E-Car 2026–27</p>
+        <p>Proof-of-concept double wishbone geometry in SolidWorks for McMaster Chem-E-Car's 2026–2027 season. Nothing is built yet: the point was to work out the kinematics and see how camber changes as the wheel moves through its travel. Whether any of that keeps a 500 mL payload from sloshing over a 33 m run is a question for the real car.</p>
+        <p class="tags">SolidWorks, Kinematics, Vehicle Dynamics</p>
+        <figure class="thumb" style="--ar: 1.183">
+          <video disablepictureinpicture src="images/suspension.mp4" width="400" height="338" muted loop playsinline preload="none" data-lightbox
+                 aria-label="Double Wishbone Suspension"
+                 data-caption="CAD study of camber change through the suspension travel. Not built yet."></video>
+        </figure>
+      </article>
+    </section>
+
+    <section data-cmd="media">
+      <h2>Media</h2>
+      <p class="dim">Art, stories and music that have stuck with me. Click any image to learn more.</p>
+
+      <div class="thumbs media-gallery" data-gallery>
+        <figure>
+          <img src="images/media-black-lagoon.webp" loading="lazy" data-lightbox
+               alt="Black Lagoon, volume 1 cover" data-title="Black Lagoon — Rei Hiroe, 2006"
+               data-caption="The way the characters play off each other carries the show's themes.">
+        </figure>
+        <figure>
+          <img src="images/media-raft-of-the-medusa.webp" loading="lazy" data-lightbox
+               alt="Shipwreck survivors on a crowded raft signalling to a distant ship" data-title="The Raft of the Medusa — Théodore Géricault, 1818–1819"
+               data-caption="A real shipwreck, moving from despair to hope, left to right. Géricault isolated himself and studied corpses to paint it.">
+        </figure>
+        <figure>
+          <img src="images/media-world-war-z.webp" loading="lazy" data-lightbox
+               alt="World War Z audiobook cover" data-title="World War Z — Max Brooks, 2006"
+               data-caption="Listened to the audiobook. The voice acting, global perspective and insanely well-thought-out lore make it feel like real history.">
+        </figure>
+        <figure>
+          <img src="images/media-serial-experiments-lain.webp" loading="lazy" data-lightbox
+               alt="Serial Experiments Lain" data-title="Serial Experiments Lain — Ryutaro Nakamura, 1998"
+               data-caption="Crazy how it anticipated the internet and its impact, especially looking back now in the age of AI.">
+        </figure>
+        <figure>
+          <img src="images/media-finally-rich.webp" loading="lazy" data-lightbox
+               alt="Finally Rich" data-title="Finally Rich — Chief Keef, 2012"
+               data-caption="Can you believe he made this at 16?">
+        </figure>
+        <figure>
+          <img src="images/media-trieste-harbour.webp" loading="lazy" data-lightbox
+               alt="View of Trieste Harbour" data-title="View of Trieste Harbour — Egon Schiele, 1907"
+               data-caption="Schiele's style holds up even in his lesser-known work. The rippling reflections and loose lines give this harbour so much character.">
+        </figure>
+        <figure>
+          <img src="images/media-superhot.webp" loading="lazy" data-lightbox
+               alt="SUPERHOT cover showing a red figure breaking apart" data-title="SUPERHOT — SUPERHOT Team, 2016"
+               data-caption="Inspired this site's terminal style. Time only moves when you move. Sort of like John Wick meets The Matrix. SUPER. HOT.">
+        </figure>
+        <figure>
+          <img src="images/media-lightning-thief.webp" loading="lazy" data-lightbox
+               alt="Percy Jackson and the Olympians: The Lightning Thief" data-title="Percy Jackson and the Olympians: The Lightning Thief — Rick Riordan, 2005"
+               data-caption="I read this religiously as a kid. The way it brings mythology into the modern world made every adventure feel close to home.">
+        </figure>
+        <figure>
+          <img src="images/media-cowboy-bebop.webp" loading="lazy" data-lightbox
+               alt="Cowboy Bebop" data-title="Cowboy Bebop — Shinichirō Watanabe, 1998"
+               data-caption="Great music, a crew of lovable misfits, and a surprising amount of melancholy for a show about space bounty hunters.">
+        </figure>
+        <figure>
+          <img src="images/media-schiele-self-portrait.webp" loading="lazy" data-lightbox
+               alt="Self-Portrait with Arm Twisted above Head" data-title="Self-Portrait with Arm Twisted above Head — Egon Schiele, 1910"
+               data-caption="His art makes me feel uncomfortable, like I'm looking at something I shouldn't be. The pose and expression make it hard to look away.">
+        </figure>
+        <figure>
+          <img src="images/media-chainsaw-man.webp" loading="lazy" data-lightbox
+               alt="Chainsaw Man" data-title="Chainsaw Man — Tatsuki Fujimoto, 2018"
+               data-caption="My favourite panel. Fujimoto's vibe is grungy and unsettling, but chaotic and fun too.">
+        </figure>
+        <figure>
+          <img src="images/media-breaking-bad.webp" loading="lazy" data-lightbox
+               alt="Breaking Bad" data-title="Breaking Bad — Vince Gilligan, 2008–2013"
+               data-caption="Your choices have consequences. The show follows each decision as it builds into something bigger.">
+        </figure>
+        <figure>
+          <img src="images/media-klimt-medicine.webp" loading="lazy" data-lightbox
+               alt="Medicine (Hygieia detail)" data-title="Medicine (Hygieia detail) — Gustav Klimt, 1901–1907"
+               data-caption="Schiele's mentor and a founding figure of Art Nouveau. His colours and the intricate patterns throughout this piece are what draw me in.">
+        </figure>
+        <figure>
+          <img src="images/media-no-longer-human.webp" loading="lazy" data-lightbox
+               alt="No Longer Human" data-title="No Longer Human — Osamu Dazai, 1948"
+               data-caption="This one made me really sad, but the writing and its portrayal of feeling out of place stuck with me.">
+        </figure>
+        <figure>
+          <img src="images/media-hellsing-ultimate.webp" loading="lazy" data-lightbox
+               alt="Hellsing Ultimate" data-title="Hellsing Ultimate — Kouta Hirano, 2006–2012"
+               data-caption="Not everything needs to be deep. Sometimes you just need vampires blowing things up and aura farming for ten episodes.">
+        </figure>
+      </div>
+    </section>
+
+    <section data-cmd="misc">
+      <h2>Misc</h2>
+      <p class="dim">Side builds and experiments: cool, but not quite cool enough to be projects. Click any image to enlarge.</p>
+
+      <div class="thumbs" data-gallery>
+        <figure>
+          <video disablepictureinpicture src="images/chemecar-transmission.mp4" muted loop playsinline preload="none" data-lightbox
+                 aria-label="Chem-E-Car Transmission"
+                 data-caption="Transmission work for Chem-E-Car. Even a shoebox-sized car needs gear selection."></video>
+          <figcaption>Chem-E-Car transmission</figcaption>
+        </figure>
+        <figure>
+          <video disablepictureinpicture src="images/hv-discharge.mp4" muted loop playsinline preload="none" data-lightbox
+                 aria-label="HV Discharge Test"
+                 data-caption="High-voltage pulse discharge test. For legal reasons, this is not a taser."></video>
+          <figcaption>HV discharge test</figcaption>
+        </figure>
+        <figure>
+          <video disablepictureinpicture src="images/balancing-robot.mp4" muted loop playsinline preload="none" data-lightbox
+                 aria-label="Self-Balancing Robot (Sort Of)"
+                 data-caption="Not my proudest work. Underpowered batteries meant no small corrections, just lurches, and the CAD was rough even by my standards. Surprisingly, it still somewhat worked. Here to prove my PID knowledge is non-zero."></video>
+          <figcaption>Balancing (?) robot</figcaption>
+        </figure>
+        <figure>
+          <img src="images/accidental-antenna.webp" loading="lazy" data-lightbox
+               alt="Keysight oscilloscope screen showing two noisy, overlapping wave traces in yellow and green, picked up through poorly grounded probes" data-title="Accidental Antenna"
+               data-caption="Accidental RF antenna: when poor probe grounding becomes generative art">
+          <figcaption>Accidental RF antenna</figcaption>
+        </figure>
+        <figure>
+          <img src="images/spoofer-apple-park.webp" loading="lazy" data-lightbox
+               alt="iPhone Find My map placing the phone at Apple Park in Cupertino, California, a location set by Globe Ghost" data-title="Globe Ghost Field Test" data-repo="https://github.com/danielzhang122/globe-ghost"
+               data-caption="Find My placing me at Apple Park. I have never been to California.">
+          <figcaption>Globe Ghost field test</figcaption>
+        </figure>
+        <figure>
+          <img src="images/computer-bootleg.webp" loading="lazy" data-lightbox
+               alt="Open Dell desktop tower with its motherboard, CPU cooler and RAM visible, and a 250 GB WD Blue hard drive in a blue caddy in front" data-title="Rebuilt Dell"
+               data-caption="An old Dell, generously donated by my high school tech teacher and upgraded with spare and e-waste parts. It ran a 24/7 Minecraft server for two months. I have big plans for it: Linux, a homelab, self-hosting everything. For now it lives in my basement, waiting.">
+          <figcaption>Rebuilt Dell server</figcaption>
+        </figure>
+        <figure>
+          <img src="images/newcomputer.webp" loading="lazy" data-lightbox
+               alt="New PC build with an RGB liquid cooler and a Gigabyte GeForce graphics card beside a monitor showing the ASUS UEFI BIOS, which detects an Intel Core i7-13700KF and 32 GB of RAM" data-title="First POST"
+               data-caption="New build, first boot. Everything worked on the first try, which almost never happens.">
+          <figcaption>New build, first boot</figcaption>
+        </figure>
+        <figure>
+          <img src="images/subtitle-sync.webp" loading="lazy" data-lightbox
+               alt="A scene from the open movie Tears of Steel, two people arguing on a canal bridge, with a subtitle line timed to the dialogue" data-title="subtitle-sync" data-repo="https://github.com/danielzhang122/subtitle-sync"
+               data-caption="I got fed up watching Breaking Bad because the subtitles were either wrong or misaligned, so I built a Firefox extension that finds the right ones and syncs them to the audio. Film: Tears of Steel, (CC) Blender Foundation, CC BY 3.0.">
+          <figcaption>subtitle-sync</figcaption>
+        </figure>
+      </div>
+    </section>
+
+    <section data-cmd="experience">
+      <h2>Experience</h2>
+
+      <div class="row">
+        <span class="key">Jan 2026 – present</span>
+        <div>
+          <p><b>Nuclear Engineering Intern</b>, Eclipse Automation</p>
+          <p class="dim">Project engineering for CANDU tooling at Pickering and international stations, including ASD calculations, weldment FEA, seismic analysis, FMEAs and shop-floor testing with toolmakers, technicians and clients. Built a shipping tracker for CNL’s SBWRS project, managing 400+ labels across 70+ trucks.</p>
+        </div>
+      </div>
+      <div class="row">
+        <span class="key">Sep 2026 – present</span>
+        <div>
+          <p><b>Mechanical Sub-team Member, Wheel Assembly</b>, McMaster Chem-E-Car</p>
+          <p class="dim">Designing custom wheel assemblies and suspension geometry for the 2026–2027 car, which carries 500 mL of water over a 33 m run. Also handled some maintenance and last-minute fixes on the previous car ahead of 2026 Nationals.</p>
+        </div>
+      </div>
+      <div class="row">
+        <span class="key">Sep 2023 – present</span>
+        <div>
+          <p><b>B.Eng., Mechatronics Engineering Co-op (Level III)</b>, McMaster University</p>
+          <p class="dim">Mechanical, electrical and software: mechanical design, circuits, controls, embedded systems, programming and applied physics. Expected graduation April 2028, with co-op terms in between.</p>
+        </div>
+      </div>
+    </section>
+
+    <section data-cmd="skills">
+      <h2>Skills</h2>
+
+      <div class="row">
+        <span class="key">Hardware</span>
+        <p>STM32, ESP32, PCA9685 / motor drivers, NI Multisim, soldering, 3D printing</p>
+      </div>
+      <div class="row">
+        <span class="key">CAD &amp; simulation</span>
+        <p>SolidWorks (CSWA), Autodesk Inventor, Fusion 360, FEA, MuJoCo, FlexPDE</p>
+      </div>
+      <div class="row">
+        <span class="key">Software</span>
+        <p>Python (OpenCV), C / C++, SQL (DuckDB), MATLAB / Simulink, Julia, SMath, Maple, Power Automate <a href="https://github.com/danielzhang122/junk-drawer" target="_blank" rel="noopener noreferrer">Misc scripts</a></p>
+      </div>
+      <div class="row">
+        <span class="key">Industry</span>
+        <p>CSA N299.2 / N299.3, FMEA &amp; FAT plans, GD&amp;T, ASD verification, project engineering, technical writing, WHMIS / LOTO</p>
+      </div>
+    </section>
+
+    <section data-cmd="certs">
+      <h2>Certifications</h2>
+
+      <div class="row">
+        <span class="key">Oct 2026</span>
+        <p><b>Certified SOLIDWORKS Associate (CSWA)</b>, Dassault Systèmes <a href="https://www.credly.com/badges/bcc90d7a-0618-4137-8657-ae155791fee6" target="_blank" rel="noopener noreferrer">Verify</a></p>
+      </div>
+      <div class="row">
+        <span class="key">Nov 2026</span>
+        <p><b>Claude Code in Action</b>, Anthropic Academy <a href="https://academy.claude.com/verify/cc8a4bd6e37218505c49c953be80d28a" target="_blank" rel="noopener noreferrer">Verify</a></p>
+      </div>
+    </section>
+
+    <section data-cmd="resume">
+      <h2>Resume</h2>
+      <p>One page, covering nuclear tooling at Eclipse Automation, wheel and suspension design for Chem-E-Car, and projects from an Ontario nuclear grid dashboard to a legged robot and pacemaker firmware.</p>
+      <p class="dim">PDF, one page, updated Nov 2026. <a href="Daniel_Zhang_Resume.pdf" download>Download</a> or <a href="Daniel_Zhang_Resume.pdf" target="_blank" rel="noopener noreferrer">open it in a new tab</a>.</p>
+      <div class="thumbs whole">
+        <img src="images/resume-preview.webp" width="1654" height="2339" class="resume-thumb" loading="lazy" data-lightbox
+             alt="Preview of Daniel Zhang's one-page resume" data-title="Resume" data-caption="One page, updated Nov 2026.">
+      </div>
+
+    </section>
+
+        <section data-cmd="interests">
+      <h2>interests</h2>
+      <p>I'm curious about all things engineering and technology, but I'm just as happy following a rabbit hole into languages, history or science. Away from a screen, I enjoy woodcarving and cooking. Lately, I've also been picking up jump rope, nunchucks and the harmonica.</p>
+      <p class="dim">Click any photo to enlarge.</p>
+
+      <div class="thumbs whole" data-gallery>
+        <img src="images/bucket-hat.webp" width="830" height="1100" loading="lazy" data-lightbox
+             alt="Selfie wearing a light blue crocheted bucket hat" data-title="Crochet Bucket Hat"
+             data-caption="Crocheted bucket hat.">
+        <img src="images/pork-belly.webp" width="1100" height="865" loading="lazy" data-lightbox
+             alt="A plate of Hunan-style stir-fried pork belly with scrambled egg, green peppers, red chilies and fermented black beans" data-title="Hunan Stir-Fry"
+             data-caption="A dish from Hunan, my mom's home province: pork belly, egg, peppers and fermented black beans.">
+        <img src="images/run-route.webp" width="1100" height="869" loading="lazy" data-lightbox
+             alt="Map of a walking route traced in orange around the west end of Hamilton Harbour, with one straight line shooting north across the water" data-title="10-10-10"
+             data-caption="10 miles, 10 hot dogs, 10 beers, on foot around Hamilton Harbour. I finished (barely); my phone didn't. The straight line across the water is where it died.">
+        <img src="images/hamilton-sunset.webp" width="1100" height="818" loading="lazy" data-lightbox
+             alt="Pink and orange clouds over a quiet residential street in Hamilton at dusk, with power lines across the sky" data-title="Hamilton Sunset"
+             data-caption="Sunset in Hamilton, June.">
+        <img src="images/ninja-belt.webp" width="1100" height="818" loading="lazy" data-lightbox
+             alt="Club Penguin screenshot of the black ninja belt, with Sensei saying: But remember that even a ninja master must seek more training" data-title="Black Belt"
+             data-caption="Club Penguin black belt, earned at 3:54 AM.">
+        <img src="images/balaclava.webp" width="825" height="1100" loading="lazy" data-lightbox
+             alt="Selfie in a black fleece balaclava, a hood and a red winter parka" data-title="Snowboarding"
+             data-caption="I snowboard occasionally, I just don't have any videos. Here's a selfie of me in the mask, though.">
+        <img src="images/night-walk.webp" width="917" height="1100" loading="lazy" data-lightbox
+             alt="Night walk seen from above: a hand holding a reflective leash, lit up by the camera flash, that stretches across the grass to a dog in a reflective harness" data-title="Night Walk"
+             data-caption="Night walk with the dog.">
+        <img src="images/sushi-burrito.webp" width="1100" height="831" loading="lazy" data-lightbox
+             alt="A foil-wrapped sushi burrito cut in half on a wooden board in afternoon sun, showing rice, salmon, crab and avocado" data-title="Sushi Burrito"
+             data-caption="Sushi burrito: salmon, crab and avocado. Better lighting than any photo of me.">
+        <img src="images/keef-lain.webp" width="1100" height="1094" loading="lazy" data-lightbox
+             alt="Edit of rapper Chief Keef in a Lead Never Follow Leaders shirt standing in a hallway next to Lain Iwakura from Serial Experiments Lain" data-title="Favourite Media"
+             data-caption="Chief Keef and Lain: my two favourite pieces of media in one frame. Present day, present time.">
+      </div>
+
+    </section>
+
+    <section data-cmd="art">
+      <h2>Art</h2>
+      <p class="dim">Painting, drawing, printmaking and carving. Click any piece to enlarge.</p>
+
+      <div class="thumbs whole" data-gallery>
+        <img src="images/self-portrait-3.webp" width="1122" height="1454" loading="lazy" data-lightbox
+             alt="Acrylic self-portrait on a green background: half the face is exposed skull with a staring eye, and the neck shows spine and muscle above an orange hoodie" data-title="Half Dead Portrait"
+             data-caption="Acrylic self-portrait. About how fixing CAD constraints at 2 AM feels.">
+        <img src="images/skull.webp" width="938" height="693" loading="lazy" data-lightbox
+             alt="Painting of a skull and upper body with red facial and neck muscles partly peeled away and the tongue out, against a torn black-and-white background" data-title="Flayed Skull"
+             data-caption="Anatomical study of facial musculature, and a good excuse to use up the red paint.">
+        <img src="images/sketch-2.webp" width="1078" height="1333" loading="lazy" data-lightbox
+             alt="Charcoal and white chalk drawing of a figure seen from behind, arms raised overhead and drapery at the hips, on a purple background" data-title="Toned Back Study"
+             data-caption="Charcoal on paper. I still find black dust from this on my desk.">
+        <img src="images/painting.webp" width="1094" height="861" loading="lazy" data-lightbox
+             alt="Painting of two people sitting cross-legged on a dark floor in front of red curtains, their faces covered by pink poppies, with candles and bowls of fruit before them" data-title="Floral Heads"
+             data-caption="Painting faces requires perfect symmetry. Painting flowers over them does not.">
+        <img src="images/self-portrait-1.webp" width="924" height="768" loading="lazy" data-lightbox
+             alt="Oil self-portrait with a calm expression in front of a burning house" data-title="Everything Is Fine"
+             data-caption="Self-portrait with zero underlying metaphors.">
+        <img src="images/lake-reflection.webp" width="800" height="613" loading="lazy" data-lightbox
+             alt="Flat-colour digital landscape of pine trees and a boardwalk reflected in still lake water" data-title="Lake Reflection"
+             data-caption="Digital landscape that won a local contest and was printed on a municipal utility box.">
+        <img src="images/utility-box-install.webp" width="600" height="800" loading="lazy" data-lightbox
+             alt="The lake reflection artwork printed on a roadside utility box, photographed at night" data-title="Utility Box Install"
+             data-caption="In the wild, 2022. Technically a public infrastructure install.">
+        <img src="images/skull2.webp" width="1016" height="768" loading="lazy" data-lightbox
+             alt="Black-and-white linocut print of a skull, signed and numbered 1/1" data-title="Block Print Skull"
+             data-caption="Linocut print. The hard part was not carving my thumb.">
+        <img src="images/sketch.webp" width="930" height="1010" loading="lazy" data-lightbox
+             alt="Pencil drawing of a seated figure seen from behind, with a long braid and both arms raised holding a frame overhead" data-title="Live Figure Drawing"
+             data-caption="A 10-minute live pose, carefully avoiding the hands.">
+        <img src="images/digital-teeth.webp" width="469" height="294" loading="lazy" data-lightbox
+             alt="Digital painting of a close-up of teeth and gums, with loose purple sketch lines around the edges" data-title="Dental Study"
+             data-caption="Digital study of teeth. A reminder to floss.">
+        <img src="images/chameleon.webp" width="1620" height="890" loading="lazy" data-lightbox
+             alt="Hand-carved wooden chameleon on a grey surface" data-title="Wood Lizard"
+             data-caption="Carved from a single block of wood. The chisel slipped once; it cost me 11 stitches.">
+      </div>
+    </section>
+
+    <section data-cmd="fonts">
+      <h2>Fonts</h2>
+      <div class="row"><button type="button" class="key cmd" data-run="cascadia">cascadia</button><p><a href="https://github.com/microsoft/cascadia-code" target="_blank" rel="noopener noreferrer">Cascadia Mono</a> by Microsoft. The default in modern.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="plex">plex</button><p><a href="https://github.com/IBM/plex" target="_blank" rel="noopener noreferrer">IBM Plex Mono</a> by IBM. The default in retro.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="vga">vga</button><p>IBM VGA 9x16 from VileR's <a href="https://int10h.org/oldschool-pc-fonts/" target="_blank" rel="noopener noreferrer">Ultimate Oldschool PC Font Pack</a>, the IBM PC's text mode.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="superhot">superhot</button><p>Not a font: all four below at once, in retro. Again to turn them off. SUPER. HOT.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="blue">blue</button><p>Light blue text. On by default.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="glow">glow</button><p>A strong glow around the text.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="fisheye">fisheye</button><p>The screen bulges like an old TV's curved glass. Desktop only.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="outline">outline</button><p>A glowing screen outline that switches on like an old TV. Desktop only.</p></div>
+      <div class="row"><button type="button" class="key cmd" data-run="default">default</button><p>Back to the defaults.</p></div>
+      <p class="dim">Each mode keeps its own font: set one in retro and another in modern.</p>
+    </section>
+
+    <section data-cmd="contact">
+      <h2>Contact</h2>
+      <div class="row"><span class="key">Email</span><p><a href="mailto:zhand40@mcmaster.ca">zhand40@mcmaster.ca</a></p></div>
+      <div class="row"><span class="key">GitHub</span><p><a href="https://github.com/danielzhang122" target="_blank" rel="noopener noreferrer">github.com/danielzhang122</a></p></div>
+      <div class="row"><span class="key">LinkedIn</span><p><a href="https://www.linkedin.com/in/zhangdz/" target="_blank" rel="noopener noreferrer">linkedin.com/in/zhangdz</a></p></div>
+      <p class="dim">© 2026 Daniel Zhang.</p>
+    </section>
+
+  </div>
+
+  <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image viewer">
+    <button class="lightbox-nav lightbox-prev" type="button" aria-label="Previous image">‹</button>
+    <img alt="">
+    <video disablepictureinpicture muted loop playsinline hidden></video>
+    <p class="lightbox-caption"></p>
+    <span class="lightbox-count"></span>
+    <button class="lightbox-nav lightbox-next" type="button" aria-label="Next image">›</button>
+  </div>
+
+</body>
+</html>
