@@ -683,8 +683,10 @@ html.sh-glow:not(.no-retro) .chrome-art {
 article > * + * { margin-top: var(--gap-s); }
 
 .tags { color: var(--dim); }
-/* One-line skim of each project, under its title. */
+/* One-line skim of each project, under its title. Each item stays whole, so a narrow
+   screen wraps between items (after a ·) rather than mid-phrase. */
 .tldr { color: var(--accent); }
+.tldr > span { white-space: nowrap; }
 .tags a { margin-left: 1ch; }
 
 /* key / value lines: experience dates, skill groups, help */
