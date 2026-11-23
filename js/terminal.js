@@ -604,6 +604,8 @@
       await applyLook(true, fontFor(true));
     }
     const apply = () => {
+      // blue fades over (css/style.css) rather than switching at once.
+      if (names.includes('blue') && featureOn('blue') !== on) fadeColours();
       for (const name of names) {
         save(name, on ? 'on' : 'off');
         document.documentElement.classList.toggle(`sh-${name}`, on);
@@ -612,6 +614,14 @@
     // Switching the outline off switches the TV off and back on onto the page without it.
     if (!on && names.includes('outline') && window.Fisheye?.outlineShown()) await window.Fisheye.powerCycle(apply);
     else apply();
+  }
+  let fadeTimer;
+  function fadeColours() {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const root = document.documentElement;
+    root.classList.add('sh-fade');
+    clearTimeout(fadeTimer);
+    fadeTimer = setTimeout(() => root.classList.remove('sh-fade'), 1600);
   }
   async function toggleFeature(name) {
     const on = !featureOn(name);

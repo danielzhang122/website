@@ -137,6 +137,13 @@ html.sh-blue:not(.no-retro) {
   --bright: #cfe8ff;
   --dim: #747d88;
 }
+/* Switching blue on or off (by blue or superhot) fades the text colours over instead of jumping:
+   js/terminal.js adds .sh-fade for the length of the fade. Registered as colours so they can animate;
+   children inherit the in-between value each frame. */
+@property --ink { syntax: '<color>'; inherits: true; initial-value: #b8b8b8; }
+@property --bright { syntax: '<color>'; inherits: true; initial-value: #d2d2d2; }
+@property --dim { syntax: '<color>'; inherits: true; initial-value: #747474; }
+html.sh-fade { transition: --ink 1.5s ease, --bright 1.5s ease, --dim 1.5s ease; }
 
 
 /* ==========================================================================
