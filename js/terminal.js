@@ -1050,8 +1050,12 @@
 
   /* ---------- input ---------- */
 
+  // The letter under the cursor is redrawn inside it, in the background colour, so it stays readable.
+  const ghost = form.querySelector('.ghost');
   function updateCursor() {
-    cursor.style.left = `${input.selectionStart ?? input.value.length}ch`;
+    const pos = input.selectionStart ?? input.value.length;
+    cursor.style.left = `${pos}ch`;
+    cursor.textContent = input.value ? (input.value[pos] ?? '') : (ghost?.textContent.trim()[0] ?? '');
   }
 
   form.addEventListener('submit', (e) => {

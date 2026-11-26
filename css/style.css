@@ -521,13 +521,14 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
   caret-color: transparent;
 }
 
-/* The block cursor; js/terminal.js moves it to the caret position. */
+/* The block cursor; js/terminal.js moves it to the caret position and copies in the letter under it. */
 .cursor {
   position: absolute;
-  top: .2em;
+  top: 0;
+  bottom: 0;
   left: 0;
   width: 1ch;
-  height: 1.2em;
+  color: var(--bg);
   background: var(--accent);
   opacity: .85;
   animation: blink 1.1s steps(1) infinite;
@@ -555,10 +556,18 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
 #cmd::placeholder { color: transparent; }
 
 #prompt:not(:focus-within) .cursor {
+  color: transparent;
   background: transparent;
   outline: 1px solid var(--accent);
   outline-offset: -1px;
   animation: none;
+}
+
+/* VGA's 24px lines hold a 16px cell: shrink the cursor to the cell, like the real text-mode cursor. */
+html.vga .cursor {
+  top: calc(4 * var(--pxu));
+  bottom: calc(4 * var(--pxu));
+  line-height: calc(16 * var(--pxu));
 }
 
 @keyframes blink {
