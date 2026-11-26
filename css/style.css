@@ -532,6 +532,7 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
   opacity: .85;
   animation: blink 1.1s steps(1) infinite;
   pointer-events: none;
+  z-index: 1;
 }
 
 /* Ghost hint after the cursor; gone once anything is typed. Only its commands take clicks,
@@ -540,7 +541,7 @@ html.vga .name-art { font: 400 calc(16 * var(--pxu))/calc(15 * var(--pxu)) var(-
   position: absolute;
   top: 0;
   left: 0;
-  max-width: calc(100% - 1ch);
+  right: 0;
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
